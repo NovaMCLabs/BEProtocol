@@ -1,5 +1,8 @@
 @PACKAGE_INIT@
 
+include(CMakeFindDependencyMacro)
+find_dependency(OpenSSL REQUIRED)
+
 include("${CMAKE_CURRENT_LIST_DIR}/ProtocolTargets.cmake")
 
 check_required_components(Protocol)

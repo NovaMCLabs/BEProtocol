@@ -28,7 +28,7 @@ using Result = std::expected<T, ErrorInfo>;
 namespace error_utils {
 
 [[nodiscard]] constexpr std::unexpected<ErrorInfo>
-makeError(std::string_view error, std::source_location location) noexcept {
+makeError(std::string_view error, std::source_location location = std::source_location::current()) noexcept {
     return std::unexpected(ErrorInfo(error, location));
 }
 
