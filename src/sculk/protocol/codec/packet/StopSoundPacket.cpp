@@ -1,0 +1,28 @@
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+// distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// SPDX-License-Identifier: MPL-2.0
+
+#include "sculk/protocol/codec/packet/StopSoundPacket.hpp"
+
+namespace sculk::protocol::inline abi_v944 {
+
+MinecraftPacketIds StopSoundPacket::getId() const noexcept { return MinecraftPacketIds::StopSound; }
+
+std::string_view StopSoundPacket::getName() const noexcept { return "StopSoundPacket"; }
+
+void StopSoundPacket::write(BinaryStream& stream) const {
+    stream.writeString(mSoundName);
+    stream.writeBool(mStopAllSounds);
+    stream.writeBool(mStopLegacyMusic);
+}
+
+Result<> StopSoundPacket::read(ReadOnlyBinaryStream& stream) {
+    if (auto status = stream.readString(mSoundName); !status) return status;
+    if (auto status = stream.readBool(mStopAllSounds); !status) return status;
+    return stream.readBool(mStopLegacyMusic);
+}
+
+} // namespace sculk::protocol::inline abi_v944

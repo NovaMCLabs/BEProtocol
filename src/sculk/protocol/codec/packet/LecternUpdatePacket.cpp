@@ -1,0 +1,28 @@
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+// distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// SPDX-License-Identifier: MPL-2.0
+
+#include "sculk/protocol/codec/packet/LecternUpdatePacket.hpp"
+
+namespace sculk::protocol::inline abi_v944 {
+
+MinecraftPacketIds LecternUpdatePacket::getId() const noexcept { return MinecraftPacketIds::LecternUpdate; }
+
+std::string_view LecternUpdatePacket::getName() const noexcept { return "LecternUpdatePacket"; }
+
+void LecternUpdatePacket::write(BinaryStream& stream) const {
+    stream.writeByte(mNewPageToShow);
+    stream.writeByte(mTotalPages);
+    mPosition.write(stream);
+}
+
+Result<> LecternUpdatePacket::read(ReadOnlyBinaryStream& stream) {
+    if (auto status = stream.readByte(mNewPageToShow); !status) return status;
+    if (auto status = stream.readByte(mTotalPages); !status) return status;
+    return mPosition.read(stream);
+}
+
+} // namespace sculk::protocol::inline abi_v944

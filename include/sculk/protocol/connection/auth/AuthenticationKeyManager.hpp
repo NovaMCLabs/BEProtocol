@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "sculk/protocol/codec/utility/deps/Result.hpp"
 #include "sculk/protocol/connection/encryption/JsonWebToken.hpp"
-#include "sculk/protocol/utility/deps/Result.hpp"
 #include <unordered_map>
 
 namespace sculk::protocol::inline abi_v944 {

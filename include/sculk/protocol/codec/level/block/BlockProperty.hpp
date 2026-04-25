@@ -1,0 +1,25 @@
+﻿// Copyright © 2026 SculkCatalystMC. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+// distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// SPDX-License-Identifier: MPL-2.0
+
+#pragma once
+#include "sculk/protocol/codec/nbt/TagType.hpp"
+#include "sculk/protocol/codec/nbt/TagVariant.hpp"
+#include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
+#include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
+
+namespace sculk::protocol::inline abi_v944 {
+
+struct BlockProperty {
+    std::string mName{};
+    CompoundTag mNbt{};
+
+    void write(BinaryStream& stream) const;
+
+    [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+};
+
+} // namespace sculk::protocol::inline abi_v944

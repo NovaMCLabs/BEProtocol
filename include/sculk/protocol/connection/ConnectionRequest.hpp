@@ -7,9 +7,9 @@
 
 #pragma once
 #include "AuthenticationType.hpp"
-#include "sculk/protocol/utility/deps/BinaryStream.hpp"
-#include "sculk/protocol/utility/deps/ReadOnlyBinaryStream.hpp"
-#include "sculk/protocol/utility/deps/Result.hpp"
+#include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
+#include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/codec/utility/deps/Result.hpp"
 
 namespace sculk::protocol::inline abi_v944 {
 

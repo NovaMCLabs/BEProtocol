@@ -1,0 +1,45 @@
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+// distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// SPDX-License-Identifier: MPL-2.0
+
+#include "sculk/protocol/codec/packet/PlayerArmorDamagePacket.hpp"
+
+namespace sculk::protocol::inline abi_v944 {
+
+MinecraftPacketIds PlayerArmorDamagePacket::getId() const noexcept { return MinecraftPacketIds::PlayerArmorDamage; }
+
+std::string_view PlayerArmorDamagePacket::getName() const noexcept { return "PlayerArmorDamagePacket"; }
+
+void PlayerArmorDamagePacket::write(BinaryStream& stream) const {
+    stream.writeUnsignedVarInt(static_cast<uint32_t>(mSlotsBitset.count()));
+    for (int index = 0; index < ArmorSlotCount; index++) {
+        if (mSlotsBitset.test(index)) {
+            stream.writeByte(static_cast<uint8_t>(index << 1));
+            stream.writeSignedShort(mDamage[index]);
+        }
+    }
+}
+
+Result<> PlayerArmorDamagePacket::read(ReadOnlyBinaryStream& stream) {
+    std::uint32_t count{};
+    if (auto status = stream.readUnsignedVarInt(count); !status) return status;
+    mSlotsBitset.reset();
+    mDamage.fill(0);
+    for (std::uint32_t i = 0; i < count; ++i) {
+        std::uint8_t encodedIndex{};
+        std::int16_t damage{};
+        if (auto status = stream.readByte(encodedIndex); !status) return status;
+        if (auto status = stream.readSignedShort(damage); !status) return status;
+        const std::size_t index = encodedIndex >> 1;
+        if (index < ArmorSlotCount) {
+            mSlotsBitset.set(index, true);
+            mDamage[index] = damage;
+        }
+    }
+    return {};
+}
+
+} // namespace sculk::protocol::inline abi_v944

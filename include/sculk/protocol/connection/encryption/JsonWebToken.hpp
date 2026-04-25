@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/utility/deps/Result.hpp"
+#include "sculk/protocol/codec/utility/deps/Result.hpp"
 #include <cstdint>
 #include <optional>
 #include <string>

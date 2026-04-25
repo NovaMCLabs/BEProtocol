@@ -1,0 +1,24 @@
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+// distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// SPDX-License-Identifier: MPL-2.0
+
+#include "sculk/protocol/codec/packet/ClientboundAttributeLayerSyncPacket.hpp"
+
+namespace sculk::protocol::inline abi_v944 {
+
+MinecraftPacketIds ClientboundAttributeLayerSyncPacket::getId() const noexcept {
+    return MinecraftPacketIds::ClientboundAttributeLayerSync;
+}
+
+std::string_view ClientboundAttributeLayerSyncPacket::getName() const noexcept {
+    return "ClientboundAttributeLayerSyncPacket";
+}
+
+void ClientboundAttributeLayerSyncPacket::write(BinaryStream& stream) const { mData.write(stream); }
+
+Result<> ClientboundAttributeLayerSyncPacket::read(ReadOnlyBinaryStream& stream) { return mData.read(stream); }
+
+} // namespace sculk::protocol::inline abi_v944

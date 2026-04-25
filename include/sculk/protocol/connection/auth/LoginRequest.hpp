@@ -9,11 +9,11 @@
 #include "ClientProperties.hpp"
 #include "LegacyCertificateChain.hpp"
 #include "LoginToken.hpp"
+#include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
+#include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/codec/utility/deps/Result.hpp"
 #include "sculk/protocol/connection/AuthenticationType.hpp"
 #include "sculk/protocol/connection/ConnectionRequest.hpp"
-#include "sculk/protocol/utility/deps/BinaryStream.hpp"
-#include "sculk/protocol/utility/deps/ReadOnlyBinaryStream.hpp"
-#include "sculk/protocol/utility/deps/Result.hpp"
 
 namespace sculk::protocol::inline abi_v944 {
 

@@ -1,0 +1,32 @@
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+// distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// SPDX-License-Identifier: MPL-2.0
+
+#include "sculk/protocol/codec/packet/MobEquipmentPacket.hpp"
+
+namespace sculk::protocol::inline abi_v944 {
+
+MinecraftPacketIds MobEquipmentPacket::getId() const noexcept { return MinecraftPacketIds::MobEquipment; }
+
+std::string_view MobEquipmentPacket::getName() const noexcept { return "MobEquipmentPacket"; }
+
+void MobEquipmentPacket::write(BinaryStream& stream) const {
+    stream.writeUnsignedVarInt64(mRuntimeId);
+    mItem.write(stream);
+    stream.writeByte(mSlotByte);
+    stream.writeByte(mSelectedSlotByte);
+    stream.writeByte(mContainerIdByte);
+}
+
+Result<> MobEquipmentPacket::read(ReadOnlyBinaryStream& stream) {
+    if (auto status = stream.readUnsignedVarInt64(mRuntimeId); !status) return status;
+    if (auto status = mItem.read(stream); !status) return status;
+    if (auto status = stream.readByte(mSlotByte); !status) return status;
+    if (auto status = stream.readByte(mSelectedSlotByte); !status) return status;
+    return stream.readByte(mContainerIdByte);
+}
+
+} // namespace sculk::protocol::inline abi_v944
