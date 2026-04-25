@@ -50,17 +50,17 @@ void EvpCipherCtxDeleter::operator()(evp_cipher_ctx_st* ctx) const noexcept { EV
 CryptoManager::CryptoManager(std::vector<std::byte> keyBytes) { setKeyBytes(std::move(keyBytes)); }
 
 bool CryptoManager::isEnabled() const {
-    std::lock_guard lock(mMutex);
+    std::scoped_lock lock(mMutex);
     return mEnabled;
 }
 
 void CryptoManager::setEnabled(bool enabled) {
-    std::lock_guard lock(mMutex);
+    std::scoped_lock lock(mMutex);
     mEnabled = enabled;
 }
 
 void CryptoManager::setKeyBytes(std::vector<std::byte> keyBytes) {
-    std::lock_guard lock(mMutex);
+    std::scoped_lock lock(mMutex);
 
     mKeyBytes       = std::move(keyBytes);
     mEncryptCounter = 0;
@@ -146,7 +146,7 @@ std::vector<std::byte> CryptoManager::ctrCrypt(EvpCipherCtxPtr& ctx, const std::
 }
 
 std::vector<std::byte> CryptoManager::encrypt(const std::vector<std::byte>& bytes) {
-    std::lock_guard lock(mMutex);
+    std::scoped_lock lock(mMutex);
 
     if (!mEnabled || bytes.empty()) {
         return bytes;
@@ -166,7 +166,7 @@ std::vector<std::byte> CryptoManager::encrypt(const std::vector<std::byte>& byte
 }
 
 std::vector<std::byte> CryptoManager::decrypt(const std::vector<std::byte>& bytes) {
-    std::lock_guard lock(mMutex);
+    std::scoped_lock lock(mMutex);
 
     if (!mEnabled || bytes.empty()) {
         return bytes;
@@ -189,7 +189,7 @@ std::vector<std::byte> CryptoManager::decrypt(const std::vector<std::byte>& byte
 }
 
 bool CryptoManager::verify(const std::vector<std::byte>& bytes) {
-    std::lock_guard lock(mMutex);
+    std::scoped_lock lock(mMutex);
 
     return verifyUnlocked(bytes);
 }
