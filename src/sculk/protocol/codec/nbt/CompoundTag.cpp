@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CompoundTag::serialize(BinaryStream& stream) const {
     for (const auto& [key, value] : mValue) {
@@ -24,15 +24,15 @@ void CompoundTag::serialize(BinaryStream& stream) const {
 Result<> CompoundTag::deserialize(ReadOnlyBinaryStream& stream) {
     while (true) {
         TagType tagType{};
-        if (auto status = stream.readEnum(tagType, &ReadOnlyBinaryStream::readByte); !status) return status;
+        _SCULK_READ(stream.readEnum(tagType, &ReadOnlyBinaryStream::readByte));
         if (tagType == TagType::End) {
             break;
         }
         std::string key{};
-        if (auto status = stream.readString(key); !status) return status;
+        _SCULK_READ(stream.readString(key));
         TagVariant value{};
         value.emplace(tagType);
-        if (auto status = value.deserialize(stream); !status) return status;
+        _SCULK_READ(value.deserialize(stream));
         mValue.emplace(std::move(key), std::move(value));
     }
     return {};
@@ -46,12 +46,12 @@ void CompoundTag::write(BinaryStream& stream) const {
 
 [[nodiscard]] Result<> CompoundTag::read(ReadOnlyBinaryStream& stream) {
     TagType rootType{};
-    if (auto status = stream.readEnum(rootType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(rootType, &ReadOnlyBinaryStream::readByte));
     if (rootType != TagType::Compound) {
         return error_utils::makeError("CompoundTag::read invalid root tag type");
     }
-    if (auto status = stream.ignoreBytes(1); !status) return status; // Ignore root name (empty string)
+    _SCULK_READ(stream.ignoreBytes(1)); // Ignore root name (empty string)
     return deserialize(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MapCreateLockedCopyPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MapCreateLockedCopyPacket::getId() const noexcept { return MinecraftPacketIds::MapCreateLockedCopy; }
 
@@ -19,8 +19,8 @@ void MapCreateLockedCopyPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MapCreateLockedCopyPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mOriginMapId); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mOriginMapId));
     return stream.readVarInt64(mNewMapId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

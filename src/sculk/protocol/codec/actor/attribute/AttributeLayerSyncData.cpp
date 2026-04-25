@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/AttributeLayerSyncData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void AttributeLayerSyncData::write(BinaryStream& stream) const {
     stream.writeVariantIndex<std::uint32_t>(mData, &BinaryStream::writeUnsignedVarInt);
@@ -16,9 +16,8 @@ void AttributeLayerSyncData::write(BinaryStream& stream) const {
 }
 
 Result<> AttributeLayerSyncData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt); !status)
-        return status;
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit([&](auto& value) { return value.read(stream); }, mData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

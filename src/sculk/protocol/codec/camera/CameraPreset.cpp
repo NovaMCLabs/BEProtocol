@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/camera/CameraPreset.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CameraPreset::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -39,38 +39,32 @@ void CameraPreset::write(BinaryStream& stream) const {
 }
 
 Result<> CameraPreset::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readString(mInhertFrom); !status) return status;
-    if (auto status = stream.readOptional(mPosX, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mPosY, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mPosZ, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mRotX, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mRotY, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mRotationSpeed, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mSnapToTarget, &ReadOnlyBinaryStream::readBool); !status) return status;
-    if (auto status = stream.readOptional(mHorizontalRotationLimit, &Vec2::read); !status) return status;
-    if (auto status = stream.readOptional(mVerticalRotationLimit, &Vec2::read); !status) return status;
-    if (auto status = stream.readOptional(mContinueTargeting, &ReadOnlyBinaryStream::readBool); !status) return status;
-    if (auto status = stream.readOptional(mBlockListingRadius, &ReadOnlyBinaryStream::readFloat); !status)
-        return status;
-    if (auto status = stream.readOptional(mViewOffset, &Vec2::read); !status) return status;
-    if (auto status = stream.readOptional(mEntityOffset, &Vec3::read); !status) return status;
-    if (auto status = stream.readOptional(mRadius, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mYawLimitMin, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(mYawLimitMax, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readOptional(
-            mListener,
-            [](ReadOnlyBinaryStream& stream, AudioListener& value) {
-                return stream.readEnum(value, &ReadOnlyBinaryStream::readByte);
-            }
-        );
-        !status)
-        return status;
-    if (auto status = stream.readOptional(mPlayerEffects, &ReadOnlyBinaryStream::readBool); !status) return status;
-    if (auto status = stream.readOptional(mAimAssist, &CameraPresetAimAssistDefinition::read); !status) return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readString(mInhertFrom));
+    _SCULK_READ(stream.readOptional(mPosX, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mPosY, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mPosZ, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mRotX, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mRotY, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mRotationSpeed, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mSnapToTarget, &ReadOnlyBinaryStream::readBool));
+    _SCULK_READ(stream.readOptional(mHorizontalRotationLimit, &Vec2::read));
+    _SCULK_READ(stream.readOptional(mVerticalRotationLimit, &Vec2::read));
+    _SCULK_READ(stream.readOptional(mContinueTargeting, &ReadOnlyBinaryStream::readBool));
+    _SCULK_READ(stream.readOptional(mBlockListingRadius, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mViewOffset, &Vec2::read));
+    _SCULK_READ(stream.readOptional(mEntityOffset, &Vec3::read));
+    _SCULK_READ(stream.readOptional(mRadius, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mYawLimitMin, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mYawLimitMax, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readOptional(mListener, [](ReadOnlyBinaryStream& stream, AudioListener& value) {
+        return stream.readEnum(value, &ReadOnlyBinaryStream::readByte);
+    }));
+    _SCULK_READ(stream.readOptional(mPlayerEffects, &ReadOnlyBinaryStream::readBool));
+    _SCULK_READ(stream.readOptional(mAimAssist, &CameraPresetAimAssistDefinition::read));
     return stream.readOptional(mControlScheme, [](ReadOnlyBinaryStream& stream, ControlScheme& value) {
         return stream.readEnum(value, &ReadOnlyBinaryStream::readByte);
     });
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

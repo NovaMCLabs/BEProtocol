@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeSurfaceMaterialData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeSurfaceMaterialData::write(BinaryStream& stream) const {
     stream.writeSignedInt(mTopBlock);
@@ -19,12 +19,12 @@ void BiomeSurfaceMaterialData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeSurfaceMaterialData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mTopBlock); !status) return status;
-    if (auto status = stream.readSignedInt(mMidBlock); !status) return status;
-    if (auto status = stream.readSignedInt(mSeaFloorBlock); !status) return status;
-    if (auto status = stream.readSignedInt(mFoundationBlock); !status) return status;
-    if (auto status = stream.readSignedInt(mSeaBlock); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mTopBlock));
+    _SCULK_READ(stream.readSignedInt(mMidBlock));
+    _SCULK_READ(stream.readSignedInt(mSeaFloorBlock));
+    _SCULK_READ(stream.readSignedInt(mFoundationBlock));
+    _SCULK_READ(stream.readSignedInt(mSeaBlock));
     return stream.readSignedInt(mSeaFloorDepth);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

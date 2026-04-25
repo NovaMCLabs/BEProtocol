@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AwardAchievementPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AwardAchievementPacket::getId() const noexcept { return MinecraftPacketIds::AwardAchievement; }
 
@@ -21,4 +21,4 @@ Result<> AwardAchievementPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mAchievementId, &ReadOnlyBinaryStream::readSignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

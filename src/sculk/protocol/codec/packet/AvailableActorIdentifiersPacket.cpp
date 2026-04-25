@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AvailableActorIdentifiersPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AvailableActorIdentifiersPacket::getId() const noexcept {
     return MinecraftPacketIds::AvailableActorIdentifiers;
@@ -19,4 +19,4 @@ void AvailableActorIdentifiersPacket::write(BinaryStream& stream) const { mTag.w
 
 Result<> AvailableActorIdentifiersPacket::read(ReadOnlyBinaryStream& stream) { return mTag.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

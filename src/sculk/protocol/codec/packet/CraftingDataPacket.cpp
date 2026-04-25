@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CraftingDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CraftingDataPacket::getId() const noexcept { return MinecraftPacketIds::CraftingData; }
 
@@ -22,12 +22,11 @@ void CraftingDataPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CraftingDataPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mCraftingDataEntries, &CraftingDataEntry::read); !status) return status;
-    if (auto status = stream.readArray(mPotionMixDataEntries, &PotionMixDataEntry::read); !status) return status;
-    if (auto status = stream.readArray(mContainerMixDataEntries, &ContainerMixDataEntry::read); !status) return status;
-    if (auto status = stream.readArray(mMaterialReducerDataEntries, &MaterialReducerDataEntry::read); !status)
-        return status;
+    _SCULK_READ(stream.readArray(mCraftingDataEntries, &CraftingDataEntry::read));
+    _SCULK_READ(stream.readArray(mPotionMixDataEntries, &PotionMixDataEntry::read));
+    _SCULK_READ(stream.readArray(mContainerMixDataEntries, &ContainerMixDataEntry::read));
+    _SCULK_READ(stream.readArray(mMaterialReducerDataEntries, &MaterialReducerDataEntry::read));
     return stream.readBool(mClearRecipe);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

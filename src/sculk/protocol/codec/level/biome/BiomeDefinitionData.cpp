@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeDefinitionData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeDefinitionData::write(BinaryStream& stream) const {
     stream.writeSignedShort(mBiomeId);
@@ -23,16 +23,16 @@ void BiomeDefinitionData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeDefinitionData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedShort(mBiomeId); !status) return status;
-    if (auto status = stream.readFloat(mTemperature); !status) return status;
-    if (auto status = stream.readFloat(mDownfall); !status) return status;
-    if (auto status = stream.readFloat(mFoliageSnow); !status) return status;
-    if (auto status = stream.readFloat(mDepth); !status) return status;
-    if (auto status = stream.readFloat(mScale); !status) return status;
-    if (auto status = stream.readSignedInt(mMapWaterColorARGB); !status) return status;
-    if (auto status = stream.readBool(mRain); !status) return status;
-    if (auto status = stream.readOptional(mTags, &BiomeTagsData::read); !status) return status;
+    _SCULK_READ(stream.readSignedShort(mBiomeId));
+    _SCULK_READ(stream.readFloat(mTemperature));
+    _SCULK_READ(stream.readFloat(mDownfall));
+    _SCULK_READ(stream.readFloat(mFoliageSnow));
+    _SCULK_READ(stream.readFloat(mDepth));
+    _SCULK_READ(stream.readFloat(mScale));
+    _SCULK_READ(stream.readSignedInt(mMapWaterColorARGB));
+    _SCULK_READ(stream.readBool(mRain));
+    _SCULK_READ(stream.readOptional(mTags, &BiomeTagsData::read));
     return stream.readOptional(mChunkGenData, &BiomeDefinitionChunkGenData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

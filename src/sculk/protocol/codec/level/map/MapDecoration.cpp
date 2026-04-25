@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/map/MapDecoration.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void MapDecoration::write(BinaryStream& stream) const {
     stream.writeByte(mType);
@@ -19,12 +19,12 @@ void MapDecoration::write(BinaryStream& stream) const {
 }
 
 Result<> MapDecoration::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mType); !status) return status;
-    if (auto status = stream.readByte(mRotation); !status) return status;
-    if (auto status = stream.readByte(mX); !status) return status;
-    if (auto status = stream.readByte(mY); !status) return status;
-    if (auto status = stream.readString(mLabel); !status) return status;
+    _SCULK_READ(stream.readByte(mType));
+    _SCULK_READ(stream.readByte(mRotation));
+    _SCULK_READ(stream.readByte(mX));
+    _SCULK_READ(stream.readByte(mY));
+    _SCULK_READ(stream.readString(mLabel));
     return stream.readUnsignedVarInt(mColor);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

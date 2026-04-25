@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ActorType : std::int32_t {
     Undefined                  = 1,
@@ -167,7 +167,8 @@ enum class ActorType : std::int32_t {
     Nautilus                   = 9109,
     ZombieNautilus             = 74646,
     Parched                    = 1117079,
-    CamelHusk                  = 70552
+    CamelHusk                  = 70552,
+    SulfurCube                 = 2969,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

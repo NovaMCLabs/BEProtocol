@@ -9,7 +9,7 @@
 #include "../../codec/utility/Reflection.hpp"
 #include "sculk/protocol/connection/encryption/Base64Url.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 Result<> ClientProperties::load(std::string_view compactJwt) {
     const auto first = compactJwt.find('.');
@@ -55,4 +55,4 @@ std::string ClientProperties::saveAndSign(std::string_view eccPrivateKey) {
     return signES384(eccPrivateKey);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

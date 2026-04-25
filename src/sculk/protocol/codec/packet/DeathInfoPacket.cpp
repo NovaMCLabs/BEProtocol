@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/DeathInfoPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds DeathInfoPacket::getId() const noexcept { return MinecraftPacketIds::DeathInfo; }
 
@@ -19,8 +19,8 @@ void DeathInfoPacket::write(BinaryStream& stream) const {
 }
 
 Result<> DeathInfoPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mDeathCauseAttackName); !status) return status;
+    _SCULK_READ(stream.readString(mDeathCauseAttackName));
     return stream.readArray(mDeathCauseMessageList, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

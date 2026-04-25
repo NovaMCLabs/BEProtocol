@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class SoftEnumUpdateType : std::uint8_t {
     Add     = 0,
@@ -16,4 +16,4 @@ enum class SoftEnumUpdateType : std::uint8_t {
     Replace = 2,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

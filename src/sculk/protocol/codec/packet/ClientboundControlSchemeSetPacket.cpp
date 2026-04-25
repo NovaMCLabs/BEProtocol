@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundControlSchemeSetPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundControlSchemeSetPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundControlSchemeSet;
@@ -25,4 +25,4 @@ Result<> ClientboundControlSchemeSetPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mControlScheme, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

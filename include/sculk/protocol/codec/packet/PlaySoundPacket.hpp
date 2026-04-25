@@ -8,15 +8,17 @@
 #pragma once
 #include "sculk/protocol/codec/level/block/BlockPos.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class PlaySoundPacket : public IPacket {
 public:
-    std::string mName{};
-    BlockPos    mPosition{};
-    float       mVolume{};
-    float       mPitch{};
+    std::string                  mName{};
+    BlockPos                     mPosition{};
+    float                        mVolume{};
+    float                        mPitch{};
+    std::optional<std::uint64_t> mServerSoundHandle{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -28,4 +30,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

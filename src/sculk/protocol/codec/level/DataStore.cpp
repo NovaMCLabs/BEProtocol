@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/DataStore.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void DataStoreUpdate::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -27,23 +27,21 @@ void DataStoreUpdate::write(BinaryStream& stream) const {
 }
 
 Result<> DataStoreUpdate::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readString(mProperty); !status) return status;
-    if (auto status = stream.readString(mPath); !status) return status;
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt); !status)
-        return status;
-    if (auto status = std::visit(
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readString(mProperty));
+    _SCULK_READ(stream.readString(mPath));
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(
+        std::visit(
             Overload{
                 [&](double& value) { return stream.readDouble(value); },
                 [&](bool& value) { return stream.readBool(value); },
                 [&](std::string& value) { return stream.readString(value); },
             },
             mData
-        );
-        !status) {
-        return status;
-    }
-    if (auto status = stream.readUnsignedInt(mPropertyUpdateCount); !status) return status;
+        )
+    );
+    _SCULK_READ(stream.readUnsignedInt(mPropertyUpdateCount));
     return stream.readUnsignedInt(mPathUpdateCount);
 }
 
@@ -63,11 +61,10 @@ void DataStoreChange::write(BinaryStream& stream) const {
 }
 
 Result<> DataStoreChange::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readString(mProperty); !status) return status;
-    if (auto status = stream.readUnsignedInt(mUpdateCount); !status) return status;
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt); !status)
-        return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readString(mProperty));
+    _SCULK_READ(stream.readUnsignedInt(mUpdateCount));
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit(
         Overload{
             [&](double& value) { return stream.readDouble(value); },
@@ -82,4 +79,4 @@ void DataStoreRemoval::write(BinaryStream& stream) const { stream.writeString(mN
 
 Result<> DataStoreRemoval::read(ReadOnlyBinaryStream& stream) { return stream.readString(mName); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

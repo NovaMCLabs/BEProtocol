@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/StructureEditorData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void StructureEditorData::write(BinaryStream& stream) const {
     stream.writeString(mStructureName);
@@ -21,14 +21,14 @@ void StructureEditorData::write(BinaryStream& stream) const {
 }
 
 Result<> StructureEditorData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mStructureName); !status) return status;
-    if (auto status = stream.readString(mFilteredStructureName); !status) return status;
-    if (auto status = stream.readString(mDataField); !status) return status;
-    if (auto status = stream.readBool(mIncludePlayer); !status) return status;
-    if (auto status = stream.readBool(mShowBoundingBox); !status) return status;
-    if (auto status = stream.readVarInt(mStructureBlockType); !status) return status;
-    if (auto status = mStructureSettings.read(stream); !status) return status;
+    _SCULK_READ(stream.readString(mStructureName));
+    _SCULK_READ(stream.readString(mFilteredStructureName));
+    _SCULK_READ(stream.readString(mDataField));
+    _SCULK_READ(stream.readBool(mIncludePlayer));
+    _SCULK_READ(stream.readBool(mShowBoundingBox));
+    _SCULK_READ(stream.readVarInt(mStructureBlockType));
+    _SCULK_READ(mStructureSettings.read(stream));
     return stream.readVarInt(mRedstoneSaveMode);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

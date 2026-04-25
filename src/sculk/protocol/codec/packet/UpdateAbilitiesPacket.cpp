@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateAbilitiesPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateAbilitiesPacket::getId() const noexcept { return MinecraftPacketIds::UpdateAbilities; }
 
@@ -17,4 +17,4 @@ void UpdateAbilitiesPacket::write(BinaryStream& stream) const { mAbilities.write
 
 Result<> UpdateAbilitiesPacket::read(ReadOnlyBinaryStream& stream) { return mAbilities.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class InteractionType : std::uint32_t {
     Breeding   = 1,
@@ -29,4 +29,4 @@ enum class InteractionType : std::uint32_t {
     Commanding = 16
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

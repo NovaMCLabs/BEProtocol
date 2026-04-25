@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ToastRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ToastRequestPacket::getId() const noexcept { return MinecraftPacketIds::ToastRequest; }
 
@@ -19,8 +19,8 @@ void ToastRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ToastRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mTitle); !status) return status;
+    _SCULK_READ(stream.readString(mTitle));
     return stream.readString(mContent);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

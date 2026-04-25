@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/container/FullContainerName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void FullContainerName::write(BinaryStream& stream) const {
     stream.writeEnum(mContainerEnumName, &BinaryStream::writeByte);
@@ -15,8 +15,8 @@ void FullContainerName::write(BinaryStream& stream) const {
 }
 
 Result<> FullContainerName::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mContainerEnumName, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mContainerEnumName, &ReadOnlyBinaryStream::readByte));
     return stream.readOptional(mDynamicId, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

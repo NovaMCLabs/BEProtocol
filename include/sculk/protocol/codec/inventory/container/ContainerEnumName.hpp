@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ContainerEnumName : uint8_t {
     AnvilInputContainer                 = 0,
@@ -80,4 +80,4 @@ enum class ContainerEnumName : uint8_t {
     RecipeFurnaceItemsContainer         = 66,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,11 +7,11 @@
 
 #include "sculk/protocol/connection/auth/AuthenticationKeyManager.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 Result<> AuthenticationKeyManager::initializeMojangPublicKeyFromInternet() {
     //
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

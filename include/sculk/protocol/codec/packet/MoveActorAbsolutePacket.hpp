@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class MoveActorAbsolutePacket : public IPacket {
 public:
@@ -19,6 +19,7 @@ public:
     std::uint8_t  mRotationX{};
     std::uint8_t  mRotationY{};
     std::uint8_t  mRotationYHead{};
+    bool          mForceCompletion{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -30,4 +31,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

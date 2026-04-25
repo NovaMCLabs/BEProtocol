@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlaySoundPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlaySoundPacket::getId() const noexcept { return MinecraftPacketIds::PlaySound; }
 
@@ -18,13 +18,15 @@ void PlaySoundPacket::write(BinaryStream& stream) const {
     mPosition.write(stream);
     stream.writeFloat(mVolume);
     stream.writeFloat(mPitch);
+    stream.writeOptional(mServerSoundHandle, &BinaryStream::writeUnsignedInt64);
 }
 
 Result<> PlaySoundPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mVolume); !status) return status;
-    return stream.readFloat(mPitch);
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readFloat(mVolume));
+    _SCULK_READ(stream.readFloat(mPitch));
+    return stream.readOptional(mServerSoundHandle, &ReadOnlyBinaryStream::readUnsignedInt64);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

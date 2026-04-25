@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RequestPermissionsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RequestPermissionsPacket::getId() const noexcept { return MinecraftPacketIds::RequestPermissions; }
 
@@ -20,9 +20,9 @@ void RequestPermissionsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> RequestPermissionsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt64(mPlayerRawId); !status) return status;
-    if (auto status = stream.readVarInt(mPermissionLevel); !status) return status;
+    _SCULK_READ(stream.readSignedInt64(mPlayerRawId));
+    _SCULK_READ(stream.readVarInt(mPermissionLevel));
     return stream.readUnsignedShort(mCustomPermissionFlag);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

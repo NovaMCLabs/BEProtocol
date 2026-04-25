@@ -17,7 +17,7 @@
 #include <openssl/pem.h>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 namespace {
 
@@ -283,4 +283,4 @@ std::string JsonWebToken::signRS256(std::string_view rsaPrivateKeyPem) {
     return mRawHeader + "." + mRawPayload + "." + encodedSignature;
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

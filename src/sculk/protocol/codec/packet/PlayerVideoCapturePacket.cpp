@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerVideoCapturePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerVideoCapturePacket::getId() const noexcept { return MinecraftPacketIds::PlayerVideoCapture; }
 
@@ -28,12 +28,11 @@ void PlayerVideoCapturePacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerVideoCapturePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint8_t>(mParams, &ReadOnlyBinaryStream::readByte); !status)
-        return status;
+    _SCULK_READ(stream.readVariantIndex<std::uint8_t>(mParams, &ReadOnlyBinaryStream::readByte));
     return std::visit(
         Overload{
             [&](StartVideoCapture& data) {
-                if (auto status = stream.readUnsignedInt(data.mFrameRate); !status) return status;
+                _SCULK_READ(stream.readUnsignedInt(data.mFrameRate));
                 return stream.readString(data.mFilePrefix);
             },
             [&](StopVideoCapture&) { return Result<>{}; },
@@ -42,4 +41,4 @@ Result<> PlayerVideoCapturePacket::read(ReadOnlyBinaryStream& stream) {
     );
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

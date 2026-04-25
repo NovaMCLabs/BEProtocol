@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RemoveActorPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RemoveActorPacket::getId() const noexcept { return MinecraftPacketIds::RemoveActor; }
 
@@ -17,4 +17,4 @@ void RemoveActorPacket::write(BinaryStream& stream) const { stream.writeVarInt64
 
 Result<> RemoveActorPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt64(mActorUniqueId); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/command/CommandOverloadData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CommandOverloadData::write(BinaryStream& stream) const {
     stream.writeBool(mIsChaining);
@@ -15,8 +15,8 @@ void CommandOverloadData::write(BinaryStream& stream) const {
 }
 
 Result<> CommandOverloadData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mIsChaining); !status) return status;
+    _SCULK_READ(stream.readBool(mIsChaining));
     return stream.readArray(mParameters, &CommandParameterData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

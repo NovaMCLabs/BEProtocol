@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ContainerOpenPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ContainerOpenPacket::getId() const noexcept { return MinecraftPacketIds::ContainerOpen; }
 
@@ -21,10 +21,10 @@ void ContainerOpenPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ContainerOpenPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt64(mTargetActorId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

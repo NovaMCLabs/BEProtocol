@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientMovementPredictionSyncPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientMovementPredictionSyncPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientMovementPredictionSync;
@@ -18,7 +18,6 @@ std::string_view ClientMovementPredictionSyncPacket::getName() const noexcept {
 
 void ClientMovementPredictionSyncPacket::write(BinaryStream& stream) const {
     stream.writeBitset(mActorFlags);
-    static_assert(mActorFlags.size() == ACTOR_FLAGS_COUNT);
     mActorBoundingBox.write(stream);
     stream.writeFloat(mMovementAttributes.mMovementSpeed);
     stream.writeFloat(mMovementAttributes.mUnderwaterMovementSpeed);
@@ -31,17 +30,16 @@ void ClientMovementPredictionSyncPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ClientMovementPredictionSyncPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBitset(mActorFlags); !status) return status;
-    static_assert(mActorFlags.size() == ACTOR_FLAGS_COUNT);
-    if (auto status = mActorBoundingBox.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mMovementAttributes.mMovementSpeed); !status) return status;
-    if (auto status = stream.readFloat(mMovementAttributes.mUnderwaterMovementSpeed); !status) return status;
-    if (auto status = stream.readFloat(mMovementAttributes.mLavaMovementSpeed); !status) return status;
-    if (auto status = stream.readFloat(mMovementAttributes.mJumpStrength); !status) return status;
-    if (auto status = stream.readFloat(mMovementAttributes.mHealth); !status) return status;
-    if (auto status = stream.readFloat(mMovementAttributes.mHunger); !status) return status;
-    if (auto status = stream.readVarInt64(mActorID); !status) return status;
+    _SCULK_READ(stream.readBitset(mActorFlags));
+    _SCULK_READ(mActorBoundingBox.read(stream));
+    _SCULK_READ(stream.readFloat(mMovementAttributes.mMovementSpeed));
+    _SCULK_READ(stream.readFloat(mMovementAttributes.mUnderwaterMovementSpeed));
+    _SCULK_READ(stream.readFloat(mMovementAttributes.mLavaMovementSpeed));
+    _SCULK_READ(stream.readFloat(mMovementAttributes.mJumpStrength));
+    _SCULK_READ(stream.readFloat(mMovementAttributes.mHealth));
+    _SCULK_READ(stream.readFloat(mMovementAttributes.mHunger));
+    _SCULK_READ(stream.readVarInt64(mActorID));
     return stream.readBool(mFlying);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

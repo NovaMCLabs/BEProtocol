@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SyncActorPropertyPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SyncActorPropertyPacket::getId() const noexcept { return MinecraftPacketIds::SyncActorProperty; }
 
@@ -17,4 +17,4 @@ void SyncActorPropertyPacket::write(BinaryStream& stream) const { mPropertyData.
 
 Result<> SyncActorPropertyPacket::read(ReadOnlyBinaryStream& stream) { return mPropertyData.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

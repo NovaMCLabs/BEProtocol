@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/TakeItemActorPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds TakeItemActorPacket::getId() const noexcept { return MinecraftPacketIds::TakeItemActor; }
 
@@ -19,8 +19,8 @@ void TakeItemActorPacket::write(BinaryStream& stream) const {
 }
 
 Result<> TakeItemActorPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mItemRuntimeId); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mItemRuntimeId));
     return stream.readUnsignedVarInt64(mActorRuntimeId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

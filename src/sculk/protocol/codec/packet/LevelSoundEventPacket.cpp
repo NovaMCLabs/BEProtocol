@@ -7,30 +7,32 @@
 
 #include "sculk/protocol/codec/packet/LevelSoundEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LevelSoundEventPacket::getId() const noexcept { return MinecraftPacketIds::LevelSoundEvent; }
 
 std::string_view LevelSoundEventPacket::getName() const noexcept { return "LevelSoundEventPacket"; }
 
 void LevelSoundEventPacket::write(BinaryStream& stream) const {
-    stream.writeUnsignedVarInt(mEventId);
+    stream.writeEnum(mEventId, &BinaryStream::writeUnsignedVarInt);
     mPosition.write(stream);
     stream.writeVarInt(mData);
     stream.writeString(mActorIdentifier);
     stream.writeBool(mIsBabyMob);
     stream.writeBool(mIsGlobal);
     stream.writeSignedInt64(mActorUniqueId);
+    stream.writeOptional(mFireAtPosition, &Vec3::write);
 }
 
 Result<> LevelSoundEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mEventId); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mData); !status) return status;
-    if (auto status = stream.readString(mActorIdentifier); !status) return status;
-    if (auto status = stream.readBool(mIsBabyMob); !status) return status;
-    if (auto status = stream.readBool(mIsGlobal); !status) return status;
-    return stream.readSignedInt64(mActorUniqueId);
+    _SCULK_READ(stream.readEnum(mEventId, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readVarInt(mData));
+    _SCULK_READ(stream.readString(mActorIdentifier));
+    _SCULK_READ(stream.readBool(mIsBabyMob));
+    _SCULK_READ(stream.readBool(mIsGlobal));
+    _SCULK_READ(stream.readSignedInt64(mActorUniqueId));
+    return stream.readOptional(mFireAtPosition, &Vec3::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ActorDataIDs : std::uint32_t {
     Reserved0                        = 0,
@@ -150,7 +150,9 @@ enum class ActorDataIDs : std::uint32_t {
     AimAssistPriorityPresetId        = 136,
     AimAssistPriorityCategoryId      = 137,
     AimAssistPriorityActorId         = 138,
-    Count                            = 139,
+    Reserved139                      = 139,
+    NameplateRenderDistanceMax       = 140,
+    Count                            = 141,
 };
 
 }

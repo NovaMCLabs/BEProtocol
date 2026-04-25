@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateBlockSyncedPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateBlockSyncedPacket::getId() const noexcept { return MinecraftPacketIds::UpdateBlockSynced; }
 
@@ -23,12 +23,12 @@ void UpdateBlockSyncedPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateBlockSyncedPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mBlockPosition.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mRuntimeId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mFlag); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mLayer); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mUniqueActorId); !status) return status;
+    _SCULK_READ(mBlockPosition.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mRuntimeId));
+    _SCULK_READ(stream.readUnsignedVarInt(mFlag));
+    _SCULK_READ(stream.readUnsignedVarInt(mLayer));
+    _SCULK_READ(stream.readUnsignedVarInt64(mUniqueActorId));
     return stream.readUnsignedVarInt64(mActorSyncMessage);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

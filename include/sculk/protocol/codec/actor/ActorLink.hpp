@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ActorLinkType : std::uint8_t { None = 0, Riding = 1, Passenger = 2 };
 
@@ -26,4 +26,4 @@ struct ActorLink {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -12,7 +12,7 @@
 #include <sculk/reflection/utils/string_utils.hpp>
 #include <type_traits>
 
-namespace sculk::protocol::inline abi_v944::utils {
+namespace sculk::protocol::inline abi_v975::utils {
 
 template <typename Enum>
     requires std::is_enum_v<Enum>
@@ -48,4 +48,4 @@ constexpr void writeEnumName(BinaryStream& stream, T value) {
     stream.writeString(reflection::string_utils::to_lower_case(utils::enum_to_str(value)));
 }
 
-} // namespace sculk::protocol::inline abi_v944::utils
+} // namespace sculk::protocol::inline abi_v975::utils

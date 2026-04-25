@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/InteractPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds InteractPacket::getId() const noexcept { return MinecraftPacketIds::Interact; }
 
@@ -20,9 +20,9 @@ void InteractPacket::write(BinaryStream& stream) const {
 }
 
 Result<> InteractPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
     return stream.readOptional(mPosition, &Vec3::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

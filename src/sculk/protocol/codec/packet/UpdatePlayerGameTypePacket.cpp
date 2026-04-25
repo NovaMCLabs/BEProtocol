@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdatePlayerGameTypePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdatePlayerGameTypePacket::getId() const noexcept {
     return MinecraftPacketIds::UpdatePlayerGameType;
@@ -22,9 +22,9 @@ void UpdatePlayerGameTypePacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdatePlayerGameTypePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readVarInt64(mPlayerUniqueId); !status) return status;
+    _SCULK_READ(stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readVarInt64(mPlayerUniqueId));
     return stream.readUnsignedVarInt64(mTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

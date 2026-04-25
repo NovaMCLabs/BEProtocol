@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AddVolumeEntityPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AddVolumeEntityPacket::getId() const noexcept { return MinecraftPacketIds::AddVolumeEntity; }
 
@@ -25,14 +25,14 @@ void AddVolumeEntityPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AddVolumeEntityPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mEntityNetId); !status) return status;
-    if (auto status = mComponents.read(stream); !status) return status;
-    if (auto status = stream.readString(mJsonIdentifier); !status) return status;
-    if (auto status = stream.readString(mInstanceName); !status) return status;
-    if (auto status = mMaxBounds.read(stream); !status) return status;
-    if (auto status = mMaxBounds.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mDimensionType); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mEntityNetId));
+    _SCULK_READ(mComponents.read(stream));
+    _SCULK_READ(stream.readString(mJsonIdentifier));
+    _SCULK_READ(stream.readString(mInstanceName));
+    _SCULK_READ(mMaxBounds.read(stream));
+    _SCULK_READ(mMaxBounds.read(stream));
+    _SCULK_READ(stream.readVarInt(mDimensionType));
     return stream.readString(mEngineVersion);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientCacheStatusPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientCacheStatusPacket::getId() const noexcept { return MinecraftPacketIds::ClientCacheStatus; }
 
@@ -17,4 +17,4 @@ void ClientCacheStatusPacket::write(BinaryStream& stream) const { stream.writeBo
 
 Result<> ClientCacheStatusPacket::read(ReadOnlyBinaryStream& stream) { return stream.readBool(mIsCacheSupport); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

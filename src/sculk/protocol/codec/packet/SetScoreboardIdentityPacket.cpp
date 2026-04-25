@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetScoreboardIdentityPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetScoreboardIdentityPacket::getId() const noexcept {
     return MinecraftPacketIds::SetScoreboardIdentity;
@@ -26,11 +26,11 @@ void SetScoreboardIdentityPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetScoreboardIdentityPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     return stream.readArray(mSetScoreboardIdentities, [&](ScoreboardIdentity& data) {
-        if (auto status = stream.readVarInt64(data.mScoreboardId); !status) return status;
+        _SCULK_READ(stream.readVarInt64(data.mScoreboardId));
         if (mType == Type::Update) {
-            if (auto status = stream.readVarInt64(data.mPlayerUniqueId); !status) return status;
+            _SCULK_READ(stream.readVarInt64(data.mPlayerUniqueId));
         } else {
             data.mPlayerUniqueId = 0;
         }
@@ -38,4 +38,4 @@ Result<> SetScoreboardIdentityPacket::read(ReadOnlyBinaryStream& stream) {
     });
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

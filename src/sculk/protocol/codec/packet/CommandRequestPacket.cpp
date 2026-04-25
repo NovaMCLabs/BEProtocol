@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/packet/CommandRequestPacket.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CommandRequestPacket::getId() const noexcept { return MinecraftPacketIds::CommandRequest; }
 
@@ -22,10 +22,10 @@ void CommandRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CommandRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mCommand); !status) return status;
-    if (auto status = mOriginData.read(stream); !status) return status;
-    if (auto status = stream.readBool(mIsInternal); !status) return status;
+    _SCULK_READ(stream.readString(mCommand));
+    _SCULK_READ(mOriginData.read(stream));
+    _SCULK_READ(stream.readBool(mIsInternal));
     return utils::readEnumName(stream, mVersion);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

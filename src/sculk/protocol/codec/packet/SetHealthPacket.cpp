@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetHealthPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetHealthPacket::getId() const noexcept { return MinecraftPacketIds::SetHealth; }
 
@@ -17,4 +17,4 @@ void SetHealthPacket::write(BinaryStream& stream) const { stream.writeVarInt(mHe
 
 Result<> SetHealthPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mHealth); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

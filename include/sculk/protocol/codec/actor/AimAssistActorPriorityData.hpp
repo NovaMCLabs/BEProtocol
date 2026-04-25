@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct AimAssistActorPriorityData {
     std::int32_t mPresetIndex{};
@@ -23,4 +23,4 @@ struct AimAssistActorPriorityData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

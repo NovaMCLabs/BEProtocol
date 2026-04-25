@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateAdventureSettingsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateAdventureSettingsPacket::getId() const noexcept {
     return MinecraftPacketIds::UpdateAdventureSettings;
@@ -24,11 +24,11 @@ void UpdateAdventureSettingsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateAdventureSettingsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mNoPvM); !status) return status;
-    if (auto status = stream.readBool(mNoMvP); !status) return status;
-    if (auto status = stream.readBool(mImmutableWorld); !status) return status;
-    if (auto status = stream.readBool(mShowNameTags); !status) return status;
+    _SCULK_READ(stream.readBool(mNoPvM));
+    _SCULK_READ(stream.readBool(mNoMvP));
+    _SCULK_READ(stream.readBool(mImmutableWorld));
+    _SCULK_READ(stream.readBool(mShowNameTags));
     return stream.readBool(mAutoJump);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

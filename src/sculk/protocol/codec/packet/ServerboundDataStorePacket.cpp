@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerboundDataStorePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerboundDataStorePacket::getId() const noexcept {
     return MinecraftPacketIds::ServerboundDataStore;
@@ -19,4 +19,4 @@ void ServerboundDataStorePacket::write(BinaryStream& stream) const { mDataStoreU
 
 Result<> ServerboundDataStorePacket::read(ReadOnlyBinaryStream& stream) { return mDataStoreUpdate.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

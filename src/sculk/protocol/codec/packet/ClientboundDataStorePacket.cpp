@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundDataStorePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundDataStorePacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundDataStore;
@@ -22,9 +22,9 @@ void ClientboundDataStorePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ClientboundDataStorePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mDataStoreUpdate.read(stream); !status) return status;
-    if (auto status = mDataStoreChange.read(stream); !status) return status;
+    _SCULK_READ(mDataStoreUpdate.read(stream));
+    _SCULK_READ(mDataStoreChange.read(stream));
     return mDataStoreRemoval.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

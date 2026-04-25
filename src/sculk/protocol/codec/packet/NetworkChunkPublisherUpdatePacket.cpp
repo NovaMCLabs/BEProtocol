@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/NetworkChunkPublisherUpdatePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds NetworkChunkPublisherUpdatePacket::getId() const noexcept {
     return MinecraftPacketIds::NetworkChunkPublisherUpdate;
@@ -28,15 +28,15 @@ void NetworkChunkPublisherUpdatePacket::write(BinaryStream& stream) const {
 
 Result<> NetworkChunkPublisherUpdatePacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t count{};
-    if (auto status = mNewPositionForView.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mNewRadiusForView); !status) return status;
-    if (auto status = stream.readUnsignedInt(count); !status) return status;
+    _SCULK_READ(mNewPositionForView.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mNewRadiusForView));
+    _SCULK_READ(stream.readUnsignedInt(count));
     mServerBuiltChunksList.clear();
     mServerBuiltChunksList.resize(count);
     for (auto& chunkPos : mServerBuiltChunksList) {
-        if (auto status = chunkPos.read(stream); !status) return status;
+        _SCULK_READ(chunkPos.read(stream));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

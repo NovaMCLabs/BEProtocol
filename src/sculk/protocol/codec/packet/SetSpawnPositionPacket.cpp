@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetSpawnPositionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetSpawnPositionPacket::getId() const noexcept { return MinecraftPacketIds::SetSpawnPosition; }
 
@@ -21,10 +21,10 @@ void SetSpawnPositionPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetSpawnPositionPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mSpawnPositionType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = mBlockPosition.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mDimensionType); !status) return status;
+    _SCULK_READ(stream.readEnum(mSpawnPositionType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(mBlockPosition.read(stream));
+    _SCULK_READ(stream.readVarInt(mDimensionType));
     return mSpawnBlockPos.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

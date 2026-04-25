@@ -8,14 +8,17 @@
 #pragma once
 #include "sculk/protocol/codec/actor/ActorEvent.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include "sculk/protocol/codec/utility/math/Vec3.hpp"
+#include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class ActorEventPacket : public IPacket {
 public:
-    std::uint64_t mRuntimeId{};
-    ActorEvent    mEventId{};
-    int           mData{};
+    std::uint64_t       mRuntimeId{};
+    ActorEvent          mEventId{};
+    int                 mData{};
+    std::optional<Vec3> mFireAtPosition{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -27,4 +30,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

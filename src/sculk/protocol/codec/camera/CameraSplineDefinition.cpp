@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/camera/CameraSplineDefinition.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CameraSplineProgressKeyFrame::write(BinaryStream& stream) const {
     stream.writeFloat(mProgress);
@@ -17,8 +17,8 @@ void CameraSplineProgressKeyFrame::write(BinaryStream& stream) const {
 }
 
 Result<> CameraSplineProgressKeyFrame::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mProgress); !status) return status;
-    if (auto status = stream.readFloat(mTime); !status) return status;
+    _SCULK_READ(stream.readFloat(mProgress));
+    _SCULK_READ(stream.readFloat(mTime));
     return utils::readEnumName(stream, mEasing);
 }
 
@@ -29,8 +29,8 @@ void CameraSplineRotationKeyFrame::write(BinaryStream& stream) const {
 }
 
 Result<> CameraSplineRotationKeyFrame::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mRotation.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mTime); !status) return status;
+    _SCULK_READ(mRotation.read(stream));
+    _SCULK_READ(stream.readFloat(mTime));
     return utils::readEnumName(stream, mEasing);
 }
 
@@ -44,12 +44,12 @@ void CameraSplineDefinition::write(BinaryStream& stream) const {
 }
 
 Result<> CameraSplineDefinition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readFloat(mTotalTime); !status) return status;
-    if (auto status = stream.readString(mSplineType); !status) return status;
-    if (auto status = stream.readArray(mControlPoints, &Vec3::read); !status) return status;
-    if (auto status = stream.readArray(mProgressKeyFrames, &CameraSplineProgressKeyFrame::read); !status) return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readFloat(mTotalTime));
+    _SCULK_READ(stream.readString(mSplineType));
+    _SCULK_READ(stream.readArray(mControlPoints, &Vec3::read));
+    _SCULK_READ(stream.readArray(mProgressKeyFrames, &CameraSplineProgressKeyFrame::read));
     return stream.readArray(mRotationKeyFrames, &CameraSplineRotationKeyFrame::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

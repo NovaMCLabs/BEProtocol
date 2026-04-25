@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AnimatePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AnimatePacket::getId() const noexcept { return MinecraftPacketIds::Animate; }
 
@@ -21,10 +21,10 @@ void AnimatePacket::write(BinaryStream& stream) const {
 }
 
 Result<> AnimatePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readFloat(mData); !status) return status;
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readFloat(mData));
     return stream.readOptional(mSwingSource, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

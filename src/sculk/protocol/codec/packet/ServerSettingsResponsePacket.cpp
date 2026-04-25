@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerSettingsResponsePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerSettingsResponsePacket::getId() const noexcept {
     return MinecraftPacketIds::ServerSettingsResponse;
@@ -21,8 +21,8 @@ void ServerSettingsResponsePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ServerSettingsResponsePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mFormId); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mFormId));
     return stream.readString(mFormJson);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

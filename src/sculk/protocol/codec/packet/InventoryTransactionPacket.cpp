@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/InventoryTransactionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds InventoryTransactionPacket::getId() const noexcept {
     return MinecraftPacketIds::InventoryTransaction;
@@ -26,17 +26,13 @@ void InventoryTransactionPacket::write(BinaryStream& stream) const {
 }
 
 Result<> InventoryTransactionPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mLegacyRequestRawId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mLegacyRequestRawId));
     if (mLegacyRequestRawId < -1 && (mLegacyRequestRawId & 1) == 0) {
-        if (auto status = stream.readArray(mLegacySetItemSlots, &LegacySetItemSlot::read); !status) return status;
+        _SCULK_READ(stream.readArray(mLegacySetItemSlots, &LegacySetItemSlot::read));
     }
-    if (auto status =
-            stream.readVariantIndex<std::uint32_t>(mTransactionData, &ReadOnlyBinaryStream::readUnsignedVarInt);
-        !status) {
-        return status;
-    }
-    if (auto status = mInventoryTransactionActions.read(stream); !status) return status;
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mTransactionData, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(mInventoryTransactionActions.read(stream));
     return std::visit([&](auto& transaction) { return transaction.read(stream); }, mTransactionData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeTagsData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeTagsData::write(BinaryStream& stream) const { stream.writeArray(mTags, &BinaryStream::writeSignedShort); }
 
@@ -15,4 +15,4 @@ Result<> BiomeTagsData::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mTags, &ReadOnlyBinaryStream::readSignedShort);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

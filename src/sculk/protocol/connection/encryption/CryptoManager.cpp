@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 namespace {
 
@@ -207,4 +207,4 @@ bool CryptoManager::verifyUnlocked(const std::vector<std::byte>& bytes) {
     return std::equal(expected.begin(), expected.end(), bytes.begin() + static_cast<std::ptrdiff_t>(payloadSize));
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

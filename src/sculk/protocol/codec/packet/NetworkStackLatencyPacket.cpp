@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/NetworkStackLatencyPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds NetworkStackLatencyPacket::getId() const noexcept { return MinecraftPacketIds::NetworkStackLatency; }
 
@@ -19,8 +19,8 @@ void NetworkStackLatencyPacket::write(BinaryStream& stream) const {
 }
 
 Result<> NetworkStackLatencyPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt64(mCreationTime); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt64(mCreationTime));
     return stream.readBool(mIsFromServer);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

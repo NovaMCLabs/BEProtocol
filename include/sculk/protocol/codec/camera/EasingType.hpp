@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class EasingType : std::uint8_t {
     LINEAR         = 0,
@@ -45,4 +45,4 @@ enum class EasingType : std::uint8_t {
     IN_OUT_ELASTIC = 31
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

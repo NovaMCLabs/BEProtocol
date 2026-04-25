@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class ReadOnlyBinaryStream {
 public:
@@ -308,21 +308,13 @@ public:
         outVector.resize(length);
         for (auto& element : outVector) {
             if constexpr (std::is_invocable_r_v<Result<>, F, ReadOnlyBinaryStream&, T&>) {
-                if (auto status = std::invoke(std::forward<F>(func), *this, element); !status) {
-                    return status;
-                }
+                _SCULK_READ(std::invoke(std::forward<F>(func), *this, element));
             } else if constexpr (std::is_invocable_r_v<Result<>, F, ReadOnlyBinaryStream&, T & _SCULK_SL_PARAMETER>) {
-                if (auto status = std::invoke(std::forward<F>(func), *this, element _SCULK_SL_PARAM_PASS); !status) {
-                    return status;
-                }
+                _SCULK_READ(std::invoke(std::forward<F>(func), *this, element _SCULK_SL_PARAM_PASS));
             } else if constexpr (std::is_invocable_r_v<Result<>, F, T&, ReadOnlyBinaryStream&>) {
-                if (auto status = std::invoke(std::forward<F>(func), element, *this); !status) {
-                    return status;
-                }
+                _SCULK_READ(std::invoke(std::forward<F>(func), element, *this));
             } else if constexpr (std::is_invocable_r_v<Result<>, F, T&>) {
-                if (auto status = std::invoke(std::forward<F>(func), element); !status) {
-                    return status;
-                }
+                _SCULK_READ(std::invoke(std::forward<F>(func), element));
             } else {
                 static_assert(false, "invalid read array function");
             }
@@ -435,4 +427,4 @@ public:
     }
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

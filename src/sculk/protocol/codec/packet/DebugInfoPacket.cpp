@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/DebugInfoPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds DebugInfoPacket::getId() const noexcept { return MinecraftPacketIds::DebugInfo; }
 
@@ -19,8 +19,8 @@ void DebugInfoPacket::write(BinaryStream& stream) const {
 }
 
 Result<> DebugInfoPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
     return stream.readString(mData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

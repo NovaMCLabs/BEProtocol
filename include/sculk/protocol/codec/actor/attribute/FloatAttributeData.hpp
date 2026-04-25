@@ -9,16 +9,16 @@
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class FloatAttributeOperation : std::int32_t {
-    Override   = 0,
-    AlphaBlend = 1,
-    Add        = 2,
-    Subtract   = 3,
-    Multiply   = 4,
-    Minimum    = 5,
-    Maximum    = 6,
+    OVERRIDE    = 0,
+    ALPHA_BLEND = 1,
+    ADD         = 2,
+    SUBTRACT    = 3,
+    MULTIPLY    = 4,
+    MINIMUM     = 5,
+    MAXIMUM     = 6,
 };
 
 struct FloatAttributeData {
@@ -32,4 +32,4 @@ struct FloatAttributeData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

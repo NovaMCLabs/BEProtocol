@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RequestAbilityPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RequestAbilityPacket::getId() const noexcept { return MinecraftPacketIds::RequestAbility; }
 
@@ -23,13 +23,13 @@ void RequestAbilityPacket::write(BinaryStream& stream) const {
 }
 
 Result<> RequestAbilityPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mAbility); !status) return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readVarInt(mAbility));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     if (mType != Type::Unset) {
-        if (auto status = stream.readBool(mBoolValue); !status) return status;
-        if (auto status = stream.readFloat(mFloatValue); !status) return status;
+        _SCULK_READ(stream.readBool(mBoolValue));
+        _SCULK_READ(stream.readFloat(mFloatValue));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

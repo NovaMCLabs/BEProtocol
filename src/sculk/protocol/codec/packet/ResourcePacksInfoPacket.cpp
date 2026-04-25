@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ResourcePacksInfoPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ResourcePacksInfoPacket::getId() const noexcept { return MinecraftPacketIds::ResourcePacksInfo; }
 
@@ -27,19 +27,19 @@ void ResourcePacksInfoPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ResourcePacksInfoPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mResourcePackRequired); !status) return status;
-    if (auto status = stream.readBool(mHasAddonPacks); !status) return status;
-    if (auto status = stream.readBool(mHasScripts); !status) return status;
-    if (auto status = stream.readBool(mIsVibrantVisualsForceDisabled); !status) return status;
-    if (auto status = mWorldTemplateId.read(stream); !status) return status;
-    if (auto status = stream.readString(mWorldTemplateVersion); !status) return status;
+    _SCULK_READ(stream.readBool(mResourcePackRequired));
+    _SCULK_READ(stream.readBool(mHasAddonPacks));
+    _SCULK_READ(stream.readBool(mHasScripts));
+    _SCULK_READ(stream.readBool(mIsVibrantVisualsForceDisabled));
+    _SCULK_READ(mWorldTemplateId.read(stream));
+    _SCULK_READ(stream.readString(mWorldTemplateVersion));
     std::uint16_t size{};
-    if (auto status = stream.readUnsignedShort(size); !status) return status;
+    _SCULK_READ(stream.readUnsignedShort(size));
     mResourcePacks.resize(size);
     for (auto& pack : mResourcePacks) {
-        if (auto status = pack.read(stream); !status) return status;
+        _SCULK_READ(pack.read(stream));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

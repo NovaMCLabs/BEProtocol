@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeMesaSurfaceData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeMesaSurfaceData::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mClayMaterial);
@@ -17,10 +17,10 @@ void BiomeMesaSurfaceData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeMesaSurfaceData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt(mClayMaterial); !status) return status;
-    if (auto status = stream.readUnsignedInt(mHardClayMaterial); !status) return status;
-    if (auto status = stream.readBool(mBrycePillars); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(mClayMaterial));
+    _SCULK_READ(stream.readUnsignedInt(mHardClayMaterial));
+    _SCULK_READ(stream.readBool(mBrycePillars));
     return stream.readBool(mHasForest);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

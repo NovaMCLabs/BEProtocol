@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerEnchantOptionsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerEnchantOptionsPacket::getId() const noexcept {
     return MinecraftPacketIds::PlayerEnchantOptions;
@@ -23,4 +23,4 @@ Result<> PlayerEnchantOptionsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mOptions, &EnchantOption::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

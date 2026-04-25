@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class DisconnectFailReason : int {
     Unknown                                       = 0,
@@ -128,6 +128,28 @@ enum class DisconnectFailReason : int {
     NetherNetClientSignalingError                 = 115,
     SubClientLoginDisabled                        = 116,
     DeepLinkTryingToOpenDemoWorldWhileSignedIn    = 117,
+    AsyncJoinTaskDenied                           = 118,
+    RealmsTimelineRequired                        = 119,
+    GuestWithoutHost                              = 120,
+    FailedToJoinExperience                        = 121,
+    NetherNetDataChannelClosed                    = 122,
+    DiscoveryEnvironmentMismatch                  = 123,
+    HostWithoutKeys                               = 124,
+    HostSignedOut                                 = 125,
+    ScriptWatchdogException                       = 126,
+    ScriptMemoryLimitExceeded                     = 127,
+    StorageLowDuringGameplay                      = 128,
+    StorageFullDuringGameplay                     = 129,
+    LevelStorageCorruption                        = 130,
+    EditionMismatchVanillaToEdu                   = 131,
+    EditionMismatchEduToVanilla                   = 132,
+    EditorMismatchEditorToVanilla                 = 133,
+    EditorMismatchVanillaToEditor                 = 134,
+    DenyListed                                    = 135,
+    NonceMissing                                  = 136,
+    NonceNotFound                                 = 137,
+    NonceExpired                                  = 138,
+    NonceNotValid                                 = 139,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

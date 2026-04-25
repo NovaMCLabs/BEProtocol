@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class BlockEventType : std::int32_t {
     EntityFallOn     = 0,
@@ -30,4 +30,4 @@ enum class BlockEventType : std::int32_t {
     Count            = 16,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

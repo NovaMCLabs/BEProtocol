@@ -107,7 +107,7 @@ int main() {
 ## 🧬 ABI 命名空间
 
 公开 API 通过内联 ABI 命名空间进行版本化，
-例如 `sculk::protocol::abi_v944`。
+例如 `sculk::protocol::abi_v975`。
 
 ## 🤝 欢迎贡献
 

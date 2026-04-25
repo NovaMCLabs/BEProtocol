@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraAimAssistPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraAimAssistPacket::getId() const noexcept { return MinecraftPacketIds::CameraAimAssist; }
 
@@ -23,12 +23,12 @@ void CameraAimAssistPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CameraAimAssistPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mPresetId); !status) return status;
-    if (auto status = mViewAngle.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mDistance); !status) return status;
-    if (auto status = stream.readEnum(mTargetMode, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readString(mPresetId));
+    _SCULK_READ(mViewAngle.read(stream));
+    _SCULK_READ(stream.readFloat(mDistance));
+    _SCULK_READ(stream.readEnum(mTargetMode, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
     return stream.readBool(mShowDebugRender);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

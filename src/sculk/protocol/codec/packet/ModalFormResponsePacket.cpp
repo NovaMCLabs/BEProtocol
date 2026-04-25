@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ModalFormResponsePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ModalFormResponsePacket::getId() const noexcept { return MinecraftPacketIds::ModalFormResponse; }
 
@@ -22,11 +22,11 @@ void ModalFormResponsePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ModalFormResponsePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mFormId); !status) return status;
-    if (auto status = stream.readOptional(mResponse, &ReadOnlyBinaryStream::readString); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mFormId));
+    _SCULK_READ(stream.readOptional(mResponse, &ReadOnlyBinaryStream::readString));
     return stream.readOptional(mCancelReason, [](ReadOnlyBinaryStream& stream, CancelReason& reason) {
         return stream.readEnum(reason, &ReadOnlyBinaryStream::readByte);
     });
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

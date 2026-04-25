@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeCappedSurfaceData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeCappedSurfaceData::write(BinaryStream& stream) const {
     stream.writeArray(mFloorBlocks, &BinaryStream::writeSignedInt);
@@ -18,12 +18,11 @@ void BiomeCappedSurfaceData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeCappedSurfaceData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mFloorBlocks, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
-    if (auto status = stream.readArray(mCeilingBlocks, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
-    if (auto status = stream.readOptional(mSeaBlock, &ReadOnlyBinaryStream::readUnsignedInt); !status) return status;
-    if (auto status = stream.readOptional(mFoundationBlock, &ReadOnlyBinaryStream::readUnsignedInt); !status)
-        return status;
+    _SCULK_READ(stream.readArray(mFloorBlocks, &ReadOnlyBinaryStream::readSignedInt));
+    _SCULK_READ(stream.readArray(mCeilingBlocks, &ReadOnlyBinaryStream::readSignedInt));
+    _SCULK_READ(stream.readOptional(mSeaBlock, &ReadOnlyBinaryStream::readUnsignedInt));
+    _SCULK_READ(stream.readOptional(mFoundationBlock, &ReadOnlyBinaryStream::readUnsignedInt));
     return stream.readOptional(mBeachBlock, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

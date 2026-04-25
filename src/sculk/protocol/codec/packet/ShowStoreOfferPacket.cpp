@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ShowStoreOfferPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ShowStoreOfferPacket::getId() const noexcept { return MinecraftPacketIds::ShowStoreOffer; }
 
@@ -19,8 +19,8 @@ void ShowStoreOfferPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ShowStoreOfferPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mProductUuid); !status) return status;
+    _SCULK_READ(stream.readString(mProductUuid));
     return stream.readEnum(mRedirectType, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

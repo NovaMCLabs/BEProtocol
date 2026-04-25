@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ScriptMessagePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ScriptMessagePacket::getId() const noexcept { return MinecraftPacketIds::ScriptMessage; }
 
@@ -19,8 +19,8 @@ void ScriptMessagePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ScriptMessagePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mMessageId); !status) return status;
+    _SCULK_READ(stream.readString(mMessageId));
     return stream.readString(mMessageValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RequestNetworkSettingsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RequestNetworkSettingsPacket::getId() const noexcept {
     return MinecraftPacketIds::RequestNetworkSettings;
@@ -23,4 +23,4 @@ Result<> RequestNetworkSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readSignedBigEndianInt(mClientNetworkVersion);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

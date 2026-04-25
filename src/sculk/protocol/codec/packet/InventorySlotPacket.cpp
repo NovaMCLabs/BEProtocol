@@ -7,14 +7,14 @@
 
 #include "sculk/protocol/codec/packet/InventorySlotPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds InventorySlotPacket::getId() const noexcept { return MinecraftPacketIds::InventorySlot; }
 
 std::string_view InventorySlotPacket::getName() const noexcept { return "InventorySlotPacket"; }
 
 void InventorySlotPacket::write(BinaryStream& stream) const {
-    stream.writeUnsignedVarInt(mInventoryId);
+    stream.writeByte(mInventoryId);
     stream.writeUnsignedVarInt(mSlot);
     mFullContainerName.write(stream);
     mStorageItem.write(stream);
@@ -22,11 +22,11 @@ void InventorySlotPacket::write(BinaryStream& stream) const {
 }
 
 Result<> InventorySlotPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mInventoryId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mSlot); !status) return status;
-    if (auto status = mFullContainerName.read(stream); !status) return status;
-    if (auto status = mStorageItem.read(stream); !status) return status;
+    _SCULK_READ(stream.readByte(mInventoryId));
+    _SCULK_READ(stream.readUnsignedVarInt(mSlot));
+    _SCULK_READ(mFullContainerName.read(stream));
+    _SCULK_READ(mStorageItem.read(stream));
     return mItem.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

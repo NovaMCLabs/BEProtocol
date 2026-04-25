@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/item/ItemStackResponse.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ItemStackResponseSlotInfo::write(BinaryStream& stream) const {
     stream.writeByte(mRequestedSlot);
@@ -20,12 +20,12 @@ void ItemStackResponseSlotInfo::write(BinaryStream& stream) const {
 }
 
 Result<> ItemStackResponseSlotInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mRequestedSlot); !status) return status;
-    if (auto status = stream.readByte(mSlot); !status) return status;
-    if (auto status = stream.readByte(mAmount); !status) return status;
-    if (auto status = stream.readVarInt(mNetId); !status) return status;
-    if (auto status = stream.readString(mCustomName); !status) return status;
-    if (auto status = stream.readString(mFilteredCustomName); !status) return status;
+    _SCULK_READ(stream.readByte(mRequestedSlot));
+    _SCULK_READ(stream.readByte(mSlot));
+    _SCULK_READ(stream.readByte(mAmount));
+    _SCULK_READ(stream.readVarInt(mNetId));
+    _SCULK_READ(stream.readString(mCustomName));
+    _SCULK_READ(stream.readString(mFilteredCustomName));
     return stream.readVarInt(mDurationCorrection);
 }
 
@@ -35,7 +35,7 @@ void ItemStackResponseContainerInfo::write(BinaryStream& stream) const {
 }
 
 Result<> ItemStackResponseContainerInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mContainerName.read(stream); !status) return status;
+    _SCULK_READ(mContainerName.read(stream));
     return stream.readArray(mSlots, &ItemStackResponseSlotInfo::read);
 }
 
@@ -48,8 +48,8 @@ void ItemStackResponseInfo::write(BinaryStream& stream) const {
 }
 
 Result<> ItemStackResponseInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mResult, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readVarInt(mRequestId); !status) return status;
+    _SCULK_READ(stream.readEnum(mResult, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readVarInt(mRequestId));
     if (mResult == ItemStackNetResult::Success) {
         return stream.readArray(mContainers, &ItemStackResponseContainerInfo::read);
     }
@@ -64,4 +64,4 @@ Result<> ItemStackResponse::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mResponses, &ItemStackResponseInfo::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

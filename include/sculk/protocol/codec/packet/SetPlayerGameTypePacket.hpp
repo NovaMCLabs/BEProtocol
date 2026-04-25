@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/actor/player/GameType.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class SetPlayerGameTypePacket : public IPacket {
 public:
@@ -25,4 +25,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

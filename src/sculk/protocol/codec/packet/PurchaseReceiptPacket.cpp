@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PurchaseReceiptPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PurchaseReceiptPacket::getId() const noexcept { return MinecraftPacketIds::PurchaseReceipt; }
 
@@ -21,4 +21,4 @@ Result<> PurchaseReceiptPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mPurchaseProofs, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

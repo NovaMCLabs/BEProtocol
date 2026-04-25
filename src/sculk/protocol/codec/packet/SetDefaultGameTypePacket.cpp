@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetDefaultGameTypePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetDefaultGameTypePacket::getId() const noexcept { return MinecraftPacketIds::SetDefaultGameType; }
 
@@ -21,4 +21,4 @@ Result<> SetDefaultGameTypePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mDefaultGameType, &ReadOnlyBinaryStream::readVarInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

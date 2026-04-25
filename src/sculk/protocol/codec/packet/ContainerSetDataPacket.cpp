@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ContainerSetDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ContainerSetDataPacket::getId() const noexcept { return MinecraftPacketIds::ContainerSetData; }
 std::string_view   ContainerSetDataPacket::getName() const noexcept { return "ContainerSetDataPacket"; }
@@ -19,9 +19,9 @@ void ContainerSetDataPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ContainerSetDataPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readVarInt(mId); !status) return status;
+    _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readVarInt(mId));
     return stream.readVarInt(mValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

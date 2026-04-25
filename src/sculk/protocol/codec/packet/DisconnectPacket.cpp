@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/DisconnectPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds DisconnectPacket::getId() const noexcept { return MinecraftPacketIds::Disconnect; }
 
@@ -23,13 +23,13 @@ void DisconnectPacket::write(BinaryStream& stream) const {
 }
 
 Result<> DisconnectPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mReason, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readBool(mSkipMessage); !status) return status;
+    _SCULK_READ(stream.readEnum(mReason, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readBool(mSkipMessage));
     if (!mSkipMessage) {
-        if (auto status = stream.readString(mMessage); !status) return status;
-        if (auto status = stream.readString(mFilteredMessage); !status) return status;
+        _SCULK_READ(stream.readString(mMessage));
+        _SCULK_READ(stream.readString(mFilteredMessage));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

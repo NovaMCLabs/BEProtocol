@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SettingsCommandPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SettingsCommandPacket::getId() const noexcept { return MinecraftPacketIds::SettingsCommand; }
 
@@ -19,8 +19,8 @@ void SettingsCommandPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SettingsCommandPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mCommand); !status) return status;
+    _SCULK_READ(stream.readString(mCommand));
     return stream.readBool(mSuppressOutput);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

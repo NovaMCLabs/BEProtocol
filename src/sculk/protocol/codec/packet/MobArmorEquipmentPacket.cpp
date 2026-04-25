@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MobArmorEquipmentPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MobArmorEquipmentPacket::getId() const noexcept { return MinecraftPacketIds::MobArmorEquipment; }
 
@@ -23,12 +23,12 @@ void MobArmorEquipmentPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MobArmorEquipmentPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mRuntimeId); !status) return status;
-    if (auto status = mHead.read(stream); !status) return status;
-    if (auto status = mTorso.read(stream); !status) return status;
-    if (auto status = mLegs.read(stream); !status) return status;
-    if (auto status = mFeet.read(stream); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mRuntimeId));
+    _SCULK_READ(mHead.read(stream));
+    _SCULK_READ(mTorso.read(stream));
+    _SCULK_READ(mLegs.read(stream));
+    _SCULK_READ(mFeet.read(stream));
     return mBody.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

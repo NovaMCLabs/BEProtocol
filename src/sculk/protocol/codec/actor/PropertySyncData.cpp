@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/PropertySyncData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void PropertySyncData::write(BinaryStream& stream) const {
     stream.writeArray(mIntEntries, [&](const PropertySyncIntEntry& entry) {
@@ -21,21 +21,15 @@ void PropertySyncData::write(BinaryStream& stream) const {
 }
 
 Result<> PropertySyncData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(
-            mIntEntries,
-            [&](PropertySyncIntEntry& entry) {
-                if (auto status = stream.readUnsignedVarInt(entry.mPropertyIndex); !status) return status;
-                if (auto status = stream.readVarInt(entry.mData); !status) return status;
-                return Result<>{};
-            }
-        );
-        !status) {
-        return status;
-    }
+    _SCULK_READ(stream.readArray(mIntEntries, [&](PropertySyncIntEntry& entry) {
+        _SCULK_READ(stream.readUnsignedVarInt(entry.mPropertyIndex));
+        _SCULK_READ(stream.readVarInt(entry.mData));
+        return Result<>{};
+    }));
     return stream.readArray(mFloatEntries, [&](PropertySyncFloatEntry& entry) {
-        if (auto status = stream.readUnsignedVarInt(entry.mPropertyIndex); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(entry.mPropertyIndex));
         return stream.readFloat(entry.mData);
     });
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

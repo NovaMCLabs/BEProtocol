@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/camera/CameraAimAssist.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 namespace {
 
@@ -22,12 +22,12 @@ inline void writePriorityMap(BinaryStream& stream, const std::map<std::string, s
 inline Result<> readPriorityMap(ReadOnlyBinaryStream& stream, std::map<std::string, std::int32_t>& values) {
     values.clear();
     std::uint32_t size{};
-    if (auto status = stream.readUnsignedVarInt(size); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(size));
     for (std::uint32_t i = 0; i < size; ++i) {
         std::string  name{};
         std::int32_t priority{};
-        if (auto status = stream.readString(name); !status) return status;
-        if (auto status = stream.readSignedInt(priority); !status) return status;
+        _SCULK_READ(stream.readString(name));
+        _SCULK_READ(stream.readSignedInt(priority));
         values.emplace(std::move(name), priority);
     }
     return {};
@@ -44,12 +44,12 @@ inline void writeStringMap(BinaryStream& stream, const std::map<std::string, std
 inline Result<> readStringMap(ReadOnlyBinaryStream& stream, std::map<std::string, std::string>& values) {
     values.clear();
     std::uint32_t size{};
-    if (auto status = stream.readUnsignedVarInt(size); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(size));
     for (std::uint32_t i = 0; i < size; ++i) {
         std::string name{};
         std::string category{};
-        if (auto status = stream.readString(name); !status) return status;
-        if (auto status = stream.readString(category); !status) return status;
+        _SCULK_READ(stream.readString(name));
+        _SCULK_READ(stream.readString(category));
         values.emplace(std::move(name), std::move(category));
     }
     return {};
@@ -67,11 +67,11 @@ void CameraAimAssistCategoryPriorities::write(BinaryStream& stream) const {
 }
 
 Result<> CameraAimAssistCategoryPriorities::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = readPriorityMap(stream, mEntities); !status) return status;
-    if (auto status = readPriorityMap(stream, mBlocks); !status) return status;
-    if (auto status = readPriorityMap(stream, mBlockTags); !status) return status;
-    if (auto status = readPriorityMap(stream, mEntityTypeFamilies); !status) return status;
-    if (auto status = stream.readOptional(mEntityDefault, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
+    _SCULK_READ(readPriorityMap(stream, mEntities));
+    _SCULK_READ(readPriorityMap(stream, mBlocks));
+    _SCULK_READ(readPriorityMap(stream, mBlockTags));
+    _SCULK_READ(readPriorityMap(stream, mEntityTypeFamilies));
+    _SCULK_READ(stream.readOptional(mEntityDefault, &ReadOnlyBinaryStream::readSignedInt));
     return stream.readOptional(mBlockDefault, &ReadOnlyBinaryStream::readSignedInt);
 }
 
@@ -81,7 +81,7 @@ void CameraAimAssistCategoryDefinition::write(BinaryStream& stream) const {
 }
 
 Result<> CameraAimAssistCategoryDefinition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return mPriorities.read(stream);
 }
 
@@ -91,7 +91,7 @@ void CameraAimAssistCategoriesDefinition::write(BinaryStream& stream) const {
 }
 
 Result<> CameraAimAssistCategoriesDefinition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mIdentifier); !status) return status;
+    _SCULK_READ(stream.readString(mIdentifier));
     return stream.readArray(mCategory, &CameraAimAssistCategoryDefinition::read);
 }
 
@@ -108,17 +108,14 @@ void CameraAimAssistPresetDefinition::write(BinaryStream& stream) const {
 }
 
 Result<> CameraAimAssistPresetDefinition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mIdentifier); !status) return status;
-    if (auto status = stream.readArray(mBlockExclusionList, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = stream.readArray(mEntityExclusionList, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = stream.readArray(mBlockTagExclusionList, &ReadOnlyBinaryStream::readString); !status)
-        return status;
-    if (auto status = stream.readArray(mEntityTypeFamilyExclusionList, &ReadOnlyBinaryStream::readString); !status)
-        return status;
-    if (auto status = stream.readArray(mLiquidTargetingList, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = readStringMap(stream, mItemSettings); !status) return status;
-    if (auto status = stream.readOptional(mDefaultItemSettings, &ReadOnlyBinaryStream::readString); !status)
-        return status;
+    _SCULK_READ(stream.readString(mIdentifier));
+    _SCULK_READ(stream.readArray(mBlockExclusionList, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mEntityExclusionList, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mBlockTagExclusionList, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mEntityTypeFamilyExclusionList, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mLiquidTargetingList, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(readStringMap(stream, mItemSettings));
+    _SCULK_READ(stream.readOptional(mDefaultItemSettings, &ReadOnlyBinaryStream::readString));
     return stream.readOptional(mHandSettings, &ReadOnlyBinaryStream::readString);
 }
 
@@ -132,17 +129,12 @@ void CameraPresetAimAssistDefinition::write(BinaryStream& stream) const {
 }
 
 Result<> CameraPresetAimAssistDefinition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readOptional(mPresetId, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = stream.readOptional(
-            mTargetMode,
-            [](ReadOnlyBinaryStream& stream, TargetMode& value) {
-                return stream.readEnum(value, &ReadOnlyBinaryStream::readByte);
-            }
-        );
-        !status)
-        return status;
-    if (auto status = stream.readOptional(mViewAngle, &Vec2::read); !status) return status;
+    _SCULK_READ(stream.readOptional(mPresetId, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readOptional(mTargetMode, [](ReadOnlyBinaryStream& stream, TargetMode& value) {
+        return stream.readEnum(value, &ReadOnlyBinaryStream::readByte);
+    }));
+    _SCULK_READ(stream.readOptional(mViewAngle, &Vec2::read));
     return stream.readOptional(mDistance, &ReadOnlyBinaryStream::readFloat);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

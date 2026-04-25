@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MoveActorAbsolutePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MoveActorAbsolutePacket::getId() const noexcept { return MinecraftPacketIds::MoveActorAbsolute; }
 
@@ -20,15 +20,17 @@ void MoveActorAbsolutePacket::write(BinaryStream& stream) const {
     stream.writeByte(mRotationX);
     stream.writeByte(mRotationY);
     stream.writeByte(mRotationYHead);
+    stream.writeBool(mForceCompletion);
 }
 
 Result<> MoveActorAbsolutePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readByte(mHeader); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readByte(mRotationX); !status) return status;
-    if (auto status = stream.readByte(mRotationY); !status) return status;
-    return stream.readByte(mRotationYHead);
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readByte(mHeader));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readByte(mRotationX));
+    _SCULK_READ(stream.readByte(mRotationY));
+    _SCULK_READ(stream.readByte(mRotationYHead));
+    return stream.readBool(mForceCompletion);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

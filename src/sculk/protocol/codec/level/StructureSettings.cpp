@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/StructureSettings.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void StructureSettings::write(BinaryStream& stream) const {
     stream.writeString(mPaletteName);
@@ -27,20 +27,20 @@ void StructureSettings::write(BinaryStream& stream) const {
 }
 
 Result<> StructureSettings::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mPaletteName); !status) return status;
-    if (auto status = stream.readBool(mShouldIgnoreEntities); !status) return status;
-    if (auto status = stream.readBool(mShouldIgnoreBlocks); !status) return status;
-    if (auto status = stream.readBool(mShouldAllowNonTickingPlayerAndTickingAreaChunks); !status) return status;
-    if (auto status = mSize.read(stream); !status) return status;
-    if (auto status = mOffset.read(stream); !status) return status;
-    if (auto status = stream.readVarInt64(mLastEditPlayer); !status) return status;
-    if (auto status = stream.readEnum(mRotation, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mMirror, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mAnimationMode, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readFloat(mAnimationSeconds); !status) return status;
-    if (auto status = stream.readFloat(mIntegretyValue); !status) return status;
-    if (auto status = stream.readUnsignedInt(mSeed); !status) return status;
+    _SCULK_READ(stream.readString(mPaletteName));
+    _SCULK_READ(stream.readBool(mShouldIgnoreEntities));
+    _SCULK_READ(stream.readBool(mShouldIgnoreBlocks));
+    _SCULK_READ(stream.readBool(mShouldAllowNonTickingPlayerAndTickingAreaChunks));
+    _SCULK_READ(mSize.read(stream));
+    _SCULK_READ(mOffset.read(stream));
+    _SCULK_READ(stream.readVarInt64(mLastEditPlayer));
+    _SCULK_READ(stream.readEnum(mRotation, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mMirror, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mAnimationMode, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readFloat(mAnimationSeconds));
+    _SCULK_READ(stream.readFloat(mIntegretyValue));
+    _SCULK_READ(stream.readUnsignedInt(mSeed));
     return mRotationPivot.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -12,7 +12,7 @@
 #include <variant>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct TimeMarkerData {
     std::uint64_t mId{};
@@ -68,4 +68,4 @@ struct RemoveTimeMarkerData {
 using SyncWorldClocksData =
     std::variant<SyncStateData, InitializeRegistryData, AddTimeMarkerData, RemoveTimeMarkerData>;
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

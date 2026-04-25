@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SimpleEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SimpleEventPacket::getId() const noexcept { return MinecraftPacketIds::SimpleEvent; }
 
@@ -21,4 +21,4 @@ Result<> SimpleEventPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedShort);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

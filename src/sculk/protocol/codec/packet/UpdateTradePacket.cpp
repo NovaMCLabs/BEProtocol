@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateTradePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateTradePacket::getId() const noexcept { return MinecraftPacketIds::UpdateTrade; }
 
@@ -27,16 +27,16 @@ void UpdateTradePacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateTradePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readVarInt(mSize); !status) return status;
-    if (auto status = stream.readVarInt(mTier); !status) return status;
-    if (auto status = stream.readVarInt64(mEntityUniqueId); !status) return status;
-    if (auto status = stream.readVarInt64(mLastTradingPlayer); !status) return status;
-    if (auto status = stream.readString(mDisplayName); !status) return status;
-    if (auto status = stream.readBool(mUseNewTradeScreen); !status) return status;
-    if (auto status = stream.readBool(mUseEconomyTrade); !status) return status;
+    _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readVarInt(mSize));
+    _SCULK_READ(stream.readVarInt(mTier));
+    _SCULK_READ(stream.readVarInt64(mEntityUniqueId));
+    _SCULK_READ(stream.readVarInt64(mLastTradingPlayer));
+    _SCULK_READ(stream.readString(mDisplayName));
+    _SCULK_READ(stream.readBool(mUseNewTradeScreen));
+    _SCULK_READ(stream.readBool(mUseEconomyTrade));
     return mOffers.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

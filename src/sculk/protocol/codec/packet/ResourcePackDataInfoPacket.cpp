@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ResourcePackDataInfoPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ResourcePackDataInfoPacket::getId() const noexcept {
     return MinecraftPacketIds::ResourcePackDataInfo;
@@ -26,13 +26,13 @@ void ResourcePackDataInfoPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ResourcePackDataInfoPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mResourceName); !status) return status;
-    if (auto status = stream.readUnsignedInt(mChunkSize); !status) return status;
-    if (auto status = stream.readUnsignedInt(mChunkIndex); !status) return status;
-    if (auto status = stream.readUnsignedInt64(mFileSize); !status) return status;
-    if (auto status = stream.readString(mFileHash); !status) return status;
-    if (auto status = stream.readBool(mIsPremiumPack); !status) return status;
+    _SCULK_READ(stream.readString(mResourceName));
+    _SCULK_READ(stream.readUnsignedInt(mChunkSize));
+    _SCULK_READ(stream.readUnsignedInt(mChunkIndex));
+    _SCULK_READ(stream.readUnsignedInt64(mFileSize));
+    _SCULK_READ(stream.readString(mFileHash));
+    _SCULK_READ(stream.readBool(mIsPremiumPack));
     return stream.readEnum(mPackType, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

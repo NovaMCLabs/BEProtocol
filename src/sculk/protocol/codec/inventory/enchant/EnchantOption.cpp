@@ -7,15 +7,15 @@
 
 #include "sculk/protocol/codec/inventory/enchant/EnchantOption.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void Enchant::write(BinaryStream& stream) const {
-    stream.writeByte(mType);
+    stream.writeEnum(mType, &BinaryStream::writeByte);
     stream.writeByte(mLevel);
 }
 
 Result<> Enchant::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mType); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     return stream.readByte(mLevel);
 }
 
@@ -27,9 +27,9 @@ void ItemEnchants::write(BinaryStream& stream) const {
 }
 
 Result<> ItemEnchants::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mSlot); !status) return status;
-    if (auto status = stream.readArray(mOption1, &Enchant::read); !status) return status;
-    if (auto status = stream.readArray(mOption2, &Enchant::read); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mSlot));
+    _SCULK_READ(stream.readArray(mOption1, &Enchant::read));
+    _SCULK_READ(stream.readArray(mOption2, &Enchant::read));
     return stream.readArray(mOption3, &Enchant::read);
 }
 
@@ -41,10 +41,10 @@ void EnchantOption::write(BinaryStream& stream) const {
 }
 
 Result<> EnchantOption::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mCost); !status) return status;
-    if (auto status = mEnchants.read(stream); !status) return status;
-    if (auto status = stream.readString(mEnchantName); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mCost));
+    _SCULK_READ(mEnchants.read(stream));
+    _SCULK_READ(stream.readString(mEnchantName));
     return stream.readUnsignedVarInt(mNetId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

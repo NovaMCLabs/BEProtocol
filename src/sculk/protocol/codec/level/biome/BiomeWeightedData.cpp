@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeWeightedData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeWeightedData::write(BinaryStream& stream) const {
     stream.writeSignedShort(mBiome);
@@ -15,8 +15,8 @@ void BiomeWeightedData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeWeightedData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedShort(mBiome); !status) return status;
+    _SCULK_READ(stream.readSignedShort(mBiome));
     return stream.readUnsignedInt(mWeight);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/SpawnSettings.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SpawnSettings::write(BinaryStream& stream) const {
     stream.writeSignedShort(mType);
@@ -16,9 +16,9 @@ void SpawnSettings::write(BinaryStream& stream) const {
 }
 
 Result<> SpawnSettings::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedShort(mType); !status) return status;
-    if (auto status = stream.readString(mBiomeName); !status) return status;
+    _SCULK_READ(stream.readSignedShort(mType));
+    _SCULK_READ(stream.readString(mBiomeName));
     return stream.readVarInt(mDimension);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

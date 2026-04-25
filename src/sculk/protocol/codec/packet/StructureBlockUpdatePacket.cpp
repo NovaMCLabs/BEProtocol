@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/StructureBlockUpdatePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds StructureBlockUpdatePacket::getId() const noexcept {
     return MinecraftPacketIds::StructureBlockUpdate;
@@ -23,10 +23,10 @@ void StructureBlockUpdatePacket::write(BinaryStream& stream) const {
 }
 
 Result<> StructureBlockUpdatePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mBlockPosition.read(stream); !status) return status;
-    if (auto status = mStructureData.read(stream); !status) return status;
-    if (auto status = stream.readBool(mTrigger); !status) return status;
+    _SCULK_READ(mBlockPosition.read(stream));
+    _SCULK_READ(mStructureData.read(stream));
+    _SCULK_READ(stream.readBool(mTrigger));
     return stream.readBool(mIsWaterLogged);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

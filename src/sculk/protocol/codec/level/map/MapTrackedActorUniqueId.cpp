@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/map/MapTrackedActorUniqueId.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void MapTrackedActorUniqueId::write(BinaryStream& stream) const {
     stream.writeEnum(mType, &BinaryStream::writeSignedInt);
@@ -24,7 +24,7 @@ void MapTrackedActorUniqueId::write(BinaryStream& stream) const {
 }
 
 Result<> MapTrackedActorUniqueId::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readSignedInt));
     switch (mType) {
     case Type::Entity:
         return stream.readVarInt64(mActorUniqueId);
@@ -35,4 +35,4 @@ Result<> MapTrackedActorUniqueId::read(ReadOnlyBinaryStream& stream) {
     }
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

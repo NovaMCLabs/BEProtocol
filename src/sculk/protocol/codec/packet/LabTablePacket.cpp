@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LabTablePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LabTablePacket::getId() const noexcept { return MinecraftPacketIds::LabTable; }
 
@@ -20,9 +20,9 @@ void LabTablePacket::write(BinaryStream& stream) const {
 }
 
 Result<> LabTablePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(mPosition.read(stream));
     return stream.readEnum(mReaction, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

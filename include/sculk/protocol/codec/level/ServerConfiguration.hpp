@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/player/UUID.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct GatheringsConfigurationJoinInfo {
     UUID        mExperienceId{};
@@ -53,4 +53,4 @@ struct ServerConfigurationJoinInfo {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

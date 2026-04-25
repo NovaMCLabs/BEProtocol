@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundMapItemDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundMapItemDataPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundMapItemData;
@@ -41,29 +41,29 @@ void ClientboundMapItemDataPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ClientboundMapItemDataPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mMapId); !status) return status;
-    if (auto status = stream.readEnum(mTypeFlag, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
-    if (auto status = stream.readByte(mDimension); !status) return status;
-    if (auto status = stream.readBool(mIsLockedMap); !status) return status;
-    if (auto status = mMapOrigin.read(stream); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mMapId));
+    _SCULK_READ(stream.readEnum(mTypeFlag, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(stream.readByte(mDimension));
+    _SCULK_READ(stream.readBool(mIsLockedMap));
+    _SCULK_READ(mMapOrigin.read(stream));
     if (static_cast<bool>(mTypeFlag & ClientboundMapItemDataType::Creation)) {
-        if (auto status = stream.readArray(mMapEntries, &ReadOnlyBinaryStream::readVarInt64); !status) return status;
+        _SCULK_READ(stream.readArray(mMapEntries, &ReadOnlyBinaryStream::readVarInt64));
     }
     if (static_cast<bool>(mTypeFlag & ClientboundMapItemDataType::All)) {
-        if (auto status = stream.readByte(mScale); !status) return status;
+        _SCULK_READ(stream.readByte(mScale));
     }
     if (static_cast<bool>(mTypeFlag & ClientboundMapItemDataType::DecorationUpdate)) {
-        if (auto status = stream.readArray(mTrackedActors, &MapTrackedActorUniqueId::read); !status) return status;
-        if (auto status = stream.readArray(mDecorationList, &MapDecoration::read); !status) return status;
+        _SCULK_READ(stream.readArray(mTrackedActors, &MapTrackedActorUniqueId::read));
+        _SCULK_READ(stream.readArray(mDecorationList, &MapDecoration::read));
     }
     if (static_cast<bool>(mTypeFlag & ClientboundMapItemDataType::TextureUpdate)) {
-        if (auto status = stream.readVarInt(mTextureWidth); !status) return status;
-        if (auto status = stream.readVarInt(mTextureHeight); !status) return status;
-        if (auto status = stream.readVarInt(mXTexCoordinate); !status) return status;
-        if (auto status = stream.readVarInt(mYTexCoordinate); !status) return status;
-        if (auto status = stream.readArray(mPixels, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
+        _SCULK_READ(stream.readVarInt(mTextureWidth));
+        _SCULK_READ(stream.readVarInt(mTextureHeight));
+        _SCULK_READ(stream.readVarInt(mXTexCoordinate));
+        _SCULK_READ(stream.readVarInt(mYTexCoordinate));
+        _SCULK_READ(stream.readArray(mPixels, &ReadOnlyBinaryStream::readUnsignedVarInt));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

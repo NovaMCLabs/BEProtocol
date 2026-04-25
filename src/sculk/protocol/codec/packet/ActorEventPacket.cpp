@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ActorEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ActorEventPacket::getId() const noexcept { return MinecraftPacketIds::ActorEvent; }
 
@@ -17,12 +17,14 @@ void ActorEventPacket::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt64(mRuntimeId);
     stream.writeEnum(mEventId, &BinaryStream::writeByte);
     stream.writeVarInt(mData);
+    stream.writeOptional(mFireAtPosition, &Vec3::write);
 }
 
 Result<> ActorEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mRuntimeId); !status) return status;
-    if (auto status = stream.readEnum(mEventId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    return stream.readVarInt(mData);
+    _SCULK_READ(stream.readUnsignedVarInt64(mRuntimeId));
+    _SCULK_READ(stream.readEnum(mEventId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readVarInt(mData));
+    return stream.readOptional(mFireAtPosition, &Vec3::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

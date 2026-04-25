@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/camera/EasingType.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct CameraSplineProgressKeyFrame {
     float      mProgress{};
@@ -44,4 +44,4 @@ struct CameraSplineDefinition {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

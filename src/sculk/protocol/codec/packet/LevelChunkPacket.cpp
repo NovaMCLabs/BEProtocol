@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LevelChunkPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LevelChunkPacket::getId() const noexcept { return MinecraftPacketIds::LevelChunk; }
 
@@ -33,9 +33,9 @@ void LevelChunkPacket::write(BinaryStream& stream) const {
 
 Result<> LevelChunkPacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t subChunkHeader{};
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mDimensionId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(subChunkHeader); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readVarInt(mDimensionId));
+    _SCULK_READ(stream.readUnsignedVarInt(subChunkHeader));
 
     if (subChunkHeader == 0xFFFFFFFFu) {
         mClientNeedsToRequestSubchunks = true;
@@ -43,7 +43,7 @@ Result<> LevelChunkPacket::read(ReadOnlyBinaryStream& stream) {
         mSubChunksCount                = 0;
     } else if (subChunkHeader == 0xFFFFFFFEu) {
         std::uint16_t limit{};
-        if (auto status = stream.readUnsignedShort(limit); !status) return status;
+        _SCULK_READ(stream.readUnsignedShort(limit));
         mClientNeedsToRequestSubchunks = true;
         mClientRequestSubChunkLimit    = static_cast<std::int16_t>(limit);
         mSubChunksCount                = 0;
@@ -53,10 +53,9 @@ Result<> LevelChunkPacket::read(ReadOnlyBinaryStream& stream) {
         mClientRequestSubChunkLimit    = 0;
     }
 
-    if (auto status = stream.readBool(mCacheEnabled); !status) return status;
+    _SCULK_READ(stream.readBool(mCacheEnabled));
     if (mCacheEnabled) {
-        if (auto status = stream.readArray(mCacheBlobs, &ReadOnlyBinaryStream::readUnsignedInt64); !status)
-            return status;
+        _SCULK_READ(stream.readArray(mCacheBlobs, &ReadOnlyBinaryStream::readUnsignedInt64));
     } else {
         mCacheBlobs.clear();
     }
@@ -64,4 +63,4 @@ Result<> LevelChunkPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readString(mSerializedChunk);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

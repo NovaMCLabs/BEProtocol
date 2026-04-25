@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/player/SerializedSkin.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SerializedSkin::Animation::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mWidth);
@@ -19,11 +19,11 @@ void SerializedSkin::Animation::write(BinaryStream& stream) const {
 }
 
 Result<> SerializedSkin::Animation::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt(mWidth); !status) return status;
-    if (auto status = stream.readUnsignedInt(mHeight); !status) return status;
-    if (auto status = stream.readString(mSkinImageBytes); !status) return status;
-    if (auto status = stream.readEnum(mAnimationType, &ReadOnlyBinaryStream::readUnsignedInt); !status) return status;
-    if (auto status = stream.readFloat(mFrameCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(mWidth));
+    _SCULK_READ(stream.readUnsignedInt(mHeight));
+    _SCULK_READ(stream.readString(mSkinImageBytes));
+    _SCULK_READ(stream.readEnum(mAnimationType, &ReadOnlyBinaryStream::readUnsignedInt));
+    _SCULK_READ(stream.readFloat(mFrameCount));
     return stream.readEnum(mAnimationExpression, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
@@ -36,10 +36,10 @@ void SerializedSkin::PersonaPiece::write(BinaryStream& stream) const {
 }
 
 Result<> SerializedSkin::PersonaPiece::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mPieceId); !status) return status;
-    if (auto status = stream.readString(mPieceType); !status) return status;
-    if (auto status = stream.readString(mPackId); !status) return status;
-    if (auto status = stream.readBool(mIsDefaultPiece); !status) return status;
+    _SCULK_READ(stream.readString(mPieceId));
+    _SCULK_READ(stream.readString(mPieceType));
+    _SCULK_READ(stream.readString(mPackId));
+    _SCULK_READ(stream.readBool(mIsDefaultPiece));
     return stream.readString(mProductId);
 }
 
@@ -52,12 +52,12 @@ void SerializedSkin::PieceTintColors::write(BinaryStream& stream) const {
 }
 
 Result<> SerializedSkin::PieceTintColors::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mPieceType); !status) return status;
+    _SCULK_READ(stream.readString(mPieceType));
     std::uint32_t tintColorCount{};
-    if (auto status = stream.readUnsignedInt(tintColorCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(tintColorCount));
     mPieceTintColors.resize(tintColorCount);
     for (std::string& tintColor : mPieceTintColors) {
-        if (auto status = stream.readString(tintColor); !status) return status;
+        _SCULK_READ(stream.readString(tintColor));
     }
     return {};
 }
@@ -99,50 +99,50 @@ void SerializedSkin::write(BinaryStream& stream) const {
 }
 
 Result<> SerializedSkin::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mId); !status) return status;
-    if (auto status = stream.readString(mPlayFabId); !status) return status;
-    if (auto status = stream.readString(mResourcePatch); !status) return status;
-    if (auto status = stream.readUnsignedInt(mSkinImageWidth); !status) return status;
-    if (auto status = stream.readUnsignedInt(mSkinImageHeight); !status) return status;
-    if (auto status = stream.readString(mSkinImageBytes); !status) return status;
+    _SCULK_READ(stream.readString(mId));
+    _SCULK_READ(stream.readString(mPlayFabId));
+    _SCULK_READ(stream.readString(mResourcePatch));
+    _SCULK_READ(stream.readUnsignedInt(mSkinImageWidth));
+    _SCULK_READ(stream.readUnsignedInt(mSkinImageHeight));
+    _SCULK_READ(stream.readString(mSkinImageBytes));
 
     std::uint32_t animationCount{};
-    if (auto status = stream.readUnsignedInt(animationCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(animationCount));
     mAnimations.resize(animationCount);
     for (Animation& animation : mAnimations) {
-        if (auto status = animation.read(stream); !status) return status;
+        _SCULK_READ(animation.read(stream));
     }
 
-    if (auto status = stream.readUnsignedInt(mCapeImageWidth); !status) return status;
-    if (auto status = stream.readUnsignedInt(mCapeImageHeight); !status) return status;
-    if (auto status = stream.readString(mCapeImageBytes); !status) return status;
-    if (auto status = stream.readString(mGeometryData); !status) return status;
-    if (auto status = stream.readString(mGeometryDataMinEngineVersion); !status) return status;
-    if (auto status = stream.readString(mAnimationData); !status) return status;
-    if (auto status = stream.readString(mCapeId); !status) return status;
-    if (auto status = stream.readString(mFullId); !status) return status;
-    if (auto status = stream.readString(mArmSize); !status) return status;
-    if (auto status = stream.readString(mSkinColor); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(mCapeImageWidth));
+    _SCULK_READ(stream.readUnsignedInt(mCapeImageHeight));
+    _SCULK_READ(stream.readString(mCapeImageBytes));
+    _SCULK_READ(stream.readString(mGeometryData));
+    _SCULK_READ(stream.readString(mGeometryDataMinEngineVersion));
+    _SCULK_READ(stream.readString(mAnimationData));
+    _SCULK_READ(stream.readString(mCapeId));
+    _SCULK_READ(stream.readString(mFullId));
+    _SCULK_READ(stream.readString(mArmSize));
+    _SCULK_READ(stream.readString(mSkinColor));
 
     std::uint32_t personaPieceCount{};
-    if (auto status = stream.readUnsignedInt(personaPieceCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(personaPieceCount));
     mPersonaPieces.resize(personaPieceCount);
     for (PersonaPiece& piece : mPersonaPieces) {
-        if (auto status = piece.read(stream); !status) return status;
+        _SCULK_READ(piece.read(stream));
     }
 
     std::uint32_t pieceTintColorCount{};
-    if (auto status = stream.readUnsignedInt(pieceTintColorCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(pieceTintColorCount));
     mPieceTintColors.resize(pieceTintColorCount);
     for (PieceTintColors& tintColors : mPieceTintColors) {
-        if (auto status = tintColors.read(stream); !status) return status;
+        _SCULK_READ(tintColors.read(stream));
     }
 
-    if (auto status = stream.readBool(mIsPremiumSkin); !status) return status;
-    if (auto status = stream.readBool(mIsPersonaSkin); !status) return status;
-    if (auto status = stream.readBool(mIsPersonaCapeOnClassicSkin); !status) return status;
-    if (auto status = stream.readBool(mIsPrimaryUser); !status) return status;
+    _SCULK_READ(stream.readBool(mIsPremiumSkin));
+    _SCULK_READ(stream.readBool(mIsPersonaSkin));
+    _SCULK_READ(stream.readBool(mIsPersonaCapeOnClassicSkin));
+    _SCULK_READ(stream.readBool(mIsPrimaryUser));
     return stream.readBool(mOverridesPlayerAppearance);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

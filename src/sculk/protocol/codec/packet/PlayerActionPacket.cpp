@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerActionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerActionPacket::getId() const noexcept { return MinecraftPacketIds::PlayerAction; }
 
@@ -22,11 +22,11 @@ void PlayerActionPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerActionPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mPlayerRuntimeId); !status) return status;
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = mBlockPosition.read(stream); !status) return status;
-    if (auto status = mResultPosition.read(stream); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mPlayerRuntimeId));
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(mBlockPosition.read(stream));
+    _SCULK_READ(mResultPosition.read(stream));
     return stream.readVarInt(mFace);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

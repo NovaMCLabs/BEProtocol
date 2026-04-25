@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ResourcePackChunkRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ResourcePackChunkRequestPacket::getId() const noexcept {
     return MinecraftPacketIds::ResourcePackChunkRequest;
@@ -21,8 +21,8 @@ void ResourcePackChunkRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ResourcePackChunkRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mResourceName); !status) return status;
+    _SCULK_READ(stream.readString(mResourceName));
     return stream.readUnsignedInt(mChunkIndex);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

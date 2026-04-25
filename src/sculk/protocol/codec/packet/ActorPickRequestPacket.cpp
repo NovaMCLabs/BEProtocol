@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ActorPickRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ActorPickRequestPacket::getId() const noexcept { return MinecraftPacketIds::ActorPickRequest; }
 
@@ -20,9 +20,9 @@ void ActorPickRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ActorPickRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt64(mActorId); !status) return status;
-    if (auto status = stream.readByte(mMaxSlots); !status) return status;
+    _SCULK_READ(stream.readSignedInt64(mActorId));
+    _SCULK_READ(stream.readByte(mMaxSlots));
     return stream.readBool(mWithData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

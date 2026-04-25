@@ -18,7 +18,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class BinaryStream {
 public:
@@ -221,4 +221,4 @@ public:
     }
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

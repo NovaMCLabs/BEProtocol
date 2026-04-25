@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/nbt/TagType.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds StartGamePacket::getId() const noexcept { return MinecraftPacketIds::StartGame; }
 
@@ -44,32 +44,31 @@ void StartGamePacket::write(BinaryStream& stream) const {
 }
 
 Result<> StartGamePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = mRotation.read(stream); !status) return status;
-    if (auto status = mLevelSettings.read(stream); !status) return status;
-    if (auto status = stream.readString(mLevelId); !status) return status;
-    if (auto status = stream.readString(mLevelName); !status) return status;
-    if (auto status = stream.readString(mTemplateContentIdentity); !status) return status;
-    if (auto status = stream.readBool(mIsTrial); !status) return status;
-    if (auto status = mMovementSettings.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedInt64(mCurrentTime); !status) return status;
-    if (auto status = stream.readVarInt(mEnchantmentSeed); !status) return status;
-    if (auto status = stream.readArray(mBlockProperties, &BlockProperty::read); !status) return status;
-    if (auto status = stream.readString(mMultiPlayerCorrelationId); !status) return status;
-    if (auto status = stream.readBool(mEnableItemStackNetManager); !status) return status;
-    if (auto status = stream.readString(mServerVersion); !status) return status;
-    if (auto status = mPlayerPropertyData.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedInt64(mServerBlockCheckSum); !status) return status;
-    if (auto status = mWorldTemplateId.read(stream); !status) return status;
-    if (auto status = stream.readBool(mClientGen); !status) return status;
-    if (auto status = stream.readBool(mEnableHashId); !status) return status;
-    if (auto status = stream.readBool(mServerAuthSound); !status) return status;
-    if (auto status = stream.readOptional(mServerConfigurationJoinInfo, &ServerConfigurationJoinInfo::read); !status)
-        return status;
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(mRotation.read(stream));
+    _SCULK_READ(mLevelSettings.read(stream));
+    _SCULK_READ(stream.readString(mLevelId));
+    _SCULK_READ(stream.readString(mLevelName));
+    _SCULK_READ(stream.readString(mTemplateContentIdentity));
+    _SCULK_READ(stream.readBool(mIsTrial));
+    _SCULK_READ(mMovementSettings.read(stream));
+    _SCULK_READ(stream.readUnsignedInt64(mCurrentTime));
+    _SCULK_READ(stream.readVarInt(mEnchantmentSeed));
+    _SCULK_READ(stream.readArray(mBlockProperties, &BlockProperty::read));
+    _SCULK_READ(stream.readString(mMultiPlayerCorrelationId));
+    _SCULK_READ(stream.readBool(mEnableItemStackNetManager));
+    _SCULK_READ(stream.readString(mServerVersion));
+    _SCULK_READ(mPlayerPropertyData.read(stream));
+    _SCULK_READ(stream.readUnsignedInt64(mServerBlockCheckSum));
+    _SCULK_READ(mWorldTemplateId.read(stream));
+    _SCULK_READ(stream.readBool(mClientGen));
+    _SCULK_READ(stream.readBool(mEnableHashId));
+    _SCULK_READ(stream.readBool(mServerAuthSound));
+    _SCULK_READ(stream.readOptional(mServerConfigurationJoinInfo, &ServerConfigurationJoinInfo::read));
     return mServerTelemetryData.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

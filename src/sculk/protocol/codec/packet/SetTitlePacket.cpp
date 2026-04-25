@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetTitlePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetTitlePacket::getId() const noexcept { return MinecraftPacketIds::SetTitle; }
 
@@ -25,14 +25,14 @@ void SetTitlePacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetTitlePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mTitleType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readString(mTitleText); !status) return status;
-    if (auto status = stream.readVarInt(mFadeInTime); !status) return status;
-    if (auto status = stream.readVarInt(mStayTime); !status) return status;
-    if (auto status = stream.readVarInt(mFadeOutTime); !status) return status;
-    if (auto status = stream.readString(mXuid); !status) return status;
-    if (auto status = stream.readString(mPlatformId); !status) return status;
+    _SCULK_READ(stream.readEnum(mTitleType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readString(mTitleText));
+    _SCULK_READ(stream.readVarInt(mFadeInTime));
+    _SCULK_READ(stream.readVarInt(mStayTime));
+    _SCULK_READ(stream.readVarInt(mFadeOutTime));
+    _SCULK_READ(stream.readString(mXuid));
+    _SCULK_READ(stream.readString(mPlatformId));
     return stream.readString(mFilteredMessage);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

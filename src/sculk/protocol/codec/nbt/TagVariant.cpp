@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void TagVariant::serialize(BinaryStream& stream) const {
     std::visit([&stream](const auto& val) { val.serialize(stream); }, mValue);
@@ -61,4 +61,4 @@ TagVariant& TagVariant::emplace(TagType type) {
 
 TagType TagVariant::getType() const noexcept { return static_cast<TagType>(mValue.index()); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

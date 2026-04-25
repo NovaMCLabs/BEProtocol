@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void NetworkItemStackDescriptor::write(BinaryStream& stream) const {
     if (mId == 0) {
@@ -23,16 +23,16 @@ void NetworkItemStackDescriptor::write(BinaryStream& stream) const {
 }
 
 [[nodiscard]] Result<> NetworkItemStackDescriptor::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mId));
     if (mId == 0) {
         return {}; // Empty item stack
     } else {
-        if (auto status = stream.readUnsignedShort(mStackSize); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(mAux); !status) return status;
-        if (auto status = stream.readOptional(mNetId, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-        if (auto status = stream.readVarInt(mBlockRuntimeId); !status) return status;
+        _SCULK_READ(stream.readUnsignedShort(mStackSize));
+        _SCULK_READ(stream.readUnsignedVarInt(mAux));
+        _SCULK_READ(stream.readOptional(mNetId, &ReadOnlyBinaryStream::readVarInt));
+        _SCULK_READ(stream.readVarInt(mBlockRuntimeId));
         return stream.readString(mUserData);
     }
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

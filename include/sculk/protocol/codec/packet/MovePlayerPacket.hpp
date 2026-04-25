@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/math/Vec2.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class MovePlayerPacket : public IPacket {
 public:
@@ -43,4 +43,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

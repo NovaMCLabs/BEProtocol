@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LecternUpdatePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LecternUpdatePacket::getId() const noexcept { return MinecraftPacketIds::LecternUpdate; }
 
@@ -20,9 +20,9 @@ void LecternUpdatePacket::write(BinaryStream& stream) const {
 }
 
 Result<> LecternUpdatePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mNewPageToShow); !status) return status;
-    if (auto status = stream.readByte(mTotalPages); !status) return status;
+    _SCULK_READ(stream.readByte(mNewPageToShow));
+    _SCULK_READ(stream.readByte(mTotalPages));
     return mPosition.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

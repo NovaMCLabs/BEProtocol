@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MobEffectPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MobEffectPacket::getId() const noexcept { return MinecraftPacketIds::MobEffect; }
 
@@ -25,14 +25,14 @@ void MobEffectPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MobEffectPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readEnum(mEventId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readVarInt(mEffectId); !status) return status;
-    if (auto status = stream.readVarInt(mEffectAmplifier); !status) return status;
-    if (auto status = stream.readBool(mShowParticles); !status) return status;
-    if (auto status = stream.readVarInt(mEffectDurationTicks); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mTick); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readEnum(mEventId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readVarInt(mEffectId));
+    _SCULK_READ(stream.readVarInt(mEffectAmplifier));
+    _SCULK_READ(stream.readBool(mShowParticles));
+    _SCULK_READ(stream.readVarInt(mEffectDurationTicks));
+    _SCULK_READ(stream.readUnsignedVarInt64(mTick));
     return stream.readBool(mAmbient);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

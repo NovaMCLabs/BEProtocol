@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeConsolidatedFeatureData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeConsolidatedFeatureData::write(BinaryStream& stream) const {
     mScatter.write(stream);
@@ -18,11 +18,11 @@ void BiomeConsolidatedFeatureData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeConsolidatedFeatureData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mScatter.read(stream); !status) return status;
-    if (auto status = stream.readSignedShort(mFeature); !status) return status;
-    if (auto status = stream.readSignedShort(mIdentifier); !status) return status;
-    if (auto status = stream.readSignedShort(mPass); !status) return status;
+    _SCULK_READ(mScatter.read(stream));
+    _SCULK_READ(stream.readSignedShort(mFeature));
+    _SCULK_READ(stream.readSignedShort(mIdentifier));
+    _SCULK_READ(stream.readSignedShort(mPass));
     return stream.readBool(mCanUseInternal);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

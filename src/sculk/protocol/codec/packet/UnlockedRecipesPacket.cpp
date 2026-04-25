@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UnlockedRecipesPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UnlockedRecipesPacket::getId() const noexcept { return MinecraftPacketIds::UnlockedRecipes; }
 
@@ -19,8 +19,8 @@ void UnlockedRecipesPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UnlockedRecipesPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mPacketType, &ReadOnlyBinaryStream::readUnsignedInt); !status) return status;
+    _SCULK_READ(stream.readEnum(mPacketType, &ReadOnlyBinaryStream::readUnsignedInt));
     return stream.readArray(mUnlockedRecipesList, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

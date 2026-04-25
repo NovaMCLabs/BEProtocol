@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetDisplayObjectivePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetDisplayObjectivePacket::getId() const noexcept { return MinecraftPacketIds::SetDisplayObjective; }
 
@@ -22,11 +22,11 @@ void SetDisplayObjectivePacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetDisplayObjectivePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mDisplaySlotName); !status) return status;
-    if (auto status = stream.readString(mObjectiveName); !status) return status;
-    if (auto status = stream.readString(mObjectiveDisplayName); !status) return status;
-    if (auto status = stream.readString(mCriteriaName); !status) return status;
+    _SCULK_READ(stream.readString(mDisplaySlotName));
+    _SCULK_READ(stream.readString(mObjectiveName));
+    _SCULK_READ(stream.readString(mObjectiveDisplayName));
+    _SCULK_READ(stream.readString(mCriteriaName));
     return stream.readEnum(mSortOrder, &ReadOnlyBinaryStream::readVarInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

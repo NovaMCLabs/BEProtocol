@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/OpenSignPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds OpenSignPacket::getId() const noexcept { return MinecraftPacketIds::OpenSign; }
 
@@ -19,8 +19,8 @@ void OpenSignPacket::write(BinaryStream& stream) const {
 }
 
 Result<> OpenSignPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
     return stream.readBool(mIsFrontSide);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

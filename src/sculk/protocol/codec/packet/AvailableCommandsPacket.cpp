@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AvailableCommandsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AvailableCommandsPacket::getId() const noexcept { return MinecraftPacketIds::AvailableCommands; }
 
@@ -25,16 +25,14 @@ void AvailableCommandsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AvailableCommandsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mEnumValues, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = stream.readArray(mChainedSubcommandsValues, &ReadOnlyBinaryStream::readString); !status)
-        return status;
-    if (auto status = stream.readArray(mPostFixes, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = stream.readArray(mEnumData, &CommandEnumData::read); !status) return status;
-    if (auto status = stream.readArray(mChainedSubcommandData, &CommandChainedSubcommandData::read); !status)
-        return status;
-    if (auto status = stream.readArray(mCommands, &CommandData::read); !status) return status;
-    if (auto status = stream.readArray(mSoftEnums, &CommandSoftEnumData::read); !status) return status;
+    _SCULK_READ(stream.readArray(mEnumValues, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mChainedSubcommandsValues, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mPostFixes, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readArray(mEnumData, &CommandEnumData::read));
+    _SCULK_READ(stream.readArray(mChainedSubcommandData, &CommandChainedSubcommandData::read));
+    _SCULK_READ(stream.readArray(mCommands, &CommandData::read));
+    _SCULK_READ(stream.readArray(mSoftEnums, &CommandSoftEnumData::read));
     return stream.readArray(mConstraints, &CommandConstrainedValueData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

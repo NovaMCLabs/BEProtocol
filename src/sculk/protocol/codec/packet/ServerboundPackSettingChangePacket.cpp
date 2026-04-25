@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerboundPackSettingChangePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerboundPackSettingChangePacket::getId() const noexcept {
     return MinecraftPacketIds::ServerboundPackSettingChange;
@@ -27,12 +27,12 @@ void ServerboundPackSettingChangePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ServerboundPackSettingChangePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPackId.read(stream); !status) return status;
-    if (auto status = stream.readByte(mPackSettingDataType); !status) return status;
-    if (auto status = stream.readString(mPackSettingName); !status) return status;
-    if (auto status = stream.readBool(mBoolValue); !status) return status;
-    if (auto status = stream.readFloat(mFloatValue); !status) return status;
+    _SCULK_READ(mPackId.read(stream));
+    _SCULK_READ(stream.readByte(mPackSettingDataType));
+    _SCULK_READ(stream.readString(mPackSettingName));
+    _SCULK_READ(stream.readBool(mBoolValue));
+    _SCULK_READ(stream.readFloat(mFloatValue));
     return stream.readString(mStringValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

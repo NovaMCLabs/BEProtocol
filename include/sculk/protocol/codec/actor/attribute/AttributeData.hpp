@@ -13,7 +13,7 @@
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 #include <variant>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct AttributeData {
     std::variant<BoolAttributeData, FloatAttributeData, ColorAttributeData> mData{};
@@ -23,4 +23,4 @@ struct AttributeData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

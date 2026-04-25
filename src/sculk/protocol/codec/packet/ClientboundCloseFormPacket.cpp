@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundCloseFormPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundCloseFormPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundCloseForm;
@@ -19,4 +19,4 @@ void ClientboundCloseFormPacket::write(BinaryStream&) const {}
 
 Result<> ClientboundCloseFormPacket::read(ReadOnlyBinaryStream&) { return {}; }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

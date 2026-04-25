@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LegacyTelemetryEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LegacyTelemetryEventPacket::getId() const noexcept {
     return MinecraftPacketIds::LegacyTelemetryEvent;
@@ -109,123 +109,118 @@ void LegacyTelemetryEventPacket::write(BinaryStream& stream) const {
 }
 
 Result<> LegacyTelemetryEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
-    if (auto status = stream.readEnum(mEventType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readByte(mUsePlayerId); !status) return status;
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mEventData, &ReadOnlyBinaryStream::readUnsignedVarInt);
-        !status)
-        return status;
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
+    _SCULK_READ(stream.readEnum(mEventType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readByte(mUsePlayerId));
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mEventData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit(
         Overload{
             [&](Achievement& data) {
                 std::int32_t achievementId{};
-                if (auto status = stream.readVarInt(achievementId); !status) return status;
+                _SCULK_READ(stream.readVarInt(achievementId));
                 data.mAchievementId = static_cast<AchievementIds>(achievementId);
                 return Result<>{};
             },
             [&](Interaction& data) {
-                if (auto status = stream.readVarInt64(data.mInteractedEntityId); !status) return status;
+                _SCULK_READ(stream.readVarInt64(data.mInteractedEntityId));
                 int interactionType{};
-                if (auto status = stream.readVarInt(interactionType); !status) return status;
+                _SCULK_READ(stream.readVarInt(interactionType));
                 data.mInteractionType = static_cast<InteractionType>(interactionType);
-                if (auto status = stream.readVarInt(data.mInteractionActorType); !status) return status;
-                if (auto status = stream.readVarInt(data.mInteractionActorVariant); !status) return status;
-                if (auto status = stream.readByte(data.mInteractionActorColor); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mInteractionActorType));
+                _SCULK_READ(stream.readVarInt(data.mInteractionActorVariant));
+                _SCULK_READ(stream.readByte(data.mInteractionActorColor));
                 return Result<>{};
             },
             [&](PortalCreated& data) { return stream.readVarInt(data.mDimensionType); },
             [&](PortalUsed& data) {
-                if (auto status = stream.readVarInt(data.mSourceDimensionType); !status) return status;
-                if (auto status = stream.readVarInt(data.mTargetDimensionType); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mSourceDimensionType));
+                _SCULK_READ(stream.readVarInt(data.mTargetDimensionType));
                 return Result<>{};
             },
             [&](MobKilled& data) {
-                if (auto status = stream.readVarInt64(data.mKillerActorId); !status) return status;
-                if (auto status = stream.readVarInt64(data.mKilledActorId); !status) return status;
-                if (auto status = stream.readEnum(data.mKillerChildActorType, &ReadOnlyBinaryStream::readVarInt);
-                    !status)
-                    return status;
-                if (auto status = stream.readVarInt(data.mDamageSource); !status) return status;
-                if (auto status = stream.readVarInt(data.mTradeTier); !status) return status;
-                if (auto status = stream.readString(data.mTraderName); !status) return status;
+                _SCULK_READ(stream.readVarInt64(data.mKillerActorId));
+                _SCULK_READ(stream.readVarInt64(data.mKilledActorId));
+                _SCULK_READ(stream.readEnum(data.mKillerChildActorType, &ReadOnlyBinaryStream::readVarInt));
+                _SCULK_READ(stream.readVarInt(data.mDamageSource));
+                _SCULK_READ(stream.readVarInt(data.mTradeTier));
+                _SCULK_READ(stream.readString(data.mTraderName));
                 return Result<>{};
             },
             [&](CauldronUsed& data) {
-                if (auto status = stream.readUnsignedVarInt(data.mContentsColor); !status) return status;
-                if (auto status = stream.readVarInt(data.mContentsType); !status) return status;
-                if (auto status = stream.readVarInt(data.mFillLevel); !status) return status;
+                _SCULK_READ(stream.readUnsignedVarInt(data.mContentsColor));
+                _SCULK_READ(stream.readVarInt(data.mContentsType));
+                _SCULK_READ(stream.readVarInt(data.mFillLevel));
                 return Result<>{};
             },
             [&](PlayerDied& data) {
-                if (auto status = stream.readVarInt(data.mKillerId); !status) return status;
-                if (auto status = stream.readVarInt(data.mKillerVariant); !status) return status;
-                if (auto status = stream.readVarInt(data.mDamageSource); !status) return status;
-                if (auto status = stream.readBool(data.mDiedInRaid); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mKillerId));
+                _SCULK_READ(stream.readVarInt(data.mKillerVariant));
+                _SCULK_READ(stream.readVarInt(data.mDamageSource));
+                _SCULK_READ(stream.readBool(data.mDiedInRaid));
                 return Result<>{};
             },
             [&](BossKilled& data) {
-                if (auto status = stream.readVarInt64(data.mBossUniqueId); !status) return status;
-                if (auto status = stream.readVarInt(data.mPartySize); !status) return status;
-                if (auto status = stream.readVarInt(data.mBossType); !status) return status;
+                _SCULK_READ(stream.readVarInt64(data.mBossUniqueId));
+                _SCULK_READ(stream.readVarInt(data.mPartySize));
+                _SCULK_READ(stream.readVarInt(data.mBossType));
                 return Result<>{};
             },
             [&](SlashCommand& data) {
-                if (auto status = stream.readVarInt(data.mSuccessCount); !status) return status;
-                if (auto status = stream.readVarInt(data.mErrorCount); !status) return status;
-                if (auto status = stream.readString(data.mCommandName); !status) return status;
-                if (auto status = stream.readString(data.mErrorList); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mSuccessCount));
+                _SCULK_READ(stream.readVarInt(data.mErrorCount));
+                _SCULK_READ(stream.readString(data.mCommandName));
+                _SCULK_READ(stream.readString(data.mErrorList));
                 return Result<>{};
             },
             [&](MobBorn& data) {
-                if (auto status = stream.readEnum(data.mMobType, &ReadOnlyBinaryStream::readVarInt); !status)
-                    return status;
-                if (auto status = stream.readVarInt(data.mMobVariant); !status) return status;
-                if (auto status = stream.readByte(data.mColor); !status) return status;
+                _SCULK_READ(stream.readEnum(data.mMobType, &ReadOnlyBinaryStream::readVarInt));
+                _SCULK_READ(stream.readVarInt(data.mMobVariant));
+                _SCULK_READ(stream.readByte(data.mColor));
                 return Result<>{};
             },
             [&](POICauldronUsed& data) {
                 int interactionType{};
-                if (auto status = stream.readVarInt(interactionType); !status) return status;
+                _SCULK_READ(stream.readVarInt(interactionType));
                 data.mInteractionType = static_cast<POIBlockInteractionType>(interactionType);
-                if (auto status = stream.readVarInt(data.mItemId); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mItemId));
                 return Result<>{};
             },
             [&](ComposterUsed& data) {
                 int interactionType{};
-                if (auto status = stream.readVarInt(interactionType); !status) return status;
+                _SCULK_READ(stream.readVarInt(interactionType));
                 data.mInteractionType = static_cast<POIBlockInteractionType>(interactionType);
-                if (auto status = stream.readVarInt(data.mItemId); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mItemId));
                 return Result<>{};
             },
             [&](BellUsed& data) {
-                if (auto status = stream.readVarInt(data.mItemId); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mItemId));
                 return Result<>{};
             },
             [&](ActorDefinition& data) { return stream.readString(data.mEventName); },
             [&](RaidUpdate& data) {
-                if (auto status = stream.readVarInt(data.mCurrentWave); !status) return status;
-                if (auto status = stream.readVarInt(data.mTotalWaves); !status) return status;
-                if (auto status = stream.readBool(data.mSuccess); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mCurrentWave));
+                _SCULK_READ(stream.readVarInt(data.mTotalWaves));
+                _SCULK_READ(stream.readBool(data.mSuccess));
                 return Result<>{};
             },
             [&](TargetBlockHit& data) { return stream.readVarInt(data.mRedstoneLevel); },
             [&](PiglinBarter& data) {
-                if (auto status = stream.readVarInt(data.mItemId); !status) return status;
-                if (auto status = stream.readBool(data.mWasTargetingBarteringPlayer); !status) return status;
+                _SCULK_READ(stream.readVarInt(data.mItemId));
+                _SCULK_READ(stream.readBool(data.mWasTargetingBarteringPlayer));
                 return Result<>{};
             },
             [&](PlayerWaxedOrUnwaxedCopper& data) { return stream.readVarInt(data.mBlockId); },
             [&](CodeBuilderRuntimeAction& data) { return stream.readString(data.mCodeBuilderRuntimeAction); },
             [&](CodeBuilderScoreboard& data) {
-                if (auto status = stream.readString(data.mObjectiveName); !status) return status;
-                if (auto status = stream.readVarInt(data.mScore); !status) return status;
+                _SCULK_READ(stream.readString(data.mObjectiveName));
+                _SCULK_READ(stream.readVarInt(data.mScore));
                 return Result<>{};
             },
             [&](ItemUsed& data) {
-                if (auto status = stream.readSignedShort(data.mItemId); !status) return status;
-                if (auto status = stream.readSignedInt(data.mItemAux); !status) return status;
-                if (auto status = stream.readSignedInt(data.mUseMethod); !status) return status;
-                if (auto status = stream.readSignedInt(data.mCount); !status) return status;
+                _SCULK_READ(stream.readSignedShort(data.mItemId));
+                _SCULK_READ(stream.readSignedInt(data.mItemAux));
+                _SCULK_READ(stream.readSignedInt(data.mUseMethod));
+                _SCULK_READ(stream.readSignedInt(data.mCount));
                 return Result<>{};
             },
             [&](std::monostate&) { return Result<>{}; }
@@ -234,4 +229,4 @@ Result<> LegacyTelemetryEventPacket::read(ReadOnlyBinaryStream& stream) {
     );
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

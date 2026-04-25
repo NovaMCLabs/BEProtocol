@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetDifficultyPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetDifficultyPacket::getId() const noexcept { return MinecraftPacketIds::SetDifficulty; }
 
@@ -17,4 +17,4 @@ void SetDifficultyPacket::write(BinaryStream& stream) const { stream.writeUnsign
 
 Result<> SetDifficultyPacket::read(ReadOnlyBinaryStream& stream) { return stream.readUnsignedVarInt(mDifficulty); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

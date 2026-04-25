@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/level/StructureSettings.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct StructureEditorData {
     std::string       mStructureName{};
@@ -25,4 +25,4 @@ struct StructureEditorData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

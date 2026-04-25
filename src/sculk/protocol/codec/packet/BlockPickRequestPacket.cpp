@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/BlockPickRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds BlockPickRequestPacket::getId() const noexcept { return MinecraftPacketIds::BlockPickRequest; }
 
@@ -20,9 +20,9 @@ void BlockPickRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> BlockPickRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readBool(mWithData); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readBool(mWithData));
     return stream.readByte(mMaxSlots);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetHudPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetHudPacket::getId() const noexcept { return MinecraftPacketIds::SetHud; }
 
@@ -21,16 +21,10 @@ void SetHudPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetHudPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(
-            mHudElements,
-            [](ReadOnlyBinaryStream& stream, HudElement& element) {
-                return stream.readEnum(element, &ReadOnlyBinaryStream::readVarInt);
-            }
-        );
-        !status) {
-        return status;
-    }
+    _SCULK_READ(stream.readArray(mHudElements, [](ReadOnlyBinaryStream& stream, HudElement& element) {
+        return stream.readEnum(element, &ReadOnlyBinaryStream::readVarInt);
+    }));
     return stream.readEnum(mHudVisibility, &ReadOnlyBinaryStream::readVarInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

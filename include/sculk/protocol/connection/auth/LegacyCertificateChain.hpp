@@ -9,7 +9,7 @@
 #include "LegacyCertificate.hpp"
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class LegacyCertificateChain {
 public:
@@ -21,4 +21,4 @@ public:
     [[nodiscard]] std::string saveAndSign(std::string_view eccPrivateKey);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

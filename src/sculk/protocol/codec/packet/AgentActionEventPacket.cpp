@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AgentActionEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AgentActionEventPacket::getId() const noexcept { return MinecraftPacketIds::AgentActionEvent; }
 
@@ -20,9 +20,9 @@ void AgentActionEventPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AgentActionEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRequestId); !status) return status;
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
+    _SCULK_READ(stream.readString(mRequestId));
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readSignedInt));
     return stream.readString(mResponse);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

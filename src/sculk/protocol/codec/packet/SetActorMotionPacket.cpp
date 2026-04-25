@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetActorMotionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetActorMotionPacket::getId() const noexcept { return MinecraftPacketIds::SetActorMotion; }
 
@@ -20,9 +20,9 @@ void SetActorMotionPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetActorMotionPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = mMotion.read(stream); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(mMotion.read(stream));
     return stream.readUnsignedVarInt64(mTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

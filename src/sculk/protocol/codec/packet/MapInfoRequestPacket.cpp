@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MapInfoRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void MapInfoRequestPacket::ClientPixel::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mPixel);
@@ -15,7 +15,7 @@ void MapInfoRequestPacket::ClientPixel::write(BinaryStream& stream) const {
 }
 
 Result<> MapInfoRequestPacket::ClientPixel::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt(mPixel); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(mPixel));
     return stream.readUnsignedShort(mIndex);
 }
 
@@ -32,15 +32,15 @@ void MapInfoRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MapInfoRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mMapUniqueId); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mMapUniqueId));
     std::uint32_t pixelCount{};
-    if (auto status = stream.readUnsignedInt(pixelCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(pixelCount));
     mClientPixels.clear();
     mClientPixels.resize(pixelCount);
     for (auto& pixel : mClientPixels) {
-        if (auto status = pixel.read(stream); !status) return status;
+        _SCULK_READ(pixel.read(stream));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

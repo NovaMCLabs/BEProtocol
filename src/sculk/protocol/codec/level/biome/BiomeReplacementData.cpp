@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeReplacementData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeReplacementData::write(BinaryStream& stream) const {
     stream.writeSignedShort(mBiome);
@@ -18,12 +18,12 @@ void BiomeReplacementData::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mReplacementIndex);
 }
 Result<> BiomeReplacementData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedShort(mBiome); !status) return status;
-    if (auto status = stream.readSignedShort(mDimension); !status) return status;
-    if (auto status = stream.readArray(mTargetBiomes, &ReadOnlyBinaryStream::readSignedShort); !status) return status;
-    if (auto status = stream.readFloat(mAmount); !status) return status;
-    if (auto status = stream.readFloat(mNoiseFrequencyScale); !status) return status;
+    _SCULK_READ(stream.readSignedShort(mBiome));
+    _SCULK_READ(stream.readSignedShort(mDimension));
+    _SCULK_READ(stream.readArray(mTargetBiomes, &ReadOnlyBinaryStream::readSignedShort));
+    _SCULK_READ(stream.readFloat(mAmount));
+    _SCULK_READ(stream.readFloat(mNoiseFrequencyScale));
     return stream.readUnsignedInt(mReplacementIndex);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

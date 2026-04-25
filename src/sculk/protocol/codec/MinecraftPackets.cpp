@@ -73,7 +73,6 @@
 #include "sculk/protocol/codec/packet/CreativeContentPacket.hpp"
 #include "sculk/protocol/codec/packet/CurrentStructureFeaturePacket.hpp"
 #include "sculk/protocol/codec/packet/DeathInfoPacket.hpp"
-#include "sculk/protocol/codec/packet/DebugDrawerPacket.hpp"
 #include "sculk/protocol/codec/packet/DebugInfoPacket.hpp"
 #include "sculk/protocol/codec/packet/DimensionDataPacket.hpp"
 #include "sculk/protocol/codec/packet/DisconnectPacket.hpp"
@@ -148,6 +147,7 @@
 #include "sculk/protocol/codec/packet/PlayerVideoCapturePacket.hpp"
 #include "sculk/protocol/codec/packet/PositionTrackingDBClientRequestPacket.hpp"
 #include "sculk/protocol/codec/packet/PositionTrackingDBServerBroadcastPacket.hpp"
+#include "sculk/protocol/codec/packet/PrimitiveShapesPacket.hpp"
 #include "sculk/protocol/codec/packet/PurchaseReceiptPacket.hpp"
 #include "sculk/protocol/codec/packet/RefreshEntitlementsPacket.hpp"
 #include "sculk/protocol/codec/packet/RemoveActorPacket.hpp"
@@ -167,9 +167,11 @@
 #include "sculk/protocol/codec/packet/RespawnPacket.hpp"
 #include "sculk/protocol/codec/packet/ScriptMessagePacket.hpp"
 #include "sculk/protocol/codec/packet/ServerPlayerPostMovePositionPacket.hpp"
+#include "sculk/protocol/codec/packet/ServerPresenceInfoPacket.hpp"
 #include "sculk/protocol/codec/packet/ServerSettingsRequestPacket.hpp"
 #include "sculk/protocol/codec/packet/ServerSettingsResponsePacket.hpp"
 #include "sculk/protocol/codec/packet/ServerStatsPacket.hpp"
+#include "sculk/protocol/codec/packet/ServerStoreInfoPacket.hpp"
 #include "sculk/protocol/codec/packet/ServerToClientHandshakePacket.hpp"
 #include "sculk/protocol/codec/packet/ServerboundDataDrivenScreenClosedPacket.hpp"
 #include "sculk/protocol/codec/packet/ServerboundDataStorePacket.hpp"
@@ -233,7 +235,7 @@
 #include "sculk/protocol/codec/packet/UpdateTradePacket.hpp"
 #include "sculk/protocol/codec/packet/VoxelShapesPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 // clang-format off
 #define CREATE_PACKET_SWITCH(PACKET_ID) switch (PACKET_ID) {
@@ -514,7 +516,7 @@ std::unique_ptr<IPacket> MinecraftPackets::createPacket(MinecraftPacketIds packe
     CREATE_PACKET(PlayerUpdateEntityOverrides)            // 325
     CREATE_PACKET(PlayerLocation)                         // 326
     CREATE_PACKET(ClientboundControlSchemeSet)            // 327
-    CREATE_PACKET(DebugDrawer)                            // 328
+    CREATE_PACKET(PrimitiveShapes)                        // 328
     CREATE_PACKET(ServerboundPackSettingChange)           // 329
     CREATE_PACKET(ClientboundDataStore)                   // 330
     CREATE_PACKET(GraphicsParameterOverride)              // 331
@@ -532,7 +534,9 @@ std::unique_ptr<IPacket> MinecraftPackets::createPacket(MinecraftPacketIds packe
     CREATE_PACKET(ServerboundDataDrivenScreenClosed)      // 343
     CREATE_PACKET(SyncWorldClocks)                        // 344
     CREATE_PACKET(ClientboundAttributeLayerSync)          // 345
+    CREATE_PACKET(ServerStoreInfo)                        // 346
+    CREATE_PACKET(ServerPresenceInfo)                     // 347
     CREATE_PACKET_DEFAULT(packetId)
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

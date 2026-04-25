@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void IPacket::writeWithHeader(BinaryStream& stream) const {
     writeHeader(stream);
@@ -24,18 +24,16 @@ void IPacket::writeHeader(BinaryStream& stream) const {
 }
 
 Result<> IPacket::readWithHeader(ReadOnlyBinaryStream& stream) {
-    if (auto status = readHeader(stream); !status) {
-        return status;
-    }
+    _SCULK_READ(readHeader(stream));
     return read(stream);
 }
 
 Result<> IPacket::readHeader(ReadOnlyBinaryStream& stream) {
     std::uint32_t header{};
-    if (auto status = stream.readUnsignedVarInt(header); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(header));
     mSenderSubClientId = (header >> 10) & 3;
     mTargetSubClientId = (header >> 12) & 3;
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

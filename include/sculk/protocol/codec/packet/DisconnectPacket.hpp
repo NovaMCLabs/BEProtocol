@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/connection/DisconnectFailReason.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class DisconnectPacket : public IPacket {
 public:
@@ -28,4 +28,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

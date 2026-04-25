@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 #include <variant>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct GameRuleData {
     std::string                                    mName{};
@@ -26,4 +26,4 @@ struct GameRuleData {
     [[nodiscard]] Result<> readLevelSettings(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

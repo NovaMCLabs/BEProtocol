@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CommandBlockUpdatePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CommandBlockUpdatePacket::getId() const noexcept { return MinecraftPacketIds::CommandBlockUpdate; }
 
@@ -33,22 +33,22 @@ void CommandBlockUpdatePacket::write(BinaryStream& stream) const {
 }
 
 Result<> CommandBlockUpdatePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mIsBlock); !status) return status;
+    _SCULK_READ(stream.readBool(mIsBlock));
     if (mIsBlock) {
-        if (auto status = mBlockPosition.read(stream); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(mCommandBlockMode); !status) return status;
-        if (auto status = stream.readBool(mRedstoneMode); !status) return status;
-        if (auto status = stream.readBool(mConditional); !status) return status;
+        _SCULK_READ(mBlockPosition.read(stream));
+        _SCULK_READ(stream.readUnsignedVarInt(mCommandBlockMode));
+        _SCULK_READ(stream.readBool(mRedstoneMode));
+        _SCULK_READ(stream.readBool(mConditional));
     } else {
-        if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
     }
-    if (auto status = stream.readString(mCommand); !status) return status;
-    if (auto status = stream.readString(mLastOutput); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readString(mFilteredName); !status) return status;
-    if (auto status = stream.readBool(mTrackOutput); !status) return status;
-    if (auto status = stream.readUnsignedInt(mTickDelay); !status) return status;
+    _SCULK_READ(stream.readString(mCommand));
+    _SCULK_READ(stream.readString(mLastOutput));
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readString(mFilteredName));
+    _SCULK_READ(stream.readBool(mTrackOutput));
+    _SCULK_READ(stream.readUnsignedInt(mTickDelay));
     return stream.readBool(mExecuteOnFirstTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

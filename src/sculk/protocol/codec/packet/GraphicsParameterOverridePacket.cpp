@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/GraphicsParameterOverridePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds GraphicsParameterOverridePacket::getId() const noexcept {
     return MinecraftPacketIds::GraphicsParameterOverride;
@@ -29,20 +29,20 @@ void GraphicsParameterOverridePacket::write(BinaryStream& stream) const {
 
 Result<> GraphicsParameterOverridePacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t mapSize{};
-    if (auto status = stream.readUnsignedVarInt(mapSize); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mapSize));
     mParameterKeyFrameValues.clear();
     for (std::uint32_t i = 0; i < mapSize; ++i) {
         float key{};
         Vec3  value{};
-        if (auto status = stream.readFloat(key); !status) return status;
-        if (auto status = value.read(stream); !status) return status;
+        _SCULK_READ(stream.readFloat(key));
+        _SCULK_READ(value.read(stream));
         mParameterKeyFrameValues.emplace(std::move(key), std::move(value));
     }
-    if (auto status = stream.readFloat(mFloatValue); !status) return status;
-    if (auto status = mVec3Value.read(stream); !status) return status;
-    if (auto status = stream.readString(mBiomeIdentifier); !status) return status;
-    if (auto status = stream.readEnum(mParameterType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readFloat(mFloatValue));
+    _SCULK_READ(mVec3Value.read(stream));
+    _SCULK_READ(stream.readString(mBiomeIdentifier));
+    _SCULK_READ(stream.readEnum(mParameterType, &ReadOnlyBinaryStream::readByte));
     return stream.readBool(mResetParameter);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

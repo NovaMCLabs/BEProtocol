@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 #include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct NetworkItemStackDescriptor {
     int                mId{};
@@ -25,4 +25,4 @@ struct NetworkItemStackDescriptor {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

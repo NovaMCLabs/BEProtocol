@@ -8,7 +8,7 @@
 #include "sculk/protocol/connection/auth/LegacyCertificateChain.hpp"
 #include "../../codec/utility/Reflection.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 Result<> LegacyCertificateChain::load(std::string_view certificateJson) {
     auto jsonObj = jsonc::json::parse(certificateJson);
@@ -46,4 +46,4 @@ std::string LegacyCertificateChain::saveAndSign(std::string_view eccPrivateKey) 
     return jsonRef.dump(-1);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

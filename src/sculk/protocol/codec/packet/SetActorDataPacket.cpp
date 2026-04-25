@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetActorDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetActorDataPacket::getId() const noexcept { return MinecraftPacketIds::SetActorData; }
 
@@ -21,10 +21,10 @@ void SetActorDataPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetActorDataPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = mMetaData.read(stream); !status) return status;
-    if (auto status = mSynchedProperties.read(stream); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(mMetaData.read(stream));
+    _SCULK_READ(mSynchedProperties.read(stream));
     return stream.readUnsignedVarInt64(mTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

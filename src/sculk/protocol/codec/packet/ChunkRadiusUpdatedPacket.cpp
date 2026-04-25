@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ChunkRadiusUpdatedPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ChunkRadiusUpdatedPacket::getId() const noexcept { return MinecraftPacketIds::ChunkRadiusUpdated; }
 
@@ -17,4 +17,4 @@ void ChunkRadiusUpdatedPacket::write(BinaryStream& stream) const { stream.writeV
 
 Result<> ChunkRadiusUpdatedPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mChunkRadius); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

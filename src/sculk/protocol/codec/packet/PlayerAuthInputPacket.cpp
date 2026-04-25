@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerAuthInputPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerAuthInputPacket::getId() const noexcept { return MinecraftPacketIds::PlayerAuthInput; }
 
@@ -19,7 +19,6 @@ void PlayerAuthInputPacket::write(BinaryStream& stream) const {
     mMoveVector.write(stream);
     stream.writeFloat(mPlayerHeadRotation);
     stream.writeBitset(mInputData);
-    static_assert(mInputData.size() == PLAYER_AUTH_INPUT_DATA_COUNT);
     stream.writeUnsignedVarInt(mInputType);
     stream.writeUnsignedVarInt(mPlayMode);
     stream.writeUnsignedVarInt(mNewInteractionModel);
@@ -45,34 +44,33 @@ void PlayerAuthInputPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerAuthInputPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPlayerRotation.read(stream); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = mMoveVector.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mPlayerHeadRotation); !status) return status;
-    if (auto status = stream.readBitset(mInputData); !status) return status;
-    static_assert(mInputData.size() == PLAYER_AUTH_INPUT_DATA_COUNT);
-    if (auto status = stream.readUnsignedVarInt(mInputType); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mPlayMode); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mNewInteractionModel); !status) return status;
-    if (auto status = mInteractRotation.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mClientTick); !status) return status;
-    if (auto status = mPosDelta.read(stream); !status) return status;
+    _SCULK_READ(mPlayerRotation.read(stream));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(mMoveVector.read(stream));
+    _SCULK_READ(stream.readFloat(mPlayerHeadRotation));
+    _SCULK_READ(stream.readBitset(mInputData));
+    _SCULK_READ(stream.readUnsignedVarInt(mInputType));
+    _SCULK_READ(stream.readUnsignedVarInt(mPlayMode));
+    _SCULK_READ(stream.readUnsignedVarInt(mNewInteractionModel));
+    _SCULK_READ(mInteractRotation.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt64(mClientTick));
+    _SCULK_READ(mPosDelta.read(stream));
     if (mInputData.test(static_cast<std::size_t>(PlayerAuthInputData::PerformItemInteraction))) {
-        if (auto status = mItemUseTransaction.read(stream); !status) return status;
+        _SCULK_READ(mItemUseTransaction.read(stream));
     }
     if (mInputData.test(static_cast<std::size_t>(PlayerAuthInputData::PerformItemStackRequest))) {
-        if (auto status = mItemStackRequestData.read(stream); !status) return status;
+        _SCULK_READ(mItemStackRequestData.read(stream));
     }
     if (mInputData.test(static_cast<std::size_t>(PlayerAuthInputData::PerformBlockActions))) {
-        if (auto status = mPlayerBlockActions.read(stream); !status) return status;
+        _SCULK_READ(mPlayerBlockActions.read(stream));
     }
     if (mInputData.test(static_cast<std::size_t>(PlayerAuthInputData::IsInClientPredictedVehicle))) {
-        if (auto status = mVehicleRotation.read(stream); !status) return status;
-        if (auto status = stream.readVarInt64(mClientPredictedVihicle); !status) return status;
+        _SCULK_READ(mVehicleRotation.read(stream));
+        _SCULK_READ(stream.readVarInt64(mClientPredictedVihicle));
     }
-    if (auto status = mAnologMoveVector.read(stream); !status) return status;
-    if (auto status = mCameraOrientation.read(stream); !status) return status;
+    _SCULK_READ(mAnologMoveVector.read(stream));
+    _SCULK_READ(mCameraOrientation.read(stream));
     return mRawMoveVector.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

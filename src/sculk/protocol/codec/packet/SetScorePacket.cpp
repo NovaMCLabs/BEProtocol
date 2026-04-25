@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetScorePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetScorePacket::getId() const noexcept { return MinecraftPacketIds::SetScore; }
 
@@ -38,25 +38,24 @@ void SetScorePacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetScorePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mPacketType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mPacketType, &ReadOnlyBinaryStream::readByte));
     std::uint32_t count{};
-    if (auto status = stream.readUnsignedVarInt(count); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(count));
     mScoresInfo.clear();
     mScoresInfo.resize(count);
     for (auto& info : mScoresInfo) {
-        if (auto status = stream.readVarInt64(info.mScoreboardId); !status) return status;
-        if (auto status = stream.readString(info.mObjectiveName); !status) return status;
-        if (auto status = stream.readSignedInt(info.mScoreValue); !status) return status;
+        _SCULK_READ(stream.readVarInt64(info.mScoreboardId));
+        _SCULK_READ(stream.readString(info.mObjectiveName));
+        _SCULK_READ(stream.readSignedInt(info.mScoreValue));
         if (mPacketType == PacketType::Change) {
-            if (auto status = stream.readEnum(info.mIdentityType, &ReadOnlyBinaryStream::readByte); !status)
-                return status;
+            _SCULK_READ(stream.readEnum(info.mIdentityType, &ReadOnlyBinaryStream::readByte));
             switch (info.mIdentityType) {
             case IdentityType::Player:
             case IdentityType::Entity:
-                if (auto status = stream.readVarInt64(info.mActorUniqueId); !status) return status;
+                _SCULK_READ(stream.readVarInt64(info.mActorUniqueId));
                 break;
             case IdentityType::FakePlayer:
-                if (auto status = stream.readString(info.mFakePlayerName); !status) return status;
+                _SCULK_READ(stream.readString(info.mFakePlayerName));
                 break;
             default:
                 break;
@@ -66,4 +65,4 @@ Result<> SetScorePacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

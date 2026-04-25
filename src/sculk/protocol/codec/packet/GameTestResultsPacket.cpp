@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/GameTestResultsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds GameTestResultsPacket::getId() const noexcept { return MinecraftPacketIds::GameTestResults; }
 
@@ -20,9 +20,9 @@ void GameTestResultsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> GameTestResultsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mSucceeded); !status) return status;
-    if (auto status = stream.readString(mError); !status) return status;
+    _SCULK_READ(stream.readBool(mSucceeded));
+    _SCULK_READ(stream.readString(mError));
     return stream.readString(mTestName);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

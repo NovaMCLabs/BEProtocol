@@ -7,20 +7,22 @@
 
 #include "sculk/protocol/codec/packet/DimensionDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void DimensionDataPacket::DimensionDefinition::write(BinaryStream& stream) const {
     stream.writeString(mName);
     stream.writeVarInt(mHeightMax);
     stream.writeVarInt(mHeightMin);
     stream.writeVarInt(mGeneratorType);
+    stream.writeVarInt(mDimensionType);
 }
 
 Result<> DimensionDataPacket::DimensionDefinition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readVarInt(mHeightMax); !status) return status;
-    if (auto status = stream.readVarInt(mHeightMin); !status) return status;
-    return stream.readVarInt(mGeneratorType);
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readVarInt(mHeightMax));
+    _SCULK_READ(stream.readVarInt(mHeightMin));
+    _SCULK_READ(stream.readVarInt(mGeneratorType));
+    return stream.readVarInt(mDimensionType);
 }
 
 MinecraftPacketIds DimensionDataPacket::getId() const noexcept { return MinecraftPacketIds::DimensionData; }
@@ -35,4 +37,4 @@ Result<> DimensionDataPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mDefinitionGroup, &DimensionDefinition::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

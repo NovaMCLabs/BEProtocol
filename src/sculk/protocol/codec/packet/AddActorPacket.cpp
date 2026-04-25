@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AddActorPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AddActorPacket::getId() const noexcept { return MinecraftPacketIds::AddActor; }
 
@@ -29,18 +29,18 @@ void AddActorPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AddActorPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readString(mIdentifier); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = mVelocity.read(stream); !status) return status;
-    if (auto status = mRotation.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mYHeadRotation); !status) return status;
-    if (auto status = stream.readFloat(mYBodyRotation); !status) return status;
-    if (auto status = stream.readArray(mAttributes, &SyncedAttribute::read); !status) return status;
-    if (auto status = mMetaData.read(stream); !status) return status;
-    if (auto status = mSynchedProperties.read(stream); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readString(mIdentifier));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(mVelocity.read(stream));
+    _SCULK_READ(mRotation.read(stream));
+    _SCULK_READ(stream.readFloat(mYHeadRotation));
+    _SCULK_READ(stream.readFloat(mYBodyRotation));
+    _SCULK_READ(stream.readArray(mAttributes, &SyncedAttribute::read));
+    _SCULK_READ(mMetaData.read(stream));
+    _SCULK_READ(mSynchedProperties.read(stream));
     return stream.readArray(mActorLinks, &ActorLink::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

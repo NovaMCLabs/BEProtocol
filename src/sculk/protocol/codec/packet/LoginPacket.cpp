@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LoginPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LoginPacket::getId() const noexcept { return MinecraftPacketIds::Login; }
 
@@ -19,8 +19,8 @@ void LoginPacket::write(BinaryStream& stream) const {
 }
 
 Result<> LoginPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedBigEndianInt(mNetworkVersion); !status) return status;
+    _SCULK_READ(stream.readSignedBigEndianInt(mNetworkVersion));
     return mConnectionRequest.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

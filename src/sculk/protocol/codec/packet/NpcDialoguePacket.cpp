@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/NpcDialoguePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds NpcDialoguePacket::getId() const noexcept { return MinecraftPacketIds::NpcDialogue; }
 
@@ -23,12 +23,12 @@ void NpcDialoguePacket::write(BinaryStream& stream) const {
 }
 
 Result<> NpcDialoguePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt64(mNpcId); !status) return status;
-    if (auto status = stream.readEnum(mActionType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readString(mDialogue); !status) return status;
-    if (auto status = stream.readString(mSceneName); !status) return status;
-    if (auto status = stream.readString(mNpcName); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt64(mNpcId));
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readString(mDialogue));
+    _SCULK_READ(stream.readString(mSceneName));
+    _SCULK_READ(stream.readString(mNpcName));
     return stream.readString(mActionJSON);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

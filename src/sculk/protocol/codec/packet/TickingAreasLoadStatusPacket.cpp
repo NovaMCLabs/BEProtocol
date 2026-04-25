@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/TickingAreasLoadStatusPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds TickingAreasLoadStatusPacket::getId() const noexcept {
     return MinecraftPacketIds::TickingAreasLoadStatus;
@@ -21,4 +21,4 @@ Result<> TickingAreasLoadStatusPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mWaitingForPreload);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

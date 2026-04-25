@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeMountainParamsData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeMountainParamsData::write(BinaryStream& stream) const {
     stream.writeSignedInt(mSteepBlock);
@@ -19,12 +19,12 @@ void BiomeMountainParamsData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeMountainParamsData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mSteepBlock); !status) return status;
-    if (auto status = stream.readBool(mNorthSlopes); !status) return status;
-    if (auto status = stream.readBool(mSouthSlopes); !status) return status;
-    if (auto status = stream.readBool(mWestSlopes); !status) return status;
-    if (auto status = stream.readBool(mEastSlopes); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mSteepBlock));
+    _SCULK_READ(stream.readBool(mNorthSlopes));
+    _SCULK_READ(stream.readBool(mSouthSlopes));
+    _SCULK_READ(stream.readBool(mWestSlopes));
+    _SCULK_READ(stream.readBool(mEastSlopes));
     return stream.readBool(mTopSlideEnabled);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

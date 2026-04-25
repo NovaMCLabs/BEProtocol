@@ -6,20 +6,23 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "sculk/protocol/codec/level/LevelSoundEvent.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
+#include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class LevelSoundEventPacket : public IPacket {
 public:
-    std::uint32_t mEventId{};
-    Vec3          mPosition{};
-    std::int32_t  mData{};
-    std::string   mActorIdentifier{};
-    bool          mIsBabyMob{};
-    bool          mIsGlobal{};
-    std::int64_t  mActorUniqueId{-1};
+    LevelSoundEvent     mEventId{};
+    Vec3                mPosition{};
+    std::int32_t        mData{};
+    std::string         mActorIdentifier{};
+    bool                mIsBabyMob{};
+    bool                mIsGlobal{};
+    std::int64_t        mActorUniqueId{-1};
+    std::optional<Vec3> mFireAtPosition{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -31,4 +34,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

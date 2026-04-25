@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ChangeDimensionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ChangeDimensionPacket::getId() const noexcept { return MinecraftPacketIds::ChangeDimension; }
 
@@ -21,10 +21,10 @@ void ChangeDimensionPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ChangeDimensionPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mDimensionType); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readBool(mRespawn); !status) return status;
+    _SCULK_READ(stream.readVarInt(mDimensionType));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readBool(mRespawn));
     return stream.readOptional(mLoadingScreenId, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

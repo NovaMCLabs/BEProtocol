@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MoveActorDeltaPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 namespace {
 
@@ -48,27 +48,27 @@ void MoveActorDeltaPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MoveActorDeltaPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readUnsignedShort(mHeader); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readUnsignedShort(mHeader));
     if ((mHeader & HasX) != 0) {
-        if (auto status = stream.readFloat(mNewPosX); !status) return status;
+        _SCULK_READ(stream.readFloat(mNewPosX));
     }
     if ((mHeader & HasY) != 0) {
-        if (auto status = stream.readFloat(mNewPosY); !status) return status;
+        _SCULK_READ(stream.readFloat(mNewPosY));
     }
     if ((mHeader & HasZ) != 0) {
-        if (auto status = stream.readFloat(mNewPosZ); !status) return status;
+        _SCULK_READ(stream.readFloat(mNewPosZ));
     }
     if ((mHeader & HasPitch) != 0) {
-        if (auto status = stream.readByte(mRotationXByteAngle); !status) return status;
+        _SCULK_READ(stream.readByte(mRotationXByteAngle));
     }
     if ((mHeader & HasYaw) != 0) {
-        if (auto status = stream.readByte(mRotationYByteAngle); !status) return status;
+        _SCULK_READ(stream.readByte(mRotationYByteAngle));
     }
     if ((mHeader & HasHeadYaw) != 0) {
-        if (auto status = stream.readByte(mRotationYHeaderByteAngle); !status) return status;
+        _SCULK_READ(stream.readByte(mRotationYHeaderByteAngle));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

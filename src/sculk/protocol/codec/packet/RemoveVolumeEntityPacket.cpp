@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RemoveVolumeEntityPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RemoveVolumeEntityPacket::getId() const noexcept { return MinecraftPacketIds::RemoveVolumeEntity; }
 
@@ -19,8 +19,8 @@ void RemoveVolumeEntityPacket::write(BinaryStream& stream) const {
 }
 
 Result<> RemoveVolumeEntityPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mEntityNetId); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mEntityNetId));
     return stream.readVarInt(mDimensionType);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

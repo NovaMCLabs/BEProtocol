@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetLocalPlayerAsInitializedPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetLocalPlayerAsInitializedPacket::getId() const noexcept {
     return MinecraftPacketIds::SetLocalPlayerAsInitialized;
@@ -23,4 +23,4 @@ Result<> SetLocalPlayerAsInitializedPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedVarInt64(mRuntimeId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerStartItemCooldownPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerStartItemCooldownPacket::getId() const noexcept {
     return MinecraftPacketIds::PlayerStartItemCooldown;
@@ -21,8 +21,8 @@ void PlayerStartItemCooldownPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerStartItemCooldownPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mItemCategory); !status) return status;
+    _SCULK_READ(stream.readString(mItemCategory));
     return stream.readVarInt(mDurationTicks);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

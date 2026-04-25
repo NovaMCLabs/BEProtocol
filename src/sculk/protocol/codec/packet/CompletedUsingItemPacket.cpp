@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CompletedUsingItemPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CompletedUsingItemPacket::getId() const noexcept { return MinecraftPacketIds::CompletedUsingItem; }
 
@@ -19,8 +19,8 @@ void CompletedUsingItemPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CompletedUsingItemPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedShort(mItemId); !status) return status;
+    _SCULK_READ(stream.readSignedShort(mItemId));
     return stream.readSignedInt(mUseMethod);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

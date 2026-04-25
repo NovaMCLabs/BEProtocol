@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetActorLinkPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetActorLinkPacket::getId() const noexcept { return MinecraftPacketIds::SetActorLink; }
 
@@ -17,4 +17,4 @@ void SetActorLinkPacket::write(BinaryStream& stream) const { mLink.write(stream)
 
 Result<> SetActorLinkPacket::read(ReadOnlyBinaryStream& stream) { return mLink.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

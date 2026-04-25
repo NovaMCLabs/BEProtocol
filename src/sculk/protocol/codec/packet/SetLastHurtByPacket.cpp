@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetLastHurtByPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetLastHurtByPacket::getId() const noexcept { return MinecraftPacketIds::SetLastHurtBy; }
 
@@ -17,4 +17,4 @@ void SetLastHurtByPacket::write(BinaryStream& stream) const { stream.writeVarInt
 
 Result<> SetLastHurtByPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mLastHurtBy); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

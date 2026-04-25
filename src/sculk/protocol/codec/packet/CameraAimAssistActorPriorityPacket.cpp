@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraAimAssistActorPriorityPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraAimAssistActorPriorityPacket::getId() const noexcept {
     return MinecraftPacketIds::CameraAimAssistActorPriority;
@@ -25,4 +25,4 @@ Result<> CameraAimAssistActorPriorityPacket::read(ReadOnlyBinaryStream& stream) 
     return stream.readArray(mCameraAimAssistActorPriorityList, &AimAssistActorPriorityData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

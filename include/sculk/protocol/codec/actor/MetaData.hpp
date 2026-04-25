@@ -14,7 +14,7 @@
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 #include <variant>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class MetaData {
 public:
@@ -47,4 +47,4 @@ public:
 };
 
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

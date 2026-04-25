@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/AimAssistActorPriorityData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void AimAssistActorPriorityData::write(BinaryStream& stream) const {
     stream.writeSignedInt(mPresetIndex);
@@ -17,10 +17,10 @@ void AimAssistActorPriorityData::write(BinaryStream& stream) const {
 }
 
 Result<> AimAssistActorPriorityData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mPresetIndex); !status) return status;
-    if (auto status = stream.readSignedInt(mCategoryIndex); !status) return status;
-    if (auto status = stream.readSignedInt(mActorIndex); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mPresetIndex));
+    _SCULK_READ(stream.readSignedInt(mCategoryIndex));
+    _SCULK_READ(stream.readSignedInt(mActorIndex));
     return stream.readSignedInt(mPriorityValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

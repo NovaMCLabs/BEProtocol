@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerPlayerPostMovePositionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerPlayerPostMovePositionPacket::getId() const noexcept {
     return MinecraftPacketIds::ServerPlayerPostMovePosition;
@@ -21,4 +21,4 @@ void ServerPlayerPostMovePositionPacket::write(BinaryStream& stream) const { mPo
 
 Result<> ServerPlayerPostMovePositionPacket::read(ReadOnlyBinaryStream& stream) { return mPos.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

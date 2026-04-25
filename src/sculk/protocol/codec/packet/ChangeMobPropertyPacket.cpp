@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ChangeMobPropertyPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ChangeMobPropertyPacket::getId() const noexcept { return MinecraftPacketIds::ChangeMobProperty; }
 
@@ -23,12 +23,12 @@ void ChangeMobPropertyPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ChangeMobPropertyPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
-    if (auto status = stream.readString(mPropertyName); !status) return status;
-    if (auto status = stream.readBool(mBoolVaue); !status) return status;
-    if (auto status = stream.readString(mStringValue); !status) return status;
-    if (auto status = stream.readVarInt(mIntValue); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
+    _SCULK_READ(stream.readString(mPropertyName));
+    _SCULK_READ(stream.readBool(mBoolVaue));
+    _SCULK_READ(stream.readString(mStringValue));
+    _SCULK_READ(stream.readVarInt(mIntValue));
     return stream.readFloat(mFloatValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

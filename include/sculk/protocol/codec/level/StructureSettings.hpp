@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/level/block/BlockPos.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class StructureSettings {
 public:
@@ -57,4 +57,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

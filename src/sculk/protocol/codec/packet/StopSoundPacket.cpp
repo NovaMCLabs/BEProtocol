@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/StopSoundPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds StopSoundPacket::getId() const noexcept { return MinecraftPacketIds::StopSound; }
 
@@ -20,9 +20,9 @@ void StopSoundPacket::write(BinaryStream& stream) const {
 }
 
 Result<> StopSoundPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mSoundName); !status) return status;
-    if (auto status = stream.readBool(mStopAllSounds); !status) return status;
+    _SCULK_READ(stream.readString(mSoundName));
+    _SCULK_READ(stream.readBool(mStopAllSounds));
     return stream.readBool(mStopLegacyMusic);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

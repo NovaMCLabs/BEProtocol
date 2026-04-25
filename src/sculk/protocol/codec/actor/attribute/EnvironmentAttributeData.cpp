@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/EnvironmentAttributeData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void EnvironmentAttributeData::write(BinaryStream& stream) const {
     stream.writeString(mAttributeName);
@@ -21,13 +21,13 @@ void EnvironmentAttributeData::write(BinaryStream& stream) const {
 }
 
 Result<> EnvironmentAttributeData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mAttributeName); !status) return status;
-    if (auto status = stream.readOptional(mFromAttribute, &AttributeData::read); !status) return status;
-    if (auto status = mAttribute.read(stream); !status) return status;
-    if (auto status = stream.readOptional(mToAttribute, &AttributeData::read); !status) return status;
-    if (auto status = stream.readUnsignedInt(mCurrentTransitionTicks); !status) return status;
-    if (auto status = stream.readUnsignedInt(mTotalTransitionTicks); !status) return status;
+    _SCULK_READ(stream.readString(mAttributeName));
+    _SCULK_READ(stream.readOptional(mFromAttribute, &AttributeData::read));
+    _SCULK_READ(mAttribute.read(stream));
+    _SCULK_READ(stream.readOptional(mToAttribute, &AttributeData::read));
+    _SCULK_READ(stream.readUnsignedInt(mCurrentTransitionTicks));
+    _SCULK_READ(stream.readUnsignedInt(mTotalTransitionTicks));
     return stream.readEnum(mEasing, &ReadOnlyBinaryStream::readSignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

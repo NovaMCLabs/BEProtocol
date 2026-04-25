@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/TrimDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void TrimDataPacket::TrimPattern::write(BinaryStream& stream) const {
     stream.writeString(mItemName);
@@ -15,7 +15,7 @@ void TrimDataPacket::TrimPattern::write(BinaryStream& stream) const {
 }
 
 Result<> TrimDataPacket::TrimPattern::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mItemName); !status) return status;
+    _SCULK_READ(stream.readString(mItemName));
     return stream.readString(mPatternId);
 }
 
@@ -26,8 +26,8 @@ void TrimDataPacket::TrimMaterial::write(BinaryStream& stream) const {
 }
 
 Result<> TrimDataPacket::TrimMaterial::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mMaterialId); !status) return status;
-    if (auto status = stream.readString(mColor); !status) return status;
+    _SCULK_READ(stream.readString(mMaterialId));
+    _SCULK_READ(stream.readString(mColor));
     return stream.readString(mItemName);
 }
 
@@ -38,8 +38,8 @@ void               TrimDataPacket::write(BinaryStream& stream) const {
     stream.writeArray(mTrimMaterialList, &TrimMaterial::write);
 }
 Result<> TrimDataPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mTrimPatternList, &TrimPattern::read); !status) return status;
+    _SCULK_READ(stream.readArray(mTrimPatternList, &TrimPattern::read));
     return stream.readArray(mTrimMaterialList, &TrimMaterial::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

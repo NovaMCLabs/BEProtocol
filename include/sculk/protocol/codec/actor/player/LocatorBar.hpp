@@ -9,10 +9,11 @@
 #include "sculk/protocol/codec/actor/player/UUID.hpp"
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/codec/utility/math/Vec2.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 #include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class LocatorBarAction : std::uint8_t {
     None   = 0,
@@ -42,7 +43,8 @@ struct LocatorBarServerWaypointPayload {
     std::uint32_t                          mUpdateFlag{};
     std::optional<bool>                    mIsVisible{};
     std::optional<LocatorBarWorldPosition> mWorldPosition{};
-    std::optional<std::uint32_t>           mTextureId{};
+    std::optional<std::string>             mTexturePath{};
+    std::optional<Vec2>                    mIconSize{};
     std::optional<std::int32_t>            mColor{};
     std::optional<bool>                    mClientPositionAuthority{};
     std::optional<std::int64_t>            mActorUniqueId{};
@@ -62,4 +64,4 @@ struct LocatorBarWaypointPayload {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -15,7 +15,7 @@
 #include "sculk/protocol/connection/AuthenticationType.hpp"
 #include "sculk/protocol/connection/ConnectionRequest.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class LoginRequest {
 public:
@@ -30,4 +30,4 @@ public:
     //[[nodiscard]] ConnectionRequest toConnectionRequest() const;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

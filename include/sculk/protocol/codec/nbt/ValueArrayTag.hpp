@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 template <typename T>
 struct ValueArrayTag {
@@ -32,13 +32,13 @@ struct ValueArrayTag {
 
     [[nodiscard]] Result<> deserialize(ReadOnlyBinaryStream& stream) {
         std::int32_t size{};
-        if (auto status = stream.readVarInt(size); !status) return status;
+        _SCULK_READ(stream.readVarInt(size));
         mValue.resize(size);
         for (std::int32_t i = 0; i < size; ++i) {
             if constexpr (std::is_same_v<T, std::int8_t>) {
-                if (auto status = stream.readSignedChar(mValue[i]); !status) return status;
+                _SCULK_READ(stream.readSignedChar(mValue[i]));
             } else if constexpr (std::is_same_v<T, std::int32_t>) {
-                if (auto status = stream.readVarInt(mValue[i]); !status) return status;
+                _SCULK_READ(stream.readVarInt(mValue[i]));
             } else {
                 static_assert(false, "Invalid ValueTag<T> template");
             }
@@ -50,4 +50,4 @@ struct ValueArrayTag {
 using ByteArrayTag = ValueArrayTag<std::int8_t>;
 using IntArrayTag  = ValueArrayTag<std::int32_t>;
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AnvilDamagePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AnvilDamagePacket::getId() const noexcept { return MinecraftPacketIds::AnvilDamage; }
 
@@ -19,8 +19,8 @@ void AnvilDamagePacket::write(BinaryStream& stream) const {
 }
 
 Result<> AnvilDamagePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mDamageAmount); !status) return status;
+    _SCULK_READ(stream.readByte(mDamageAmount));
     return mPosition.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

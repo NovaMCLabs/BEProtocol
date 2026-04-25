@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RemoveObjectivePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RemoveObjectivePacket::getId() const noexcept { return MinecraftPacketIds::RemoveObjective; }
 
@@ -17,4 +17,4 @@ void RemoveObjectivePacket::write(BinaryStream& stream) const { stream.writeStri
 
 Result<> RemoveObjectivePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mObjectiveName); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

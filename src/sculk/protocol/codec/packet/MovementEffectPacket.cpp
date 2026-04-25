@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MovementEffectPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MovementEffectPacket::getId() const noexcept { return MinecraftPacketIds::MovementEffect; }
 
@@ -21,10 +21,10 @@ void MovementEffectPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MovementEffectPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readEnum(mEffectId, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readVarInt(mEffectDuration); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readEnum(mEffectId, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readVarInt(mEffectDuration));
     return stream.readUnsignedVarInt64(mTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class CommandOriginType : int {
     Player                   = 0,
@@ -28,4 +28,4 @@ enum class CommandOriginType : int {
     ExecuteContext           = 15,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

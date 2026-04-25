@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/packet/ClientboundDebugRendererPacket.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundDebugRendererPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundDebugRenderer;
@@ -27,14 +27,14 @@ void ClientboundDebugRendererPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ClientboundDebugRendererPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = utils::readEnumName(stream, mType); !status) return status;
+    _SCULK_READ(utils::readEnumName(stream, mType));
     if (mType == Type::AddDebugMarkerCube) {
-        if (auto status = stream.readString(mText); !status) return status;
-        if (auto status = mPosition.read(stream); !status) return status;
-        if (auto status = stream.readSignedInt(mColor); !status) return status;
+        _SCULK_READ(stream.readString(mText));
+        _SCULK_READ(mPosition.read(stream));
+        _SCULK_READ(stream.readSignedInt(mColor));
         return stream.readUnsignedInt64(mDurationMilliseconds);
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

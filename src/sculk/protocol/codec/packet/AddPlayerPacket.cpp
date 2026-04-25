@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AddPlayerPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AddPlayerPacket::getId() const noexcept { return MinecraftPacketIds::AddPlayer; }
 
@@ -33,22 +33,22 @@ void AddPlayerPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AddPlayerPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mUuid.read(stream); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readString(mPlatformOnlineId); !status) return status;
-    if (auto status = mPos.read(stream); !status) return status;
-    if (auto status = mVelocity.read(stream); !status) return status;
-    if (auto status = mRot.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mYHeadRot); !status) return status;
-    if (auto status = mCarriedItem.read(stream); !status) return status;
-    if (auto status = stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = mMetaData.read(stream); !status) return status;
-    if (auto status = mSynchedProperties.read(stream); !status) return status;
-    if (auto status = mAbilities.read(stream); !status) return status;
-    if (auto status = stream.readArray(mActorLinks, &ActorLink::read); !status) return status;
-    if (auto status = stream.readString(mDeviceId); !status) return status;
+    _SCULK_READ(mUuid.read(stream));
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readString(mPlatformOnlineId));
+    _SCULK_READ(mPos.read(stream));
+    _SCULK_READ(mVelocity.read(stream));
+    _SCULK_READ(mRot.read(stream));
+    _SCULK_READ(stream.readFloat(mYHeadRot));
+    _SCULK_READ(mCarriedItem.read(stream));
+    _SCULK_READ(stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(mMetaData.read(stream));
+    _SCULK_READ(mSynchedProperties.read(stream));
+    _SCULK_READ(mAbilities.read(stream));
+    _SCULK_READ(stream.readArray(mActorLinks, &ActorLink::read));
+    _SCULK_READ(stream.readString(mDeviceId));
     return stream.readUnsignedInt(mBuildPlatform);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

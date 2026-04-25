@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SubChunkPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SubChunkPacket::SubChunkPosOffset::write(BinaryStream& stream) const {
     stream.writeSignedChar(mX);
@@ -16,8 +16,8 @@ void SubChunkPacket::SubChunkPosOffset::write(BinaryStream& stream) const {
 }
 
 Result<> SubChunkPacket::SubChunkPosOffset::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedChar(mX); !status) return status;
-    if (auto status = stream.readSignedChar(mY); !status) return status;
+    _SCULK_READ(stream.readSignedChar(mX));
+    _SCULK_READ(stream.readSignedChar(mY));
     return stream.readSignedChar(mZ);
 }
 
@@ -33,13 +33,13 @@ void SubChunkPacket::HeightmapData::write(BinaryStream& stream) const {
 }
 
 Result<> SubChunkPacket::HeightmapData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mHeightMapType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mHeightMapType, &ReadOnlyBinaryStream::readByte));
     if (mHeightMapType == HeightMapDataType::HasData) {
-        if (auto status = stream.readBytes(&mSubchunkHeightMap, sizeof(mSubchunkHeightMap)); !status) return status;
+        _SCULK_READ(stream.readBytes(&mSubchunkHeightMap, sizeof(mSubchunkHeightMap)));
     }
-    if (auto status = stream.readEnum(mRenderHeightMapType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mRenderHeightMapType, &ReadOnlyBinaryStream::readByte));
     if (mRenderHeightMapType == HeightMapDataType::HasData) {
-        if (auto status = stream.readBytes(&mRenderHeightMap, sizeof(mRenderHeightMap)); !status) return status;
+        _SCULK_READ(stream.readBytes(&mRenderHeightMap, sizeof(mRenderHeightMap)));
     }
     return {};
 }
@@ -57,14 +57,14 @@ void SubChunkPacket::SubChunkPacketData::write(BinaryStream& stream, bool cacheE
 }
 
 Result<> SubChunkPacket::SubChunkPacketData::read(ReadOnlyBinaryStream& stream, bool cacheEnabled) {
-    if (auto status = mSubChunkPosOffset.read(stream); !status) return status;
-    if (auto status = stream.readEnum(mResult, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(mSubChunkPosOffset.read(stream));
+    _SCULK_READ(stream.readEnum(mResult, &ReadOnlyBinaryStream::readByte));
     if (!cacheEnabled || mResult != SubChunkRequestResult::SuccessAllAir) {
-        if (auto status = stream.readString(mSerializedSubChunk); !status) return status;
+        _SCULK_READ(stream.readString(mSerializedSubChunk));
     } else {
         mSerializedSubChunk.clear();
     }
-    if (auto status = mHeightMapData.read(stream); !status) return status;
+    _SCULK_READ(mHeightMapData.read(stream));
     if (cacheEnabled) {
         return stream.readUnsignedInt64(mBlobId);
     }
@@ -87,15 +87,15 @@ void SubChunkPacket::write(BinaryStream& stream) const {
 
 Result<> SubChunkPacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t count{};
-    if (auto status = stream.readBool(mCacheEnabled); !status) return status;
-    if (auto status = stream.readVarInt(mDimensionType); !status) return status;
-    if (auto status = mCenterPos.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedInt(count); !status) return status;
+    _SCULK_READ(stream.readBool(mCacheEnabled));
+    _SCULK_READ(stream.readVarInt(mDimensionType));
+    _SCULK_READ(mCenterPos.read(stream));
+    _SCULK_READ(stream.readUnsignedInt(count));
     mSubChunkData.resize(count);
     for (SubChunkPacketData& data : mSubChunkData) {
-        if (auto status = data.read(stream, mCacheEnabled); !status) return status;
+        _SCULK_READ(data.read(stream, mCacheEnabled));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

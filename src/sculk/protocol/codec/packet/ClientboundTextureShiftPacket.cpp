@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundTextureShiftPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundTextureShiftPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundTextureShift;
@@ -27,14 +27,14 @@ void ClientboundTextureShiftPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ClientboundTextureShiftPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mActionType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readString(mCollectionName); !status) return status;
-    if (auto status = stream.readString(mFromStep); !status) return status;
-    if (auto status = stream.readString(mToStep); !status) return status;
-    if (auto status = stream.readArray(mAllSteps, &ReadOnlyBinaryStream::readString); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mCurrentLengthInTicks); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mTotalLengthInTicks); !status) return status;
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readString(mCollectionName));
+    _SCULK_READ(stream.readString(mFromStep));
+    _SCULK_READ(stream.readString(mToStep));
+    _SCULK_READ(stream.readArray(mAllSteps, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readUnsignedVarInt64(mCurrentLengthInTicks));
+    _SCULK_READ(stream.readUnsignedVarInt64(mTotalLengthInTicks));
     return stream.readBool(mIsEnabled);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

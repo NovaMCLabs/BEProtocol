@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/BossEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds BossEventPacket::getId() const noexcept { return MinecraftPacketIds::BossEvent; }
 
@@ -52,15 +52,15 @@ void BossEventPacket::write(BinaryStream& stream) const {
 }
 
 Result<> BossEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mTargetActor); !status) return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mTargetActor));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedVarInt));
     switch (mType) {
     case EventType::Add:
-        if (auto status = stream.readString(mName); !status) return status;
-        if (auto status = stream.readString(mFilteredName); !status) return status;
-        if (auto status = stream.readFloat(mPercentage); !status) return status;
-        if (auto status = stream.readUnsignedShort(mDarkenScreen); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(mColor); !status) return status;
+        _SCULK_READ(stream.readString(mName));
+        _SCULK_READ(stream.readString(mFilteredName));
+        _SCULK_READ(stream.readFloat(mPercentage));
+        _SCULK_READ(stream.readUnsignedShort(mDarkenScreen));
+        _SCULK_READ(stream.readUnsignedVarInt(mColor));
         return stream.readUnsignedVarInt(mOverlay);
     case EventType::PlayerAdded:
     case EventType::PlayerRemoved:
@@ -69,18 +69,18 @@ Result<> BossEventPacket::read(ReadOnlyBinaryStream& stream) {
     case EventType::UpdatePercent:
         return stream.readFloat(mPercentage);
     case EventType::UpdateName:
-        if (auto status = stream.readString(mName); !status) return status;
+        _SCULK_READ(stream.readString(mName));
         return stream.readString(mFilteredName);
     case EventType::UpdateProperties:
-        if (auto status = stream.readUnsignedShort(mDarkenScreen); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(mColor); !status) return status;
+        _SCULK_READ(stream.readUnsignedShort(mDarkenScreen));
+        _SCULK_READ(stream.readUnsignedVarInt(mColor));
         return stream.readUnsignedVarInt(mOverlay);
     case EventType::UpdateStyle:
-        if (auto status = stream.readUnsignedVarInt(mColor); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(mColor));
         return stream.readUnsignedVarInt(mOverlay);
     default:
         return {};
     }
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

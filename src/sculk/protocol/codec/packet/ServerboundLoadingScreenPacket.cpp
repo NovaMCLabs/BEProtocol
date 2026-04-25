@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerboundLoadingScreenPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerboundLoadingScreenPacket::getId() const noexcept {
     return MinecraftPacketIds::ServerboundLoadingScreen;
@@ -21,8 +21,8 @@ void ServerboundLoadingScreenPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ServerboundLoadingScreenPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readVarInt));
     return stream.readOptional(mLoadingScreenId, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

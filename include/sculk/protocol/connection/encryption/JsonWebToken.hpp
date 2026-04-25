@@ -13,7 +13,7 @@
 #include <variant>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class JsonWebToken {
 public:
@@ -59,4 +59,4 @@ public:
     [[nodiscard]] std::string signRS256(std::string_view rsaPrivateKeyPem);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

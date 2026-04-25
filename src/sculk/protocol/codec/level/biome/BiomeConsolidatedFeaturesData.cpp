@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeConsolidatedFeaturesData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeConsolidatedFeaturesData::write(BinaryStream& stream) const {
     stream.writeArray(mFeatures, &BiomeConsolidatedFeatureData::write);
@@ -17,4 +17,4 @@ Result<> BiomeConsolidatedFeaturesData::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mFeatures, &BiomeConsolidatedFeatureData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975
