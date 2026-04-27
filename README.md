@@ -108,7 +108,7 @@ int main() {
 ## 🧬 ABI Namespace
 
 Public APIs are versioned with an inline ABI namespace,
-for example `sculk::protocol::abi_v944`.
+for example `sculk::protocol::abi_v975`.
 
 ## 🤝 Contributing
 

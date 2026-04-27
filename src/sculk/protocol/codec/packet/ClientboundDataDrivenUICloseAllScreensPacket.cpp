@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundDataDrivenUICloseAllScreensPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundDataDrivenUICloseAllScreensPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundDataDrivenUICloseAllScreens;
@@ -25,4 +25,4 @@ Result<> ClientboundDataDrivenUICloseAllScreensPacket::read(ReadOnlyBinaryStream
     return stream.readOptional(mFormId, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

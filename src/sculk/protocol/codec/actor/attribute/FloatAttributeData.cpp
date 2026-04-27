@@ -7,21 +7,22 @@
 
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/FloatAttributeData.hpp"
+#include "../../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void FloatAttributeData::write(BinaryStream& stream) const {
     stream.writeFloat(mValue);
-    stream.writeEnum(mOperation, &BinaryStream::writeSignedInt);
+    utils::writeEnumName(stream, mOperation);
     stream.writeFloat(mConstraintMin);
     stream.writeFloat(mConstraintMax);
 }
 
 Result<> FloatAttributeData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mValue); !status) return status;
-    if (auto status = stream.readEnum(mOperation, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
-    if (auto status = stream.readFloat(mConstraintMin); !status) return status;
+    _SCULK_READ(stream.readFloat(mValue));
+    _SCULK_READ(utils::readEnumName(stream, mOperation));
+    _SCULK_READ(stream.readFloat(mConstraintMin));
     return stream.readFloat(mConstraintMax);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

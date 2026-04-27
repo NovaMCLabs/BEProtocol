@@ -6,14 +6,23 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/codec/actor/player/SyncedClientOptionsUpdate.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class UpdateClientOptionsPacket : public IPacket {
 public:
-    SyncedClientOptionsUpdate mUpdate{};
+    enum class GraphicsMode : std::uint8_t {
+        Simple    = 0,
+        Fancy     = 1,
+        Advanced  = 2,
+        RayTraced = 3,
+    };
+
+public:
+    std::optional<GraphicsMode> mGraphicsModeChange{};
+    std::optional<bool>         mFilterProfanity{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -25,4 +34,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraAimAssistPresetsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraAimAssistPresetsPacket::getId() const noexcept {
     return MinecraftPacketIds::CameraAimAssistPresets;
@@ -22,9 +22,9 @@ void CameraAimAssistPresetsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CameraAimAssistPresetsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mCatagory, &CameraAimAssistCategoryDefinition::read); !status) return status;
-    if (auto status = stream.readArray(mPreset, &CameraAimAssistPresetDefinition::read); !status) return status;
+    _SCULK_READ(stream.readArray(mCatagory, &CameraAimAssistCategoryDefinition::read));
+    _SCULK_READ(stream.readArray(mPreset, &CameraAimAssistPresetDefinition::read));
     return stream.readEnum(mOperation, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

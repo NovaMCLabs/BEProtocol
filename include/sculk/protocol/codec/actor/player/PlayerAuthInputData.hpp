@@ -8,7 +8,7 @@
 #pragma once
 #include <cstddef>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class PlayerAuthInputData : int {
     Ascend                          = 0,
@@ -79,6 +79,4 @@ enum class PlayerAuthInputData : int {
     InputNum                        = 65,
 };
 
-constexpr std::size_t PLAYER_AUTH_INPUT_DATA_COUNT = static_cast<std::size_t>(PlayerAuthInputData::InputNum);
-
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

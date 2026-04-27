@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/BiomeDefinitionListPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds BiomeDefinitionListPacket::getId() const noexcept { return MinecraftPacketIds::BiomeDefinitionList; }
 
@@ -19,8 +19,8 @@ void BiomeDefinitionListPacket::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeDefinitionListPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mBiomeNamesToDataMap, &BiomeData::read); !status) return status;
+    _SCULK_READ(stream.readArray(mBiomeNamesToDataMap, &BiomeData::read));
     return stream.readArray(mBiomeStringList, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

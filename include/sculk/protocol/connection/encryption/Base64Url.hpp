@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <string>
 
-namespace sculk::protocol::inline abi_v944::base64url {
+namespace sculk::protocol::inline abi_v975::base64url {
 
 namespace detail {
 
@@ -106,4 +106,4 @@ constexpr std::string decode(std::string_view str) noexcept {
     return out;
 }
 
-} // namespace sculk::protocol::inline abi_v944::base64url
+} // namespace sculk::protocol::inline abi_v975::base64url

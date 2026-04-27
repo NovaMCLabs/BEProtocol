@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientCacheBlobStatusPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientCacheBlobStatusPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientCacheBlobStatus;
@@ -29,17 +29,17 @@ void ClientCacheBlobStatusPacket::write(BinaryStream& stream) const {
 Result<> ClientCacheBlobStatusPacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t missingSize{};
     std::uint32_t foundSize{};
-    if (auto status = stream.readUnsignedVarInt(missingSize); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(foundSize); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(missingSize));
+    _SCULK_READ(stream.readUnsignedVarInt(foundSize));
     mMissingIds.resize(missingSize);
     for (auto& id : mMissingIds) {
-        if (auto status = stream.readUnsignedInt64(id); !status) return status;
+        _SCULK_READ(stream.readUnsignedInt64(id));
     }
     mFoundIds.resize(foundSize);
     for (auto& id : mFoundIds) {
-        if (auto status = stream.readUnsignedInt64(id); !status) return status;
+        _SCULK_READ(stream.readUnsignedInt64(id));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

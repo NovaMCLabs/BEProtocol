@@ -7,14 +7,28 @@
 
 #include "sculk/protocol/codec/packet/PartyChangedPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
+
+void PartyChangedPacket::PlayerPartyInfo::write(BinaryStream& stream) const {
+    stream.writeString(mPartyId);
+    stream.writeBool(mIsPartyLeader);
+}
+
+Result<> PartyChangedPacket::PlayerPartyInfo::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readString(mPartyId));
+    return stream.readBool(mIsPartyLeader);
+}
 
 MinecraftPacketIds PartyChangedPacket::getId() const noexcept { return MinecraftPacketIds::PartyChanged; }
 
 std::string_view PartyChangedPacket::getName() const noexcept { return "PartyChangedPacket"; }
 
-void PartyChangedPacket::write(BinaryStream& stream) const { stream.writeString(mPartyId); }
+void PartyChangedPacket::write(BinaryStream& stream) const {
+    stream.writeOptional(mPlayerPartyInfo, &PlayerPartyInfo::write);
+}
 
-Result<> PartyChangedPacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mPartyId); }
+Result<> PartyChangedPacket::read(ReadOnlyBinaryStream& stream) {
+    return stream.readOptional(mPlayerPartyInfo, &PlayerPartyInfo::read);
+}
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

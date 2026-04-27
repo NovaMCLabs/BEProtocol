@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 #include <map>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class GraphicsParameterOverridePacket : public IPacket {
 public:
@@ -64,6 +64,9 @@ public:
         FlashIlluminance        = 46,
         AmbientColor            = 47,
         AmbientIlluminance      = 48,
+        EmissiveDesaturation    = 49,
+        SkyIntensity            = 50,
+        OrbitalOffsetDegrees    = 51,
     };
 
 public:
@@ -84,4 +87,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

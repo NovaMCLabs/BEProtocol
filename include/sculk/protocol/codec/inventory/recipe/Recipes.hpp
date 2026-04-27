@@ -13,7 +13,7 @@
 #include <variant>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct RecipeUnlockingRequirement {
     enum class UnlockingContext : std::uint8_t {
@@ -65,21 +65,12 @@ struct ShapedRecipe {
 };
 
 struct FurnaceRecipe {
-    std::int32_t                  mItemData{};
-    NetworkItemInstanceDescriptor mResultItem{};
-    std::string                   mRecipeTag{};
-
     void write(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
 struct FurnaceAuxRecipe {
-    std::int32_t                  mItemData{};
-    std::int32_t                  mAux{};
-    NetworkItemInstanceDescriptor mResultItem{};
-    std::string                   mRecipeTag{};
-
     void write(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
@@ -219,4 +210,4 @@ struct MaterialReducerDataEntry {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

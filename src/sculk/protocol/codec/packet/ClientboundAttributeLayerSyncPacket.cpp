@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundAttributeLayerSyncPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundAttributeLayerSyncPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundAttributeLayerSync;
@@ -21,4 +21,4 @@ void ClientboundAttributeLayerSyncPacket::write(BinaryStream& stream) const { mD
 
 Result<> ClientboundAttributeLayerSyncPacket::read(ReadOnlyBinaryStream& stream) { return mData.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraSplinePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraSplinePacket::getId() const noexcept { return MinecraftPacketIds::CameraSpline; }
 
@@ -21,4 +21,4 @@ Result<> CameraSplinePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mCameraDataSplines, &CameraSplineDefinition::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

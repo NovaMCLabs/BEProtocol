@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerToClientHandshakePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerToClientHandshakePacket::getId() const noexcept {
     return MinecraftPacketIds::ServerToClientHandshake;
@@ -21,4 +21,4 @@ Result<> ServerToClientHandshakePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readString(mHandshakeWebToken);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

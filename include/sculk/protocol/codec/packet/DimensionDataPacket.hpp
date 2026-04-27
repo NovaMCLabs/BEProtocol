@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class DimensionDataPacket : public IPacket {
 public:
@@ -17,6 +17,7 @@ public:
         std::int32_t mHeightMax{};
         std::int32_t mHeightMin{};
         std::int32_t mGeneratorType{};
+        std::int32_t mDimensionType{};
 
         void write(BinaryStream& stream) const;
 
@@ -36,4 +37,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

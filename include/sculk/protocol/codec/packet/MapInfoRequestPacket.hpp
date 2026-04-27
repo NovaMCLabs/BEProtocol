@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class MapInfoRequestPacket : public IPacket {
 public:
@@ -36,4 +36,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

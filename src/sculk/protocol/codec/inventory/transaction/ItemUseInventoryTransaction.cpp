@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/transaction/ItemUseInventoryTransaction.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ItemUseInventoryTransaction::write(BinaryStream& stream) const {
     stream.writeEnum(mActionType, &BinaryStream::writeUnsignedVarInt);
@@ -24,17 +24,17 @@ void ItemUseInventoryTransaction::write(BinaryStream& stream) const {
 }
 
 Result<> ItemUseInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mActionType, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
-    if (auto status = stream.readEnum(mTriggerType, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
-    if (auto status = mPos.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mFace); !status) return status;
-    if (auto status = stream.readVarInt(mSlot); !status) return status;
-    if (auto status = mItem.read(stream); !status) return status;
-    if (auto status = mFromPos.read(stream); !status) return status;
-    if (auto status = mClickPos.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mTargetBlockId); !status) return status;
-    if (auto status = stream.readEnum(mClientPredictedResult, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(stream.readEnum(mTriggerType, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(mPos.read(stream));
+    _SCULK_READ(stream.readVarInt(mFace));
+    _SCULK_READ(stream.readVarInt(mSlot));
+    _SCULK_READ(mItem.read(stream));
+    _SCULK_READ(mFromPos.read(stream));
+    _SCULK_READ(mClickPos.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mTargetBlockId));
+    _SCULK_READ(stream.readEnum(mClientPredictedResult, &ReadOnlyBinaryStream::readByte));
     return stream.readEnum(mClientCooldownState, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

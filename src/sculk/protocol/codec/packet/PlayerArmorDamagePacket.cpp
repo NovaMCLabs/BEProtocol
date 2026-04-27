@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerArmorDamagePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerArmorDamagePacket::getId() const noexcept { return MinecraftPacketIds::PlayerArmorDamage; }
 
@@ -25,14 +25,14 @@ void PlayerArmorDamagePacket::write(BinaryStream& stream) const {
 
 Result<> PlayerArmorDamagePacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t count{};
-    if (auto status = stream.readUnsignedVarInt(count); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(count));
     mSlotsBitset.reset();
     mDamage.fill(0);
     for (std::uint32_t i = 0; i < count; ++i) {
         std::uint8_t encodedIndex{};
         std::int16_t damage{};
-        if (auto status = stream.readByte(encodedIndex); !status) return status;
-        if (auto status = stream.readSignedShort(damage); !status) return status;
+        _SCULK_READ(stream.readByte(encodedIndex));
+        _SCULK_READ(stream.readSignedShort(damage));
         const std::size_t index = encodedIndex >> 1;
         if (index < ArmorSlotCount) {
             mSlotsBitset.set(index, true);
@@ -42,4 +42,4 @@ Result<> PlayerArmorDamagePacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -8,7 +8,7 @@
 #pragma once
 #include <cstddef>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ActorFlags : int {
     Onfire                        = 0,
@@ -138,9 +138,10 @@ enum class ActorFlags : int {
     BodyRotationAlwaysFollowsHead = 124,
     CanUseVerticalMovementAction  = 125,
     RotationLockedToVehicle       = 126,
-    Count                         = 127,
+    UsesLegacyFriction            = 127,
+    UsesUniformAirDrag            = 128,
+    NameplateDepthTested          = 129,
+    Count                         = 130,
 };
 
-constexpr std::size_t ACTOR_FLAGS_COUNT = static_cast<std::size_t>(ActorFlags::Count);
-
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

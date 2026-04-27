@@ -13,7 +13,7 @@
 #include <source_location>
 #endif
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 #ifdef SCULK_PROTOCOL_DEBUG
 #define _SCULK_SL_PARAM_DEFAULT , std::source_location location = std::source_location::current()
@@ -53,4 +53,7 @@ namespace error_utils {
 
 } // namespace error_utils
 
-} // namespace sculk::protocol::inline abi_v944
+#define _SCULK_READ(expr)                                                                                              \
+    if (auto status = expr; !status) return status
+
+} // namespace sculk::protocol::inline abi_v975

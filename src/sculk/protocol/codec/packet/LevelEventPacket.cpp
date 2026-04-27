@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LevelEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LevelEventPacket::getId() const noexcept { return MinecraftPacketIds::LevelEvent; }
 
@@ -20,9 +20,9 @@ void LevelEventPacket::write(BinaryStream& stream) const {
 }
 
 Result<> LevelEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mEventType); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(stream.readVarInt(mEventType));
+    _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt(mEventData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

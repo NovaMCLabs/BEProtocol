@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PacketViolationWarningPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PacketViolationWarningPacket::getId() const noexcept {
     return MinecraftPacketIds::PacketViolationWarning;
@@ -23,10 +23,10 @@ void PacketViolationWarningPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PacketViolationWarningPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readEnum(mSeverity, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readEnum(mPacketId, &ReadOnlyBinaryStream::readVarInt); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readEnum(mSeverity, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readEnum(mPacketId, &ReadOnlyBinaryStream::readVarInt));
     return stream.readString(mContext);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

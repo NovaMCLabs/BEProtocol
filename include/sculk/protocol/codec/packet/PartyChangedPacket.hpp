@@ -8,11 +8,21 @@
 #pragma once
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class PartyChangedPacket : public IPacket {
 public:
-    std::string mPartyId{};
+    struct PlayerPartyInfo {
+        std::string mPartyId{};
+        bool        mIsPartyLeader{};
+
+        void write(BinaryStream& stream) const;
+
+        [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+    };
+
+public:
+    std::optional<PlayerPartyInfo> mPlayerPartyInfo{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -24,4 +34,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RefreshEntitlementsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RefreshEntitlementsPacket::getId() const noexcept { return MinecraftPacketIds::RefreshEntitlements; }
 
@@ -17,4 +17,4 @@ void RefreshEntitlementsPacket::write(BinaryStream&) const {}
 
 Result<> RefreshEntitlementsPacket::read(ReadOnlyBinaryStream&) { return {}; }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/ServerConfiguration.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void GatheringsConfigurationJoinInfo::write(BinaryStream& stream) const {
     mExperienceId.write(stream);
@@ -21,13 +21,13 @@ void GatheringsConfigurationJoinInfo::write(BinaryStream& stream) const {
 }
 
 Result<> GatheringsConfigurationJoinInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mExperienceId.read(stream); !status) return status;
-    if (auto status = stream.readString(mExperienceName); !status) return status;
-    if (auto status = mExperienceWorldId.read(stream); !status) return status;
-    if (auto status = stream.readString(mExperienceWorldName); !status) return status;
-    if (auto status = stream.readString(mCreatorId); !status) return status;
-    if (auto status = mTargetId.read(stream); !status) return status;
-    if (auto status = stream.readString(mScenarioId); !status) return status;
+    _SCULK_READ(mExperienceId.read(stream));
+    _SCULK_READ(stream.readString(mExperienceName));
+    _SCULK_READ(mExperienceWorldId.read(stream));
+    _SCULK_READ(stream.readString(mExperienceWorldName));
+    _SCULK_READ(stream.readString(mCreatorId));
+    _SCULK_READ(mTargetId.read(stream));
+    _SCULK_READ(stream.readString(mScenarioId));
     return stream.readString(mServerId);
 }
 
@@ -37,7 +37,7 @@ void GatheringsConfigurationClientStoreEntryPointInfo::write(BinaryStream& strea
 }
 
 Result<> GatheringsConfigurationClientStoreEntryPointInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mStoreId); !status) return status;
+    _SCULK_READ(stream.readString(mStoreId));
     return stream.readString(mStoreName);
 }
 
@@ -47,7 +47,7 @@ void GatheringsConfigurationPresenceInfo::write(BinaryStream& stream) const {
 }
 
 Result<> GatheringsConfigurationPresenceInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mExperienceName); !status) return status;
+    _SCULK_READ(stream.readString(mExperienceName));
     return stream.readString(mWorldName);
 }
 
@@ -58,15 +58,9 @@ void ServerConfigurationJoinInfo::write(BinaryStream& stream) const {
 }
 
 Result<> ServerConfigurationJoinInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readOptional(mGatheringsConfiguration, &GatheringsConfigurationJoinInfo::read); !status) {
-        return status;
-    }
-    if (auto status =
-            stream.readOptional(mStoreEntryPointInfo, &GatheringsConfigurationClientStoreEntryPointInfo::read);
-        !status) {
-        return status;
-    }
+    _SCULK_READ(stream.readOptional(mGatheringsConfiguration, &GatheringsConfigurationJoinInfo::read));
+    _SCULK_READ(stream.readOptional(mStoreEntryPointInfo, &GatheringsConfigurationClientStoreEntryPointInfo::read));
     return stream.readOptional(mPresenceInfo, &GatheringsConfigurationPresenceInfo::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

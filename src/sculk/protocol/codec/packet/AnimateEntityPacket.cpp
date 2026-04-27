@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AnimateEntityPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AnimateEntityPacket::getId() const noexcept { return MinecraftPacketIds::AnimateEntity; }
 
@@ -24,14 +24,13 @@ void AnimateEntityPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AnimateEntityPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mAnimation); !status) return status;
-    if (auto status = stream.readString(mNextState); !status) return status;
-    if (auto status = stream.readString(mStopExpression); !status) return status;
-    if (auto status = stream.readEnum(mStopExpressionMolangVersion, &ReadOnlyBinaryStream::readSignedInt); !status)
-        return status;
-    if (auto status = stream.readString(mController); !status) return status;
-    if (auto status = stream.readFloat(mBlendOutTime); !status) return status;
+    _SCULK_READ(stream.readString(mAnimation));
+    _SCULK_READ(stream.readString(mNextState));
+    _SCULK_READ(stream.readString(mStopExpression));
+    _SCULK_READ(stream.readEnum(mStopExpressionMolangVersion, &ReadOnlyBinaryStream::readSignedInt));
+    _SCULK_READ(stream.readString(mController));
+    _SCULK_READ(stream.readFloat(mBlendOutTime));
     return stream.readArray(mRuntimeIds, &ReadOnlyBinaryStream::readUnsignedVarInt64);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

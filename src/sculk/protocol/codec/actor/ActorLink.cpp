@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/ActorLink.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ActorLink::write(BinaryStream& stream) const {
     stream.writeVarInt64(mTargetAUniqueId);
@@ -19,12 +19,12 @@ void ActorLink::write(BinaryStream& stream) const {
 }
 
 Result<> ActorLink::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mTargetAUniqueId); !status) return status;
-    if (auto status = stream.readVarInt64(mTargetBUniqueId); !status) return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readBool(mImmediate); !status) return status;
-    if (auto status = stream.readBool(mPassengerInitiated); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mTargetAUniqueId));
+    _SCULK_READ(stream.readVarInt64(mTargetBUniqueId));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readBool(mImmediate));
+    _SCULK_READ(stream.readBool(mPassengerInitiated));
     return stream.readFloat(mVehicleAngularVelocity);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

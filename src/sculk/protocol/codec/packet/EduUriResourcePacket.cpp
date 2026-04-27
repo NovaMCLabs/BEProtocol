@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/EduUriResourcePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds EduUriResourcePacket::getId() const noexcept { return MinecraftPacketIds::EduUriResource; }
 
@@ -19,8 +19,8 @@ void EduUriResourcePacket::write(BinaryStream& stream) const {
 }
 
 Result<> EduUriResourcePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mButtonName); !status) return status;
+    _SCULK_READ(stream.readString(mButtonName));
     return stream.readString(mLinkUri);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

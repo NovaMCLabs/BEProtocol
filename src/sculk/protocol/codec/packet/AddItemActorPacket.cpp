@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AddItemActorPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AddItemActorPacket::getId() const noexcept { return MinecraftPacketIds::AddItemActor; }
 
@@ -24,13 +24,13 @@ void AddItemActorPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AddItemActorPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mUniqueId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mRuntimeId); !status) return status;
-    if (auto status = mItem.read(stream); !status) return status;
-    if (auto status = mPos.read(stream); !status) return status;
-    if (auto status = mVelocity.read(stream); !status) return status;
-    if (auto status = mMetaData.read(stream); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mUniqueId));
+    _SCULK_READ(stream.readUnsignedVarInt64(mRuntimeId));
+    _SCULK_READ(mItem.read(stream));
+    _SCULK_READ(mPos.read(stream));
+    _SCULK_READ(mVelocity.read(stream));
+    _SCULK_READ(mMetaData.read(stream));
     return stream.readBool(mIsFromFishing);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

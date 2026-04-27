@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerHotbarPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerHotbarPacket::getId() const noexcept { return MinecraftPacketIds::PlayerHotbar; }
 
@@ -20,9 +20,9 @@ void PlayerHotbarPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerHotbarPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mSelectedSlot); !status) return status;
-    if (auto status = stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mSelectedSlot));
+    _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
     return stream.readBool(mShouldSelectSlot);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateEquipPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateEquipPacket::getId() const noexcept { return MinecraftPacketIds::UpdateEquip; }
 
@@ -22,11 +22,11 @@ void UpdateEquipPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateEquipPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readVarInt(mSize); !status) return status;
-    if (auto status = stream.readVarInt64(mEntityUniqueId); !status) return status;
+    _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readVarInt(mSize));
+    _SCULK_READ(stream.readVarInt64(mEntityUniqueId));
     return mTag.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

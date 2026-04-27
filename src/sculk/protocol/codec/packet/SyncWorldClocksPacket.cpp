@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SyncWorldClocksPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SyncWorldClocksPacket::getId() const noexcept { return MinecraftPacketIds::SyncWorldClocks; }
 
@@ -33,18 +33,17 @@ void SyncWorldClocksPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SyncWorldClocksPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt); !status)
-        return status;
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit(
         Overload{
             [&](SyncStateData& body) { return stream.readArray(body.mClockData, &SyncWorldClockStateData::read); },
             [&](InitializeRegistryData& body) { return stream.readArray(body.mClockData, &WorldClockData::read); },
             [&](AddTimeMarkerData& body) {
-                if (auto status = stream.readUnsignedVarInt64(body.mClockId); !status) return status;
+                _SCULK_READ(stream.readUnsignedVarInt64(body.mClockId));
                 return stream.readArray(body.mTimeMarkers, &TimeMarkerData::read);
             },
             [&](RemoveTimeMarkerData& body) {
-                if (auto status = stream.readUnsignedVarInt64(body.mClockId); !status) return status;
+                _SCULK_READ(stream.readUnsignedVarInt64(body.mClockId));
                 return stream.readArray(body.mTimeMarkerIds, &ReadOnlyBinaryStream::readUnsignedVarInt64);
             },
         },
@@ -52,4 +51,4 @@ Result<> SyncWorldClocksPacket::read(ReadOnlyBinaryStream& stream) {
     );
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

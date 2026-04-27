@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerLocationPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerLocationPacket::getId() const noexcept { return MinecraftPacketIds::PlayerLocation; }
 
@@ -22,12 +22,12 @@ void PlayerLocationPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerLocationPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readSignedInt));
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
     if (mType == Type::PlayerLocationCoordinates) {
         return mPosition.read(stream);
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

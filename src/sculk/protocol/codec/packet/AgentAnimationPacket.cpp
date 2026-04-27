@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AgentAnimationPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AgentAnimationPacket::getId() const noexcept { return MinecraftPacketIds::AgentAnimation; }
 
@@ -19,8 +19,8 @@ void AgentAnimationPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AgentAnimationPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mAnimation, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mAnimation, &ReadOnlyBinaryStream::readByte));
     return stream.readUnsignedVarInt64(mRuntimeId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

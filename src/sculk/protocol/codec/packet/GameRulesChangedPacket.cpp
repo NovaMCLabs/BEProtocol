@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/GameRulesChangedPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds GameRulesChangedPacket::getId() const noexcept { return MinecraftPacketIds::GameRulesChanged; }
 
@@ -19,4 +19,4 @@ Result<> GameRulesChangedPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mGameRules, &GameRuleData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

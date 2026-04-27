@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/transaction/ItemReleaseInventoryTransaction.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ItemReleaseInventoryTransaction::write(BinaryStream& stream) const {
     stream.writeEnum(mActionType, &BinaryStream::writeUnsignedVarInt);
@@ -17,10 +17,10 @@ void ItemReleaseInventoryTransaction::write(BinaryStream& stream) const {
 }
 
 Result<> ItemReleaseInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mActionType, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
-    if (auto status = stream.readVarInt(mSlot); !status) return status;
-    if (auto status = mItem.read(stream); !status) return status;
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(stream.readVarInt(mSlot));
+    _SCULK_READ(mItem.read(stream));
     return mFromPos.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

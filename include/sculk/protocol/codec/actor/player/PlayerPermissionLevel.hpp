@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class PlayerPermissionLevel : std::int32_t {
     Visitor  = 0,
@@ -17,4 +17,4 @@ enum class PlayerPermissionLevel : std::int32_t {
     Custom   = 3,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

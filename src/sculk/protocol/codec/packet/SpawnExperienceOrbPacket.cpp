@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SpawnExperienceOrbPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SpawnExperienceOrbPacket::getId() const noexcept { return MinecraftPacketIds::SpawnExperienceOrb; }
 
@@ -19,8 +19,8 @@ void SpawnExperienceOrbPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SpawnExperienceOrbPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt(mXpValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

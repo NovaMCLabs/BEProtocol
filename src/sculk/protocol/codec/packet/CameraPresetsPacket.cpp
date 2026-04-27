@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraPresetsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraPresetsPacket::getId() const noexcept { return MinecraftPacketIds::CameraPresets; }
 
@@ -19,4 +19,4 @@ Result<> CameraPresetsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mPresets, &CameraPreset::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

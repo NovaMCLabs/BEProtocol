@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/recipe/Recipes.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void RecipeUnlockingRequirement::write(BinaryStream& stream) const {
     stream.writeEnum(mUnlockingContext, &BinaryStream::writeByte);
@@ -17,7 +17,7 @@ void RecipeUnlockingRequirement::write(BinaryStream& stream) const {
 }
 
 Result<> RecipeUnlockingRequirement::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mUnlockingContext, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mUnlockingContext, &ReadOnlyBinaryStream::readByte));
     if (mUnlockingContext == UnlockingContext::None) {
         return stream.readArray(mUnlockingIngredients, &RecipeIngredient::read);
     }
@@ -36,13 +36,13 @@ void ShapelessRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> ShapelessRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRecipeUniqueId); !status) return status;
-    if (auto status = stream.readArray(mIngredientList, &RecipeIngredient::read); !status) return status;
-    if (auto status = stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read); !status) return status;
-    if (auto status = mRecipeId.read(stream); !status) return status;
-    if (auto status = stream.readString(mRecipeTag); !status) return status;
-    if (auto status = stream.readVarInt(mPriority); !status) return status;
-    if (auto status = mUnlockingRequirement.read(stream); !status) return status;
+    _SCULK_READ(stream.readString(mRecipeUniqueId));
+    _SCULK_READ(stream.readArray(mIngredientList, &RecipeIngredient::read));
+    _SCULK_READ(stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read));
+    _SCULK_READ(mRecipeId.read(stream));
+    _SCULK_READ(stream.readString(mRecipeTag));
+    _SCULK_READ(stream.readVarInt(mPriority));
+    _SCULK_READ(mUnlockingRequirement.read(stream));
     return stream.readUnsignedVarInt(mNetId);
 }
 
@@ -63,47 +63,29 @@ void ShapedRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> ShapedRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRecipeUniqueId); !status) return status;
-    if (auto status = stream.readVarInt(mGridWidth); !status) return status;
-    if (auto status = stream.readVarInt(mGridHeight); !status) return status;
+    _SCULK_READ(stream.readString(mRecipeUniqueId));
+    _SCULK_READ(stream.readVarInt(mGridWidth));
+    _SCULK_READ(stream.readVarInt(mGridHeight));
     mIngredientList.resize(static_cast<std::size_t>(mGridWidth * mGridHeight));
     for (RecipeIngredient& ingredient : mIngredientList) {
-        if (auto status = ingredient.read(stream); !status) return status;
+        _SCULK_READ(ingredient.read(stream));
     }
-    if (auto status = stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read); !status) return status;
-    if (auto status = mRecipeId.read(stream); !status) return status;
-    if (auto status = stream.readString(mRecipeTag); !status) return status;
-    if (auto status = stream.readVarInt(mPriority); !status) return status;
-    if (auto status = stream.readBool(mAssumeSymmetry); !status) return status;
-    if (auto status = mUnlockingRequirement.read(stream); !status) return status;
+    _SCULK_READ(stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read));
+    _SCULK_READ(mRecipeId.read(stream));
+    _SCULK_READ(stream.readString(mRecipeTag));
+    _SCULK_READ(stream.readVarInt(mPriority));
+    _SCULK_READ(stream.readBool(mAssumeSymmetry));
+    _SCULK_READ(mUnlockingRequirement.read(stream));
     return stream.readUnsignedVarInt(mNetId);
 }
 
-void FurnaceRecipe::write(BinaryStream& stream) const {
-    stream.writeVarInt(mItemData);
-    mResultItem.write(stream);
-    stream.writeString(mRecipeTag);
-}
+void FurnaceRecipe::write(BinaryStream&) const {}
 
-Result<> FurnaceRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mItemData); !status) return status;
-    if (auto status = mResultItem.read(stream); !status) return status;
-    return stream.readString(mRecipeTag);
-}
+Result<> FurnaceRecipe::read(ReadOnlyBinaryStream&) { return {}; }
 
-void FurnaceAuxRecipe::write(BinaryStream& stream) const {
-    stream.writeVarInt(mItemData);
-    stream.writeVarInt(mAux);
-    mResultItem.write(stream);
-    stream.writeString(mRecipeTag);
-}
+void FurnaceAuxRecipe::write(BinaryStream&) const {}
 
-Result<> FurnaceAuxRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mItemData); !status) return status;
-    if (auto status = stream.readVarInt(mAux); !status) return status;
-    if (auto status = mResultItem.read(stream); !status) return status;
-    return stream.readString(mRecipeTag);
-}
+Result<> FurnaceAuxRecipe::read(ReadOnlyBinaryStream&) { return {}; }
 
 void MultiRecipe::write(BinaryStream& stream) const {
     mMultiRecipe.write(stream);
@@ -111,7 +93,7 @@ void MultiRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> MultiRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mMultiRecipe.read(stream); !status) return status;
+    _SCULK_READ(mMultiRecipe.read(stream));
     return stream.readUnsignedVarInt(mNetId);
 }
 
@@ -127,13 +109,13 @@ void UserDataShapelessRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> UserDataShapelessRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRecipeUniqueId); !status) return status;
-    if (auto status = stream.readArray(mIngredientList, &RecipeIngredient::read); !status) return status;
-    if (auto status = stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read); !status) return status;
-    if (auto status = mRecipeId.read(stream); !status) return status;
-    if (auto status = stream.readString(mRecipeTag); !status) return status;
-    if (auto status = stream.readVarInt(mPriority); !status) return status;
-    if (auto status = mUnlockingRequirement.read(stream); !status) return status;
+    _SCULK_READ(stream.readString(mRecipeUniqueId));
+    _SCULK_READ(stream.readArray(mIngredientList, &RecipeIngredient::read));
+    _SCULK_READ(stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read));
+    _SCULK_READ(mRecipeId.read(stream));
+    _SCULK_READ(stream.readString(mRecipeTag));
+    _SCULK_READ(stream.readVarInt(mPriority));
+    _SCULK_READ(mUnlockingRequirement.read(stream));
     return stream.readUnsignedVarInt(mNetId);
 }
 
@@ -148,12 +130,12 @@ void ShapelessChemistryRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> ShapelessChemistryRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRecipeUniqueId); !status) return status;
-    if (auto status = stream.readArray(mIngredientList, &RecipeIngredient::read); !status) return status;
-    if (auto status = stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read); !status) return status;
-    if (auto status = mRecipeId.read(stream); !status) return status;
-    if (auto status = stream.readString(mRecipeTag); !status) return status;
-    if (auto status = stream.readVarInt(mPriority); !status) return status;
+    _SCULK_READ(stream.readString(mRecipeUniqueId));
+    _SCULK_READ(stream.readArray(mIngredientList, &RecipeIngredient::read));
+    _SCULK_READ(stream.readArray(mProductionList, &NetworkItemInstanceDescriptor::read));
+    _SCULK_READ(mRecipeId.read(stream));
+    _SCULK_READ(stream.readString(mRecipeTag));
+    _SCULK_READ(stream.readVarInt(mPriority));
     return stream.readUnsignedVarInt(mNetId);
 }
 
@@ -172,12 +154,12 @@ void SmithingTransformRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> SmithingTransformRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRecipeUniqueId); !status) return status;
-    if (auto status = mTemplate.read(stream); !status) return status;
-    if (auto status = mBase.read(stream); !status) return status;
-    if (auto status = mAddition.read(stream); !status) return status;
-    if (auto status = mResult.read(stream); !status) return status;
-    if (auto status = stream.readString(mRecipeTag); !status) return status;
+    _SCULK_READ(stream.readString(mRecipeUniqueId));
+    _SCULK_READ(mTemplate.read(stream));
+    _SCULK_READ(mBase.read(stream));
+    _SCULK_READ(mAddition.read(stream));
+    _SCULK_READ(mResult.read(stream));
+    _SCULK_READ(stream.readString(mRecipeTag));
     return stream.readUnsignedVarInt(mNetId);
 }
 
@@ -191,11 +173,11 @@ void SmithingTrimRecipe::write(BinaryStream& stream) const {
 }
 
 Result<> SmithingTrimRecipe::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mRecipeUniqueId); !status) return status;
-    if (auto status = mTemplate.read(stream); !status) return status;
-    if (auto status = mBase.read(stream); !status) return status;
-    if (auto status = mAddition.read(stream); !status) return status;
-    if (auto status = stream.readString(mRecipeTag); !status) return status;
+    _SCULK_READ(stream.readString(mRecipeUniqueId));
+    _SCULK_READ(mTemplate.read(stream));
+    _SCULK_READ(mBase.read(stream));
+    _SCULK_READ(mAddition.read(stream));
+    _SCULK_READ(stream.readString(mRecipeTag));
     return stream.readUnsignedVarInt(mNetId);
 }
 
@@ -205,8 +187,7 @@ void CraftingDataEntry::write(BinaryStream& stream) const {
 }
 
 Result<> CraftingDataEntry::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::int32_t>(mRecipe, &ReadOnlyBinaryStream::readVarInt); !status)
-        return status;
+    _SCULK_READ(stream.readVariantIndex<std::int32_t>(mRecipe, &ReadOnlyBinaryStream::readVarInt));
     return std::visit([&](auto&& recipe) { return recipe.read(stream); }, mRecipe);
 }
 
@@ -220,11 +201,11 @@ void PotionMixDataEntry::write(BinaryStream& stream) const {
 }
 
 Result<> PotionMixDataEntry::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mFromPotionId); !status) return status;
-    if (auto status = stream.readVarInt(mFromPotionAux); !status) return status;
-    if (auto status = stream.readVarInt(mReagentItemId); !status) return status;
-    if (auto status = stream.readVarInt(mReagentItemAux); !status) return status;
-    if (auto status = stream.readVarInt(mToPotionId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mFromPotionId));
+    _SCULK_READ(stream.readVarInt(mFromPotionAux));
+    _SCULK_READ(stream.readVarInt(mReagentItemId));
+    _SCULK_READ(stream.readVarInt(mReagentItemAux));
+    _SCULK_READ(stream.readVarInt(mToPotionId));
     return stream.readVarInt(mToPotionAux);
 }
 
@@ -235,8 +216,8 @@ void ContainerMixDataEntry::write(BinaryStream& stream) const {
 }
 
 Result<> ContainerMixDataEntry::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mInputItemId); !status) return status;
-    if (auto status = stream.readVarInt(mReagentItemId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mInputItemId));
+    _SCULK_READ(stream.readVarInt(mReagentItemId));
     return stream.readVarInt(mToItemId);
 }
 
@@ -246,7 +227,7 @@ void MaterialReducerDataEntry::ItemInfo::write(BinaryStream& stream) const {
 }
 
 Result<> MaterialReducerDataEntry::ItemInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mItemId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mItemId));
     return stream.readVarInt(mItemCount);
 }
 
@@ -256,8 +237,8 @@ void MaterialReducerDataEntry::write(BinaryStream& stream) const {
 }
 
 Result<> MaterialReducerDataEntry::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mInput); !status) return status;
+    _SCULK_READ(stream.readVarInt(mInput));
     return stream.readArray(mItems, &ItemInfo::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

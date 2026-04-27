@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/SyncWorldClocks.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void TimeMarkerData::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt64(mId);
@@ -17,9 +17,9 @@ void TimeMarkerData::write(BinaryStream& stream) const {
 }
 
 Result<> TimeMarkerData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mId); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readVarInt(mTime); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mId));
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readVarInt(mTime));
     return stream.readSignedInt(mPeriod);
 }
 
@@ -30,8 +30,8 @@ void SyncWorldClockStateData::write(BinaryStream& stream) const {
 }
 
 Result<> SyncWorldClockStateData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mClockId); !status) return status;
-    if (auto status = stream.readVarInt(mTime); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mClockId));
+    _SCULK_READ(stream.readVarInt(mTime));
     return stream.readBool(mIsPaused);
 }
 
@@ -44,11 +44,11 @@ void WorldClockData::write(BinaryStream& stream) const {
 }
 
 Result<> WorldClockData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mId); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readVarInt(mTime); !status) return status;
-    if (auto status = stream.readBool(mIsPaused); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mId));
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readVarInt(mTime));
+    _SCULK_READ(stream.readBool(mIsPaused));
     return stream.readArray(mTimeMarkers, &TimeMarkerData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

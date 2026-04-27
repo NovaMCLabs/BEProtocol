@@ -9,17 +9,17 @@
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class BoolAttributeOperation : std::int32_t {
-    Override   = 0,
-    AlphaBlend = 1,
-    And        = 2,
-    Nand       = 3,
-    Or         = 4,
-    Nor        = 5,
-    Xor        = 6,
-    Xnor       = 7,
+    OVERRIDE    = 0,
+    ALPHA_BLEND = 1,
+    AND         = 2,
+    NAND        = 3,
+    OR          = 4,
+    NOR         = 5,
+    XOR         = 6,
+    XNOR        = 7,
 };
 
 struct BoolAttributeData {
@@ -31,4 +31,4 @@ struct BoolAttributeData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

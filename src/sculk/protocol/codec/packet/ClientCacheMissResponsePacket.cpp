@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientCacheMissResponsePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ClientCacheMissResponsePacket::ClientCache::write(BinaryStream& stream) const {
     stream.writeUnsignedInt64(mBlobId);
@@ -15,7 +15,7 @@ void ClientCacheMissResponsePacket::ClientCache::write(BinaryStream& stream) con
 }
 
 Result<> ClientCacheMissResponsePacket::ClientCache::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt64(mBlobId); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt64(mBlobId));
     return stream.readString(mBlobData);
 }
 
@@ -33,4 +33,4 @@ Result<> ClientCacheMissResponsePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mMissingBlobs, &ClientCache::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

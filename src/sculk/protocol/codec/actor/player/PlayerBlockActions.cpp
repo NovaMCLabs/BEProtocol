@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/player/PlayerBlockActions.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void PlayerBlockActionData::write(BinaryStream& stream) const {
     stream.writeEnum(mActionType, &BinaryStream::writeVarInt);
@@ -16,8 +16,8 @@ void PlayerBlockActionData::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerBlockActionData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mActionType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt(mFacing);
 }
 
@@ -30,12 +30,12 @@ void PlayerBlockActions::write(BinaryStream& stream) const {
 
 Result<> PlayerBlockActions::read(ReadOnlyBinaryStream& stream) {
     int actionCount{};
-    if (auto status = stream.readVarInt(actionCount); !status) return status;
+    _SCULK_READ(stream.readVarInt(actionCount));
     mActions.resize(static_cast<std::size_t>(actionCount));
     for (auto& action : mActions) {
-        if (auto status = action.read(stream); !status) return status;
+        _SCULK_READ(action.read(stream));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/SyncedAttribute.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SyncedAttribute::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -17,10 +17,10 @@ void SyncedAttribute::write(BinaryStream& stream) const {
 }
 
 Result<> SyncedAttribute::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readFloat(mMinValue); !status) return status;
-    if (auto status = stream.readFloat(mMaxValue); !status) return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readFloat(mMinValue));
+    _SCULK_READ(stream.readFloat(mMaxValue));
     return stream.readFloat(mCurrentValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

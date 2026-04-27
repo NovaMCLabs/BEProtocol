@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/InventoryContentPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds InventoryContentPacket::getId() const noexcept { return MinecraftPacketIds::InventoryContent; }
 
@@ -21,10 +21,10 @@ void InventoryContentPacket::write(BinaryStream& stream) const {
 }
 
 Result<> InventoryContentPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mInventoryId); !status) return status;
-    if (auto status = stream.readArray(mSlots, &NetworkItemStackDescriptor::read); !status) return status;
-    if (auto status = mFullContainerName.read(stream); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mInventoryId));
+    _SCULK_READ(stream.readArray(mSlots, &NetworkItemStackDescriptor::read));
+    _SCULK_READ(mFullContainerName.read(stream));
     return mStorageItem.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

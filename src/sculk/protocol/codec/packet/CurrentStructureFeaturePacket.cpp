@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CurrentStructureFeaturePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CurrentStructureFeaturePacket::getId() const noexcept {
     return MinecraftPacketIds::CurrentStructureFeature;
@@ -19,4 +19,4 @@ void CurrentStructureFeaturePacket::write(BinaryStream& stream) const { stream.w
 
 Result<> CurrentStructureFeaturePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mCurrent); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

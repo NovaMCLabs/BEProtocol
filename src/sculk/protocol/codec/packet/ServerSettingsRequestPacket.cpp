@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerSettingsRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerSettingsRequestPacket::getId() const noexcept {
     return MinecraftPacketIds::ServerSettingsRequest;
@@ -19,4 +19,4 @@ void ServerSettingsRequestPacket::write(BinaryStream&) const {}
 
 Result<> ServerSettingsRequestPacket::read(ReadOnlyBinaryStream&) { return {}; }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

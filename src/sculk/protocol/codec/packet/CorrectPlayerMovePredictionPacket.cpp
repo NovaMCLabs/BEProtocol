@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CorrectPlayerMovePredictionPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CorrectPlayerMovePredictionPacket::getId() const noexcept {
     return MinecraftPacketIds::CorrectPlayerMovePrediction;
@@ -28,14 +28,13 @@ void CorrectPlayerMovePredictionPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CorrectPlayerMovePredictionPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mPredictionType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = mPos.read(stream); !status) return status;
-    if (auto status = mPosDelta.read(stream); !status) return status;
-    if (auto status = mVehiclePrediction.read(stream); !status) return status;
-    if (auto status = stream.readOptional(mVehicleAngularVelocity, &ReadOnlyBinaryStream::readFloat); !status)
-        return status;
-    if (auto status = stream.readBool(mOnGround); !status) return status;
+    _SCULK_READ(stream.readEnum(mPredictionType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(mPos.read(stream));
+    _SCULK_READ(mPosDelta.read(stream));
+    _SCULK_READ(mVehiclePrediction.read(stream));
+    _SCULK_READ(stream.readOptional(mVehicleAngularVelocity, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readBool(mOnGround));
     return stream.readUnsignedVarInt64(mPlayerInputTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

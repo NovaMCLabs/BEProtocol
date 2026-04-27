@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/BlockEventPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds BlockEventPacket::getId() const noexcept { return MinecraftPacketIds::BlockEvent; }
 
@@ -20,9 +20,9 @@ void BlockEventPacket::write(BinaryStream& stream) const {
 }
 
 Result<> BlockEventPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mBlockPosition.read(stream); !status) return status;
-    if (auto status = stream.readEnum(mEventType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
+    _SCULK_READ(mBlockPosition.read(stream));
+    _SCULK_READ(stream.readEnum(mEventType, &ReadOnlyBinaryStream::readVarInt));
     return stream.readVarInt(mEventValue);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

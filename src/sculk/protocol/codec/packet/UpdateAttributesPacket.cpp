@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateAttributesPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateAttributesPacket::getId() const noexcept { return MinecraftPacketIds::UpdateAttributes; }
 std::string_view   UpdateAttributesPacket::getName() const noexcept { return "UpdateAttributesPacket"; }
@@ -19,9 +19,9 @@ void UpdateAttributesPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateAttributesPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readArray(mAttributes, &Attribute::read); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readArray(mAttributes, &Attribute::read));
     return stream.readUnsignedVarInt64(mTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

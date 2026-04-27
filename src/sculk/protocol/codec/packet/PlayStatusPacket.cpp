@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayStatusPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayStatusPacket::getId() const noexcept { return MinecraftPacketIds::PlayStatus; }
 
@@ -21,4 +21,4 @@ Result<> PlayStatusPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mStatus, &ReadOnlyBinaryStream::readSignedBigEndianInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

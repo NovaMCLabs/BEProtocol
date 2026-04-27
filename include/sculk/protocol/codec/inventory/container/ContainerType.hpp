@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ContainerType : std::uint8_t {
     Container          = 0,
@@ -52,4 +52,4 @@ enum class ContainerType : std::uint8_t {
     Inventory          = 255,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

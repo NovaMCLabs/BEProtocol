@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include <variant>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class UpdateType : std::uint8_t {
     ClearOverrides   = 0,
@@ -35,4 +35,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

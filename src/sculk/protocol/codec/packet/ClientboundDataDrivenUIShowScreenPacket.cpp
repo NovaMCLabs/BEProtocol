@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundDataDrivenUIShowScreenPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundDataDrivenUIShowScreenPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundDataDrivenUIShowScreen;
@@ -24,9 +24,9 @@ void ClientboundDataDrivenUIShowScreenPacket::write(BinaryStream& stream) const 
 }
 
 Result<> ClientboundDataDrivenUIShowScreenPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mScreenId); !status) return status;
-    if (auto status = stream.readUnsignedInt(mFormId); !status) return status;
+    _SCULK_READ(stream.readString(mScreenId));
+    _SCULK_READ(stream.readUnsignedInt(mFormId));
     return stream.readOptional(mDataInstanceId, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

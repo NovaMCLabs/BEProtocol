@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerSkinPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerSkinPacket::getId() const noexcept { return MinecraftPacketIds::PlayerSkin; }
 
@@ -21,10 +21,10 @@ void PlayerSkinPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerSkinPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mUUID.read(stream); !status) return status;
-    if (auto status = mSerializedSkin.read(stream); !status) return status;
-    if (auto status = stream.readString(mNewSkinName); !status) return status;
+    _SCULK_READ(mUUID.read(stream));
+    _SCULK_READ(mSerializedSkin.read(stream));
+    _SCULK_READ(stream.readString(mNewSkinName));
     return stream.readString(mOldSkinName);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

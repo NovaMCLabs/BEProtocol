@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/AttributeLayerData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void AttributeLayerData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -18,10 +18,10 @@ void AttributeLayerData::write(BinaryStream& stream) const {
 }
 
 Result<> AttributeLayerData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readVarInt(mDimension); !status) return status;
-    if (auto status = mSettings.read(stream); !status) return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readVarInt(mDimension));
+    _SCULK_READ(mSettings.read(stream));
     return stream.readArray(mAttributes, &EnvironmentAttributeData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

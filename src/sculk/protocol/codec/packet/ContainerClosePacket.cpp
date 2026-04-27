@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ContainerClosePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ContainerClosePacket::getId() const noexcept { return MinecraftPacketIds::ContainerClose; }
 
@@ -20,9 +20,9 @@ void ContainerClosePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ContainerClosePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte));
     return stream.readBool(mServerInitiatedClose);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

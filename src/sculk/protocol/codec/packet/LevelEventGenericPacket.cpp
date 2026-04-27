@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LevelEventGenericPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LevelEventGenericPacket::getId() const noexcept { return MinecraftPacketIds::LevelEventGeneric; }
 
@@ -19,8 +19,8 @@ void LevelEventGenericPacket::write(BinaryStream& stream) const {
 }
 
 Result<> LevelEventGenericPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mEventId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mEventId));
     return mData.deserialize(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

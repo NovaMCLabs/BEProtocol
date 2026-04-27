@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/LevelSettings.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void LevelSettings::write(BinaryStream& stream) const {
     stream.writeUnsignedInt64(mSeed);
@@ -62,55 +62,55 @@ void LevelSettings::write(BinaryStream& stream) const {
 }
 
 Result<> LevelSettings::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt64(mSeed); !status) return status;
-    if (auto status = mSpawnSettings.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mGeneratorType); !status) return status;
-    if (auto status = stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readBool(mIsHardCore); !status) return status;
-    if (auto status = stream.readEnum(mDifficulty, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = mSpawnPosition.read(stream); !status) return status;
-    if (auto status = stream.readBool(mAchievementDisabled); !status) return status;
-    if (auto status = stream.readVarInt(mEditorWorldType); !status) return status;
-    if (auto status = stream.readBool(mIsCreatedInEditor); !status) return status;
-    if (auto status = stream.readBool(mIsExportedFromEditor); !status) return status;
-    if (auto status = stream.readVarInt(mDayCycleStopTime); !status) return status;
-    if (auto status = stream.readVarInt(mEduOffer); !status) return status;
-    if (auto status = stream.readBool(mIsEdu); !status) return status;
-    if (auto status = stream.readString(mEduProductId); !status) return status;
-    if (auto status = stream.readFloat(mRainLevel); !status) return status;
-    if (auto status = stream.readFloat(mLightningLevel); !status) return status;
-    if (auto status = stream.readBool(mPlatformLocked); !status) return status;
-    if (auto status = stream.readBool(mMultiplayer); !status) return status;
-    if (auto status = stream.readBool(mLanBroadcast); !status) return status;
-    if (auto status = stream.readVarInt(mXboxLiveBroadcastSetting); !status) return status;
-    if (auto status = stream.readVarInt(mPlatformBroadcastSetting); !status) return status;
-    if (auto status = stream.readBool(mCommandsEnabled); !status) return status;
-    if (auto status = stream.readBool(mTextureRequired); !status) return status;
-    if (auto status = stream.readArray(mGameRules, &GameRuleData::readLevelSettings); !status) return status;
-    if (auto status = mExperiments.read(stream); !status) return status;
-    if (auto status = stream.readBool(mBonusChest); !status) return status;
-    if (auto status = stream.readBool(mStartsWithMap); !status) return status;
-    if (auto status = stream.readEnum(mPlayerPermission, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readSignedInt(mTickRange); !status) return status;
-    if (auto status = stream.readBool(mLockBehaviorPack); !status) return status;
-    if (auto status = stream.readBool(mLockResourcePack); !status) return status;
-    if (auto status = stream.readBool(mIsFromLockedTemplate); !status) return status;
-    if (auto status = stream.readBool(mOnlyMsaGamertags); !status) return status;
-    if (auto status = stream.readBool(mIsFromWorldTemplate); !status) return status;
-    if (auto status = stream.readBool(mIsWorldTemplateOptionLocked); !status) return status;
-    if (auto status = stream.readBool(mSpawnV1Villagers); !status) return status;
-    if (auto status = stream.readBool(mPersonaDisabled); !status) return status;
-    if (auto status = stream.readBool(mCustomSkinsDisabled); !status) return status;
-    if (auto status = stream.readBool(mEmoteChatMuted); !status) return status;
-    if (auto status = stream.readString(mBaseGameVersion); !status) return status;
-    if (auto status = stream.readSignedInt(mLimitedWorldWidth); !status) return status;
-    if (auto status = stream.readSignedInt(mLimitedWorldDepth); !status) return status;
-    if (auto status = stream.readBool(mNetherType); !status) return status;
-    if (auto status = stream.readString(mEduResourceButtonName); !status) return status;
-    if (auto status = stream.readString(mEduResourceUri); !status) return status;
-    if (auto status = stream.readBool(mForceExperimentalGameplay); !status) return status;
-    if (auto status = stream.readByte(mChatRestrictionLevel); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt64(mSeed));
+    _SCULK_READ(mSpawnSettings.read(stream));
+    _SCULK_READ(stream.readVarInt(mGeneratorType));
+    _SCULK_READ(stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readBool(mIsHardCore));
+    _SCULK_READ(stream.readEnum(mDifficulty, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(mSpawnPosition.read(stream));
+    _SCULK_READ(stream.readBool(mAchievementDisabled));
+    _SCULK_READ(stream.readVarInt(mEditorWorldType));
+    _SCULK_READ(stream.readBool(mIsCreatedInEditor));
+    _SCULK_READ(stream.readBool(mIsExportedFromEditor));
+    _SCULK_READ(stream.readVarInt(mDayCycleStopTime));
+    _SCULK_READ(stream.readVarInt(mEduOffer));
+    _SCULK_READ(stream.readBool(mIsEdu));
+    _SCULK_READ(stream.readString(mEduProductId));
+    _SCULK_READ(stream.readFloat(mRainLevel));
+    _SCULK_READ(stream.readFloat(mLightningLevel));
+    _SCULK_READ(stream.readBool(mPlatformLocked));
+    _SCULK_READ(stream.readBool(mMultiplayer));
+    _SCULK_READ(stream.readBool(mLanBroadcast));
+    _SCULK_READ(stream.readVarInt(mXboxLiveBroadcastSetting));
+    _SCULK_READ(stream.readVarInt(mPlatformBroadcastSetting));
+    _SCULK_READ(stream.readBool(mCommandsEnabled));
+    _SCULK_READ(stream.readBool(mTextureRequired));
+    _SCULK_READ(stream.readArray(mGameRules, &GameRuleData::readLevelSettings));
+    _SCULK_READ(mExperiments.read(stream));
+    _SCULK_READ(stream.readBool(mBonusChest));
+    _SCULK_READ(stream.readBool(mStartsWithMap));
+    _SCULK_READ(stream.readEnum(mPlayerPermission, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readSignedInt(mTickRange));
+    _SCULK_READ(stream.readBool(mLockBehaviorPack));
+    _SCULK_READ(stream.readBool(mLockResourcePack));
+    _SCULK_READ(stream.readBool(mIsFromLockedTemplate));
+    _SCULK_READ(stream.readBool(mOnlyMsaGamertags));
+    _SCULK_READ(stream.readBool(mIsFromWorldTemplate));
+    _SCULK_READ(stream.readBool(mIsWorldTemplateOptionLocked));
+    _SCULK_READ(stream.readBool(mSpawnV1Villagers));
+    _SCULK_READ(stream.readBool(mPersonaDisabled));
+    _SCULK_READ(stream.readBool(mCustomSkinsDisabled));
+    _SCULK_READ(stream.readBool(mEmoteChatMuted));
+    _SCULK_READ(stream.readString(mBaseGameVersion));
+    _SCULK_READ(stream.readSignedInt(mLimitedWorldWidth));
+    _SCULK_READ(stream.readSignedInt(mLimitedWorldDepth));
+    _SCULK_READ(stream.readBool(mNetherType));
+    _SCULK_READ(stream.readString(mEduResourceButtonName));
+    _SCULK_READ(stream.readString(mEduResourceUri));
+    _SCULK_READ(stream.readBool(mForceExperimentalGameplay));
+    _SCULK_READ(stream.readByte(mChatRestrictionLevel));
     return stream.readBool(mDisablePlayerInteractions);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

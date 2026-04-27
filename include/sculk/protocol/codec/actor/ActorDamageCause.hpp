@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ActorDamageCause : std::int32_t {
     Override        = 0,
@@ -48,4 +48,4 @@ enum class ActorDamageCause : std::int32_t {
     MaceSmash       = 34
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

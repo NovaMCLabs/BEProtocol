@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/packet/CommandOutputPacket.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CommandOutputPacket::getId() const noexcept { return MinecraftPacketIds::CommandOutput; }
 
@@ -27,21 +27,15 @@ void CommandOutputPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CommandOutputPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mOriginData.read(stream); !status) return status;
-    if (auto status = utils::readEnumName(stream, mOutputType); !status) return status;
-    if (auto status = stream.readUnsignedInt(mSuccessCount); !status) return status;
-    if (auto status = stream.readArray(
-            mOutputMessages,
-            [](ReadOnlyBinaryStream& input, OutputMessage& data) {
-                if (auto status = input.readString(data.mMessageId); !status) return status;
-                if (auto status = input.readBool(data.mSuccess); !status) return status;
-                return input.readArray(data.mParameters, &ReadOnlyBinaryStream::readString);
-            }
-        );
-        !status) {
-        return status;
-    }
+    _SCULK_READ(mOriginData.read(stream));
+    _SCULK_READ(utils::readEnumName(stream, mOutputType));
+    _SCULK_READ(stream.readUnsignedInt(mSuccessCount));
+    _SCULK_READ(stream.readArray(mOutputMessages, [](ReadOnlyBinaryStream& input, OutputMessage& data) {
+        _SCULK_READ(input.readString(data.mMessageId));
+        _SCULK_READ(input.readBool(data.mSuccess));
+        return input.readArray(data.mParameters, &ReadOnlyBinaryStream::readString);
+    }));
     return stream.readString(mDataSet);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

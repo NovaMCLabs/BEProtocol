@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/command/CommandChainedSubcommandData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CommandChainedSubcommandData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -18,12 +18,12 @@ void CommandChainedSubcommandData::write(BinaryStream& stream) const {
 }
 
 Result<> CommandChainedSubcommandData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return stream.readArray(mValues, [](ReadOnlyBinaryStream& stream, std::pair<std::uint32_t, std::uint32_t>& value) {
-        if (auto status = stream.readUnsignedVarInt(value.first); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(value.second); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(value.first));
+        _SCULK_READ(stream.readUnsignedVarInt(value.second));
         return Result<>{};
     });
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

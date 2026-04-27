@@ -6,14 +6,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/codec/level/DebugShape.hpp"
+#include "sculk/protocol/codec/level/PrimitiveShapes.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
-class DebugDrawerPacket : public IPacket {
+class PrimitiveShapesPacket : public IPacket {
 public:
-    std::vector<DebugShape> mShapes{};
+    std::vector<PrimitiveShapes> mShapes{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -25,4 +25,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

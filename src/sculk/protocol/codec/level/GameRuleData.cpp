@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/GameRuleData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void GameRuleData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -25,12 +25,9 @@ void GameRuleData::write(BinaryStream& stream) const {
 }
 
 Result<> GameRuleData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readBool(mCanBeModifiedByPlayer); !status) return status;
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt);
-        !status) {
-        return status;
-    }
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readBool(mCanBeModifiedByPlayer));
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit(
         Overload{
             [](std::monostate) { return Result<>{}; },
@@ -58,17 +55,16 @@ void GameRuleData::writeLevelSettings(BinaryStream& stream) const {
 }
 
 Result<> GameRuleData::readLevelSettings(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readBool(mCanBeModifiedByPlayer); !status) return status;
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt); !status)
-        return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readBool(mCanBeModifiedByPlayer));
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit(
         Overload{
             [](std::monostate) { return Result<>{}; },
             [&](bool& value) { return stream.readBool(value); },
             [&](int& value) {
                 std::uint32_t rawValue{};
-                if (auto status = stream.readUnsignedVarInt(rawValue); !status) return status;
+                _SCULK_READ(stream.readUnsignedVarInt(rawValue));
                 value = static_cast<int>(rawValue);
                 return Result<>{};
             },
@@ -78,4 +74,4 @@ Result<> GameRuleData::readLevelSettings(ReadOnlyBinaryStream& stream) {
     );
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

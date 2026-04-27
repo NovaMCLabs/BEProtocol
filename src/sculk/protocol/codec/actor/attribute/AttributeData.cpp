@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/AttributeData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void AttributeData::write(BinaryStream& stream) const {
     stream.writeVariantIndex<std::uint32_t>(mData, &BinaryStream::writeUnsignedVarInt);
@@ -16,9 +16,8 @@ void AttributeData::write(BinaryStream& stream) const {
 }
 
 Result<> AttributeData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt); !status)
-        return status;
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit([&stream](auto& data) { return data.read(stream); }, mData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

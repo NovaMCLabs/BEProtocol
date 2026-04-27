@@ -8,7 +8,7 @@
 #include "sculk/protocol/connection/ConnectionRequest.hpp"
 #include "../codec/utility/Reflection.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ConnectionRequest::write(BinaryStream& stream) const {
     std::vector<std::byte> payload{};
@@ -21,12 +21,12 @@ void ConnectionRequest::write(BinaryStream& stream) const {
 
 Result<> ConnectionRequest::read(ReadOnlyBinaryStream& stream) {
     std::string payload{};
-    if (auto status = stream.readString(payload); !status) return status;
+    _SCULK_READ(stream.readString(payload));
     ReadOnlyBinaryStream payloadStream(std::span(reinterpret_cast<std::byte*>(payload.data()), payload.size()));
     std::string          authJson{};
-    if (auto status = payloadStream.readLongString(authJson); !status) return status;
-    if (auto status = utils::deserialize_json(mAuthenticationInfo, authJson); !status) return status;
+    _SCULK_READ(payloadStream.readLongString(authJson));
+    _SCULK_READ(utils::deserialize_json(mAuthenticationInfo, authJson));
     return payloadStream.readLongString(mClientProperties);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

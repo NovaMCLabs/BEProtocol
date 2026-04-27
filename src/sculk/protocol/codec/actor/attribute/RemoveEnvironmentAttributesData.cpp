@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/RemoveEnvironmentAttributesData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void RemoveEnvironmentAttributesData::write(BinaryStream& stream) const {
     stream.writeString(mAttributeLayerName);
@@ -17,9 +17,9 @@ void RemoveEnvironmentAttributesData::write(BinaryStream& stream) const {
 }
 
 Result<> RemoveEnvironmentAttributesData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mAttributeLayerName); !status) return status;
-    if (auto status = stream.readVarInt(mAttributeLayerDimension); !status) return status;
+    _SCULK_READ(stream.readString(mAttributeLayerName));
+    _SCULK_READ(stream.readVarInt(mAttributeLayerDimension));
     return stream.readArray(mAttributes, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeConsolidatedFeaturesData {
     std::vector<BiomeConsolidatedFeatureData> mFeatures{};
@@ -20,4 +20,4 @@ struct BiomeConsolidatedFeaturesData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

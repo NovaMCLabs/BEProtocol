@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AddBehaviorTreePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AddBehaviorTreePacket::getId() const noexcept { return MinecraftPacketIds::AddBehaviorTree; }
 
@@ -17,4 +17,4 @@ void AddBehaviorTreePacket::write(BinaryStream& stream) const { stream.writeStri
 
 Result<> AddBehaviorTreePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mBehaviorTreeStructure); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

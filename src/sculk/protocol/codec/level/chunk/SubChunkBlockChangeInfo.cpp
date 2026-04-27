@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/chunk/SubChunkBlockChangeInfo.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SubChunkBlockChangeInfo::write(BinaryStream& stream) const {
     mPosition.write(stream);
@@ -18,11 +18,11 @@ void SubChunkBlockChangeInfo::write(BinaryStream& stream) const {
 }
 
 Result<> SubChunkBlockChangeInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mRuntimeId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mFlags); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mSyncEntity); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mRuntimeId));
+    _SCULK_READ(stream.readUnsignedVarInt(mFlags));
+    _SCULK_READ(stream.readUnsignedVarInt64(mSyncEntity));
     return stream.readUnsignedVarInt(mSyncMessage);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

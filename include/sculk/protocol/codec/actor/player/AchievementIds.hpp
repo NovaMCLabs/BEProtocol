@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class AchievementIds : std::int32_t {
     ChestFullOfCobblestone          = 7,
@@ -85,4 +85,4 @@ enum class AchievementIds : std::int32_t {
     AdventuringTime                 = 116,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/LessonProgressPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds LessonProgressPacket::getId() const noexcept { return MinecraftPacketIds::LessonProgress; }
 
@@ -20,9 +20,9 @@ void LessonProgressPacket::write(BinaryStream& stream) const {
 }
 
 Result<> LessonProgressPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readVarInt(mScore); !status) return status;
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readVarInt(mScore));
     return stream.readString(mActivityId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

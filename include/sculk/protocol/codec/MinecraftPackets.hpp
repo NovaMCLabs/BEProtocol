@@ -12,7 +12,7 @@
 #include "utility/deps/ReadOnlyBinaryStream.hpp"
 #include <memory>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class MinecraftPackets {
 public:
@@ -34,4 +34,4 @@ public:
     static void writePacketHeader(BinaryStream& stream, const PacketHeader& header);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

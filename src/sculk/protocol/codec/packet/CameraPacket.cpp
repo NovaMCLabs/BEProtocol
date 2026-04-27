@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraPacket::getId() const noexcept { return MinecraftPacketIds::Camera; }
 
@@ -19,8 +19,8 @@ void CameraPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CameraPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mCameraId); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mCameraId));
     return stream.readVarInt64(mTargetPlayerId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

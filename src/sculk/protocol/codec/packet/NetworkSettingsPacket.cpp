@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/NetworkSettingsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds NetworkSettingsPacket::getId() const noexcept { return MinecraftPacketIds::NetworkSettings; }
 
@@ -22,12 +22,11 @@ void NetworkSettingsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> NetworkSettingsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedShort(mCompressionThreshold); !status) return status;
-    if (auto status = stream.readEnum(mCompressionAlgorithm, &ReadOnlyBinaryStream::readUnsignedShort); !status)
-        return status;
-    if (auto status = stream.readBool(mClientThrottleEnabled); !status) return status;
-    if (auto status = stream.readByte(mClientThrottleThreshold); !status) return status;
+    _SCULK_READ(stream.readUnsignedShort(mCompressionThreshold));
+    _SCULK_READ(stream.readEnum(mCompressionAlgorithm, &ReadOnlyBinaryStream::readUnsignedShort));
+    _SCULK_READ(stream.readBool(mClientThrottleEnabled));
+    _SCULK_READ(stream.readByte(mClientThrottleThreshold));
     return stream.readFloat(mClientThrottleScalar);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

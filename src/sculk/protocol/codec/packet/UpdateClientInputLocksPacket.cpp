@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateClientInputLocksPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateClientInputLocksPacket::getId() const noexcept {
     return MinecraftPacketIds::UpdateClientInputLocks;
@@ -23,4 +23,4 @@ Result<> UpdateClientInputLocksPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedVarInt(mInputLockComponentData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

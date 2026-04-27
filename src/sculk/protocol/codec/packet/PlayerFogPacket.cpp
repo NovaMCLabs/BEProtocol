@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerFogPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerFogPacket::getId() const noexcept { return MinecraftPacketIds::PlayerFog; }
 
@@ -19,4 +19,4 @@ Result<> PlayerFogPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mFogStack, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

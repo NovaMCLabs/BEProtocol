@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/item/ItemStackRequest.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ItemStackRequestSlotInfo::write(BinaryStream& stream) const {
     mFullContainerName.write(stream);
@@ -16,8 +16,8 @@ void ItemStackRequestSlotInfo::write(BinaryStream& stream) const {
 }
 
 Result<> ItemStackRequestSlotInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mFullContainerName.read(stream); !status) return status;
-    if (auto status = stream.readByte(mSlot); !status) return status;
+    _SCULK_READ(mFullContainerName.read(stream));
+    _SCULK_READ(stream.readByte(mSlot));
     return stream.readVarInt(mNetId);
 }
 
@@ -95,58 +95,58 @@ void ItemStackRequestAction::write(BinaryStream& stream) const {
 }
 
 Result<> ItemStackRequestAction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mActionType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readByte));
     switch (mActionType) {
     case Type::Take:
     case Type::Place: {
         TransferBase data{};
-        if (auto status = stream.readByte(data.mAmount); !status) return status;
-        if (auto status = data.mSource.read(stream); !status) return status;
-        if (auto status = data.mDestination.read(stream); !status) return status;
+        _SCULK_READ(stream.readByte(data.mAmount));
+        _SCULK_READ(data.mSource.read(stream));
+        _SCULK_READ(data.mDestination.read(stream));
         mVariant = std::move(data);
         return {};
     }
     case Type::Swap: {
         Swap data{};
-        if (auto status = data.mSource.read(stream); !status) return status;
-        if (auto status = data.mDestination.read(stream); !status) return status;
+        _SCULK_READ(data.mSource.read(stream));
+        _SCULK_READ(data.mDestination.read(stream));
         mVariant = std::move(data);
         return {};
     }
     case Type::Drop: {
         Drop data{};
-        if (auto status = stream.readByte(data.mAmount); !status) return status;
-        if (auto status = data.mSource.read(stream); !status) return status;
-        if (auto status = stream.readBool(data.mRandomly); !status) return status;
+        _SCULK_READ(stream.readByte(data.mAmount));
+        _SCULK_READ(data.mSource.read(stream));
+        _SCULK_READ(stream.readBool(data.mRandomly));
         mVariant = std::move(data);
         return {};
     }
     case Type::Destroy:
     case Type::Consume: {
         DestroyConsume data{};
-        if (auto status = stream.readByte(data.mAmount); !status) return status;
-        if (auto status = data.mSource.read(stream); !status) return status;
+        _SCULK_READ(stream.readByte(data.mAmount));
+        _SCULK_READ(data.mSource.read(stream));
         mVariant = std::move(data);
         return {};
     }
     case Type::Create: {
         Create data{};
-        if (auto status = stream.readByte(data.mResultsIndex); !status) return status;
+        _SCULK_READ(stream.readByte(data.mResultsIndex));
         mVariant = std::move(data);
         return {};
     }
     case Type::BeaconPayment: {
         BeaconPayment data{};
-        if (auto status = stream.readVarInt(data.mPrimaryEffectId); !status) return status;
-        if (auto status = stream.readVarInt(data.mSecondaryEffectId); !status) return status;
+        _SCULK_READ(stream.readVarInt(data.mPrimaryEffectId));
+        _SCULK_READ(stream.readVarInt(data.mSecondaryEffectId));
         mVariant = std::move(data);
         return {};
     }
     case Type::MineBlock: {
         MineBlock data{};
-        if (auto status = stream.readVarInt(data.mSlot); !status) return status;
-        if (auto status = stream.readVarInt(data.mPredictedDurability); !status) return status;
-        if (auto status = stream.readVarInt(data.mItemStackNetId); !status) return status;
+        _SCULK_READ(stream.readVarInt(data.mSlot));
+        _SCULK_READ(stream.readVarInt(data.mPredictedDurability));
+        _SCULK_READ(stream.readVarInt(data.mItemStackNetId));
         data.mPreValidationStatus =
             data.mItemStackNetId == 0 ? MineBlock::PreValidationStatus::Invalid : MineBlock::PreValidationStatus::Valid;
         mVariant = std::move(data);
@@ -155,56 +155,56 @@ Result<> ItemStackRequestAction::read(ReadOnlyBinaryStream& stream) {
     case Type::CraftRecipe:
     case Type::CraftCreative: {
         CraftRecipe data{};
-        if (auto status = stream.readUnsignedVarInt(data.mRecipeNetworkIdOrCreativeId); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(data.mTimesCrafted); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(data.mRecipeNetworkIdOrCreativeId));
+        _SCULK_READ(stream.readUnsignedVarInt(data.mTimesCrafted));
         mVariant = std::move(data);
         return {};
     }
     case Type::CraftRecipeAuto: {
         CraftRecipeAuto data{};
-        if (auto status = stream.readUnsignedVarInt(data.mRecipeNetworkId); !status) return status;
-        if (auto status = stream.readByte(data.mNumberOfRequestedCrafts); !status) return status;
-        if (auto status = stream.readByte(data.mTimesCrafted); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(data.mRecipeNetworkId));
+        _SCULK_READ(stream.readByte(data.mNumberOfRequestedCrafts));
+        _SCULK_READ(stream.readByte(data.mTimesCrafted));
         std::uint8_t ingredientCount{};
-        if (auto status = stream.readByte(ingredientCount); !status) return status;
+        _SCULK_READ(stream.readByte(ingredientCount));
         data.mIngredients.resize(ingredientCount);
         for (RecipeIngredient& ingredient : data.mIngredients) {
-            if (auto status = ingredient.read(stream); !status) return status;
+            _SCULK_READ(ingredient.read(stream));
         }
         mVariant = std::move(data);
         return {};
     }
     case Type::CraftRecipeOptional: {
         CraftRecipeOptional data{};
-        if (auto status = stream.readUnsignedVarInt(data.mRecipeNetId); !status) return status;
-        if (auto status = stream.readUnsignedInt(data.mFilteredStringIndex); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(data.mRecipeNetId));
+        _SCULK_READ(stream.readUnsignedInt(data.mFilteredStringIndex));
         mVariant = std::move(data);
         return {};
     }
     case Type::CraftGrindStone: {
         CraftGrindStone data{};
-        if (auto status = stream.readUnsignedVarInt(data.mItemStackNetId); !status) return status;
-        if (auto status = stream.readByte(data.mTimesCrafted); !status) return status;
-        if (auto status = stream.readVarInt(data.mRepairCost); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(data.mItemStackNetId));
+        _SCULK_READ(stream.readByte(data.mTimesCrafted));
+        _SCULK_READ(stream.readVarInt(data.mRepairCost));
         mVariant = std::move(data);
         return {};
     }
     case Type::CraftLoom: {
         CraftLoom data{};
-        if (auto status = stream.readString(data.mPatternNameId); !status) return status;
-        if (auto status = stream.readByte(data.mTimesCrafted); !status) return status;
+        _SCULK_READ(stream.readString(data.mPatternNameId));
+        _SCULK_READ(stream.readByte(data.mTimesCrafted));
         mVariant = std::move(data);
         return {};
     }
     case Type::CraftResults: {
         CraftResult   data{};
         std::uint32_t resultCount{};
-        if (auto status = stream.readUnsignedVarInt(resultCount); !status) return status;
+        _SCULK_READ(stream.readUnsignedVarInt(resultCount));
         data.mCraftResults.resize(resultCount);
         for (NetworkItemInstanceDescriptor& result : data.mCraftResults) {
-            if (auto status = result.read(stream); !status) return status;
+            _SCULK_READ(result.read(stream));
         }
-        if (auto status = stream.readByte(data.mTimesCrafted); !status) return status;
+        _SCULK_READ(stream.readByte(data.mTimesCrafted));
         mVariant = std::move(data);
         return {};
     }
@@ -222,9 +222,9 @@ void ItemStackRequestData::write(BinaryStream& stream) const {
 }
 
 Result<> ItemStackRequestData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mClientRequestId); !status) return status;
-    if (auto status = stream.readArray(mActions, &ItemStackRequestAction::read); !status) return status;
-    if (auto status = stream.readArray(mStringsToFilter, &ReadOnlyBinaryStream::readString); !status) return status;
+    _SCULK_READ(stream.readVarInt(mClientRequestId));
+    _SCULK_READ(stream.readArray(mActions, &ItemStackRequestAction::read));
+    _SCULK_READ(stream.readArray(mStringsToFilter, &ReadOnlyBinaryStream::readString));
     return stream.readSignedInt(mStringsToFilterOrigin);
 }
 
@@ -234,4 +234,4 @@ Result<> ItemStackRequest::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mRequests, &ItemStackRequestData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

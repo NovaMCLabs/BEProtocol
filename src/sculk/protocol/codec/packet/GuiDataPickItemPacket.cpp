@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/GuiDataPickItemPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds GuiDataPickItemPacket::getId() const noexcept { return MinecraftPacketIds::GuiDataPickItem; }
 
@@ -20,9 +20,9 @@ void GuiDataPickItemPacket::write(BinaryStream& stream) const {
 }
 
 Result<> GuiDataPickItemPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mItemName); !status) return status;
-    if (auto status = stream.readString(mItemEffectName); !status) return status;
+    _SCULK_READ(stream.readString(mItemName));
+    _SCULK_READ(stream.readString(mItemEffectName));
     return stream.readSignedInt(mSlot);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

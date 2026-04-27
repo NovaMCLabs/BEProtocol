@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateBlockPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateBlockPacket::getId() const noexcept { return MinecraftPacketIds::UpdateBlock; }
 
@@ -21,10 +21,10 @@ void UpdateBlockPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateBlockPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mBlockPosition.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mRuntimeId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mFlag); !status) return status;
+    _SCULK_READ(mBlockPosition.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mRuntimeId));
+    _SCULK_READ(stream.readUnsignedVarInt(mFlag));
     return stream.readUnsignedVarInt(mLayer);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

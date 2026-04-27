@@ -8,7 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/AttributeLayerSettings.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void AttributeLayerWeight::write(BinaryStream& stream) const {
     stream.writeVariantIndex<std::uint32_t>(mWeight, &BinaryStream::writeUnsignedVarInt);
@@ -22,9 +22,7 @@ void AttributeLayerWeight::write(BinaryStream& stream) const {
 }
 
 Result<> AttributeLayerWeight::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mWeight, &ReadOnlyBinaryStream::readUnsignedVarInt);
-        !status)
-        return status;
+    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mWeight, &ReadOnlyBinaryStream::readUnsignedVarInt));
     return std::visit(
         Overload{
             [&](float& value) { return stream.readFloat(value); },
@@ -42,10 +40,10 @@ void AttributeLayerSettings::write(BinaryStream& stream) const {
 }
 
 Result<> AttributeLayerSettings::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mPriority); !status) return status;
-    if (auto status = mWeight.read(stream); !status) return status;
-    if (auto status = stream.readBool(mEnabled); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mPriority));
+    _SCULK_READ(mWeight.read(stream));
+    _SCULK_READ(stream.readBool(mEnabled));
     return stream.readBool(mTransitionsPaused);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

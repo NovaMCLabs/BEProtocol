@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class POIBlockInteractionType : std::uint32_t {
     None                = 0,
@@ -39,4 +39,4 @@ enum class POIBlockInteractionType : std::uint32_t {
     DisenchantAndRepair = 25
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

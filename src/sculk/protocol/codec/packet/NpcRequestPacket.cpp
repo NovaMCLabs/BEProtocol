@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/NpcRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds NpcRequestPacket::getId() const noexcept { return MinecraftPacketIds::NpcRequest; }
 
@@ -22,11 +22,11 @@ void NpcRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> NpcRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readEnum(mRequestType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readString(mActions); !status) return status;
-    if (auto status = stream.readByte(mActionIndex); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readEnum(mRequestType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readString(mActions));
+    _SCULK_READ(stream.readByte(mActionIndex));
     return stream.readString(mSceneName);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

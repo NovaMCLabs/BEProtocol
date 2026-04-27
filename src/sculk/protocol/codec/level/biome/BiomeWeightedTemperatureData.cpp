@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeWeightedTemperatureData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeWeightedTemperatureData::write(BinaryStream& stream) const {
     stream.writeVarInt(mTemperature);
@@ -15,8 +15,8 @@ void BiomeWeightedTemperatureData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeWeightedTemperatureData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mTemperature); !status) return status;
+    _SCULK_READ(stream.readVarInt(mTemperature));
     return stream.readUnsignedInt(mWeight);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

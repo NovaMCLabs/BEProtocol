@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/FeatureRegistryPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void FeatureRegistryPacket::FeatureData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -15,7 +15,7 @@ void FeatureRegistryPacket::FeatureData::write(BinaryStream& stream) const {
 }
 
 Result<> FeatureRegistryPacket::FeatureData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return stream.readString(mBinaryJsonOutput);
 }
 
@@ -31,4 +31,4 @@ Result<> FeatureRegistryPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mFuturesDataList, &FeatureData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

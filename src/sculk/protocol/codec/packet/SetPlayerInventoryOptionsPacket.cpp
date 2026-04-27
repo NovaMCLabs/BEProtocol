@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetPlayerInventoryOptionsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetPlayerInventoryOptionsPacket::getId() const noexcept {
     return MinecraftPacketIds::SetPlayerInventoryOptions;
@@ -24,11 +24,11 @@ void SetPlayerInventoryOptionsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SetPlayerInventoryOptionsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mLeftInventoryTab, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readEnum(mRightInventoryTab, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readBool(mFiltering); !status) return status;
-    if (auto status = stream.readEnum(mLayoutInventory, &ReadOnlyBinaryStream::readVarInt); !status) return status;
+    _SCULK_READ(stream.readEnum(mLeftInventoryTab, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readEnum(mRightInventoryTab, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readBool(mFiltering));
+    _SCULK_READ(stream.readEnum(mLayoutInventory, &ReadOnlyBinaryStream::readVarInt));
     return stream.readEnum(mLayoutCraft, &ReadOnlyBinaryStream::readVarInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

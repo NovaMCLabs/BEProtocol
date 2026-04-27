@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetCommandsEnabledPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetCommandsEnabledPacket::getId() const noexcept { return MinecraftPacketIds::SetCommandsEnabled; }
 
@@ -17,4 +17,4 @@ void SetCommandsEnabledPacket::write(BinaryStream& stream) const { stream.writeB
 
 Result<> SetCommandsEnabledPacket::read(ReadOnlyBinaryStream& stream) { return stream.readBool(mCommandsEnabled); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/attribute/Attribute.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void Attribute::Modifier::write(BinaryStream& stream) const {
     stream.writeString(mId);
@@ -19,11 +19,11 @@ void Attribute::Modifier::write(BinaryStream& stream) const {
 }
 
 Result<> Attribute::Modifier::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mId); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readFloat(mAmount); !status) return status;
-    if (auto status = stream.readSignedInt(mOperation); !status) return status;
-    if (auto status = stream.readSignedInt(mOperand); !status) return status;
+    _SCULK_READ(stream.readString(mId));
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readFloat(mAmount));
+    _SCULK_READ(stream.readSignedInt(mOperation));
+    _SCULK_READ(stream.readSignedInt(mOperand));
     return stream.readBool(mIsSerializable);
 }
 
@@ -39,14 +39,14 @@ void Attribute::write(BinaryStream& stream) const {
 }
 
 Result<> Attribute::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mMinValue); !status) return status;
-    if (auto status = stream.readFloat(mMaxValue); !status) return status;
-    if (auto status = stream.readFloat(mCurrentValue); !status) return status;
-    if (auto status = stream.readFloat(mDefaultMinValue); !status) return status;
-    if (auto status = stream.readFloat(mDefaultMaxValue); !status) return status;
-    if (auto status = stream.readFloat(mDefaultValue); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readFloat(mMinValue));
+    _SCULK_READ(stream.readFloat(mMaxValue));
+    _SCULK_READ(stream.readFloat(mCurrentValue));
+    _SCULK_READ(stream.readFloat(mDefaultMinValue));
+    _SCULK_READ(stream.readFloat(mDefaultMaxValue));
+    _SCULK_READ(stream.readFloat(mDefaultValue));
+    _SCULK_READ(stream.readString(mName));
     return stream.readArray(mModifiers, &Attribute::Modifier::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ControlScheme : std::uint8_t {
     LockedPlayerRelativeStrafe = 0,
@@ -18,4 +18,4 @@ enum class ControlScheme : std::uint8_t {
     PlayerRelativeStrafe       = 4,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

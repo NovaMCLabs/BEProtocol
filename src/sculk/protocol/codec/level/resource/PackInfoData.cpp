@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/resource/PackInfoData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void PackInfoData::write(BinaryStream& stream) const {
     mPackId.write(stream);
@@ -23,16 +23,16 @@ void PackInfoData::write(BinaryStream& stream) const {
 }
 
 Result<> PackInfoData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPackId.read(stream); !status) return status;
-    if (auto status = stream.readString(mPackVersion); !status) return status;
-    if (auto status = stream.readUnsignedInt64(mPackSize); !status) return status;
-    if (auto status = stream.readString(mContentKey); !status) return status;
-    if (auto status = stream.readString(mSubpackName); !status) return status;
-    if (auto status = stream.readString(mContentIdentity); !status) return status;
-    if (auto status = stream.readBool(mHasScripts); !status) return status;
-    if (auto status = stream.readBool(mIsAddonPack); !status) return status;
-    if (auto status = stream.readBool(mIsRayTracingCapable); !status) return status;
+    _SCULK_READ(mPackId.read(stream));
+    _SCULK_READ(stream.readString(mPackVersion));
+    _SCULK_READ(stream.readUnsignedInt64(mPackSize));
+    _SCULK_READ(stream.readString(mContentKey));
+    _SCULK_READ(stream.readString(mSubpackName));
+    _SCULK_READ(stream.readString(mContentIdentity));
+    _SCULK_READ(stream.readBool(mHasScripts));
+    _SCULK_READ(stream.readBool(mIsAddonPack));
+    _SCULK_READ(stream.readBool(mIsRayTracingCapable));
     return stream.readString(mCDNUrl);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class ClientMovementPredictionSyncPacket : public IPacket {
 public:
@@ -24,7 +24,7 @@ public:
     };
 
 public:
-    std::bitset<127>            mActorFlags{};
+    std::bitset<130>            mActorFlags{};
     Vec3                        mActorBoundingBox{};
     MovementAttributesComponent mMovementAttributes{};
     std::int64_t                mActorID{};
@@ -40,4 +40,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/VoxelShapesPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void VoxelShapesPacket::RegistryHandle::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -15,7 +15,7 @@ void VoxelShapesPacket::RegistryHandle::write(BinaryStream& stream) const {
 }
 
 Result<> VoxelShapesPacket::RegistryHandle::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return stream.readUnsignedShort(mValue);
 }
 
@@ -30,9 +30,9 @@ void VoxelShapesPacket::write(BinaryStream& stream) const {
 }
 
 Result<> VoxelShapesPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mShapes, &SerializableVoxelShape::read); !status) return status;
-    if (auto status = stream.readArray(mRegistryHandles, &RegistryHandle::read); !status) return status;
+    _SCULK_READ(stream.readArray(mShapes, &SerializableVoxelShape::read));
+    _SCULK_READ(stream.readArray(mRegistryHandles, &RegistryHandle::read));
     return stream.readUnsignedShort(mCustomShapeCount);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

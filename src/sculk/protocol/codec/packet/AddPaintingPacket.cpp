@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AddPaintingPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AddPaintingPacket::getId() const noexcept { return MinecraftPacketIds::AddPainting; }
 
@@ -22,11 +22,11 @@ void AddPaintingPacket::write(BinaryStream& stream) const {
 }
 
 Result<> AddPaintingPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mUniqueId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mRuntimeId); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readVarInt(mDirection); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mUniqueId));
+    _SCULK_READ(stream.readUnsignedVarInt64(mRuntimeId));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readVarInt(mDirection));
     return stream.readString(mMotif);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

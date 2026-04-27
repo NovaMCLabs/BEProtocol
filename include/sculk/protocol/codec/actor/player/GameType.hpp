@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class GameType : std::int32_t {
     Undefined    = -1,
@@ -20,4 +20,4 @@ enum class GameType : std::int32_t {
     WorldDefault = 0
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

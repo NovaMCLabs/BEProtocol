@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/Experiments.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void Experiments::Experiment::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -15,7 +15,7 @@ void Experiments::Experiment::write(BinaryStream& stream) const {
 }
 
 Result<> Experiments::Experiment::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return stream.readBool(mEnabled);
 }
 
@@ -29,12 +29,12 @@ void Experiments::write(BinaryStream& stream) const {
 
 Result<> Experiments::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t experimentCount{};
-    if (auto status = stream.readUnsignedInt(experimentCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(experimentCount));
     mExperiments.resize(experimentCount);
     for (Experiment& experiment : mExperiments) {
-        if (auto status = experiment.read(stream); !status) return status;
+        _SCULK_READ(experiment.read(stream));
     }
     return stream.readBool(mEverToggled);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

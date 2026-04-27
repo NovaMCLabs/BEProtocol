@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/HurtArmorPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds HurtArmorPacket::getId() const noexcept { return MinecraftPacketIds::HurtArmor; }
 
@@ -20,9 +20,9 @@ void HurtArmorPacket::write(BinaryStream& stream) const {
 }
 
 Result<> HurtArmorPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mCause, &ReadOnlyBinaryStream::readVarInt); !status) return status;
-    if (auto status = stream.readVarInt(mDamage); !status) return status;
+    _SCULK_READ(stream.readEnum(mCause, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readVarInt(mDamage));
     return stream.readUnsignedVarInt64(mArmorSlots);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

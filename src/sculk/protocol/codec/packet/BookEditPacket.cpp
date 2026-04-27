@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/BookEditPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds BookEditPacket::getId() const noexcept { return MinecraftPacketIds::BookEdit; }
 
@@ -41,26 +41,26 @@ void BookEditPacket::write(BinaryStream& stream) const {
 }
 
 Result<> BookEditPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mBookSlot); !status) return status;
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
+    _SCULK_READ(stream.readVarInt(mBookSlot));
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readUnsignedVarInt));
     switch (mAction) {
     case Action::ReplacePage:
     case Action::AddPage:
-        if (auto status = stream.readVarInt(mPageIndexA); !status) return status;
-        if (auto status = stream.readString(mTextA); !status) return status;
+        _SCULK_READ(stream.readVarInt(mPageIndexA));
+        _SCULK_READ(stream.readString(mTextA));
         return stream.readString(mTextB);
     case Action::DeletePage:
         return stream.readVarInt(mPageIndexA);
     case Action::SwapPages:
-        if (auto status = stream.readVarInt(mPageIndexA); !status) return status;
+        _SCULK_READ(stream.readVarInt(mPageIndexA));
         return stream.readVarInt(mPageIndexB);
     case Action::Finalize:
-        if (auto status = stream.readString(mTextA); !status) return status;
-        if (auto status = stream.readString(mTextB); !status) return status;
+        _SCULK_READ(stream.readString(mTextA));
+        _SCULK_READ(stream.readString(mTextB));
         return stream.readString(mXuid);
     default:
         return {};
     }
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

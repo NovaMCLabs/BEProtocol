@@ -10,7 +10,7 @@
 #include "sculk/protocol/connection/encryption/JsonWebToken.hpp"
 #include <unordered_map>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class AuthenticationKeyManager {
 public:
@@ -22,4 +22,4 @@ public:
     [[nodiscard]] Result<> verifyJwt(const JsonWebToken& jwt);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

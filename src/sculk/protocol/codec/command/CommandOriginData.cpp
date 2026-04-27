@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/command/CommandOriginData.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CommandOriginData::write(BinaryStream& stream) const {
     utils::writeEnumName(stream, mType);
@@ -18,10 +18,10 @@ void CommandOriginData::write(BinaryStream& stream) const {
 }
 
 Result<> CommandOriginData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = utils::readEnumName(stream, mType); !status) return status;
-    if (auto status = mUuid.read(stream); !status) return status;
-    if (auto status = stream.readString(mRequestId); !status) return status;
+    _SCULK_READ(utils::readEnumName(stream, mType));
+    _SCULK_READ(mUuid.read(stream));
+    _SCULK_READ(stream.readString(mRequestId));
     return stream.readSignedInt64(mPlayerId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

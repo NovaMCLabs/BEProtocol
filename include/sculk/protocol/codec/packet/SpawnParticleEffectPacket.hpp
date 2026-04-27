@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 #include <optional>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class SpawnParticleEffectPacket : public IPacket {
 public:
@@ -30,4 +30,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

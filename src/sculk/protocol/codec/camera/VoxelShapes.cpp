@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/block/VoxelShapes.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SerializableVoxelShape::SerializableCells::write(BinaryStream& stream) const {
     stream.writeByte(mXSize);
@@ -17,9 +17,9 @@ void SerializableVoxelShape::SerializableCells::write(BinaryStream& stream) cons
 }
 
 Result<> SerializableVoxelShape::SerializableCells::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mXSize); !status) return status;
-    if (auto status = stream.readByte(mYSize); !status) return status;
-    if (auto status = stream.readByte(mZSize); !status) return status;
+    _SCULK_READ(stream.readByte(mXSize));
+    _SCULK_READ(stream.readByte(mYSize));
+    _SCULK_READ(stream.readByte(mZSize));
     return stream.readArray(mStorage, &ReadOnlyBinaryStream::readByte);
 }
 
@@ -31,10 +31,10 @@ void SerializableVoxelShape::write(BinaryStream& stream) const {
 }
 
 Result<> SerializableVoxelShape::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mCells, &SerializableCells::read); !status) return status;
-    if (auto status = stream.readArray(mXCoordinates, &ReadOnlyBinaryStream::readFloat); !status) return status;
-    if (auto status = stream.readArray(mYCoordinates, &ReadOnlyBinaryStream::readFloat); !status) return status;
+    _SCULK_READ(stream.readArray(mCells, &SerializableCells::read));
+    _SCULK_READ(stream.readArray(mXCoordinates, &ReadOnlyBinaryStream::readFloat));
+    _SCULK_READ(stream.readArray(mYCoordinates, &ReadOnlyBinaryStream::readFloat));
     return stream.readArray(mZCoordinates, &ReadOnlyBinaryStream::readFloat);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

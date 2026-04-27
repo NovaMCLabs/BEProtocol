@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/utility/deps/Result.hpp"
 #include <sculk/reflection/jsonc/reflection.hpp>
 
-namespace sculk::protocol::inline abi_v944::utils {
+namespace sculk::protocol::inline abi_v975::utils {
 
 namespace {
 static constexpr auto json_key_formatter = [](std::string_view sv) noexcept -> std::string {
@@ -50,4 +50,4 @@ inline Result<> deserialize_from_json(T& value, const jsonc::json& json _SCULK_S
 }
 
 
-} // namespace sculk::protocol::inline abi_v944::utils
+} // namespace sculk::protocol::inline abi_v975::utils

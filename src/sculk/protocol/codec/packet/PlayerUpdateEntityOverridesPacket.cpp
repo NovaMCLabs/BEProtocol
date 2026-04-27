@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerUpdateEntityOverridesPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerUpdateEntityOverridesPacket::getId() const noexcept {
     return MinecraftPacketIds::PlayerUpdateEntityOverrides;
@@ -32,19 +32,19 @@ void PlayerUpdateEntityOverridesPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerUpdateEntityOverridesPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt64(mId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mPropertyIndex); !status) return status;
-    if (auto status = stream.readEnum(mUpdateType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readVarInt64(mId));
+    _SCULK_READ(stream.readUnsignedVarInt(mPropertyIndex));
+    _SCULK_READ(stream.readEnum(mUpdateType, &ReadOnlyBinaryStream::readByte));
     switch (mUpdateType) {
     case UpdateType::SetIntOverride: {
         std::int32_t value{};
-        if (auto status = stream.readSignedInt(value); !status) return status;
+        _SCULK_READ(stream.readSignedInt(value));
         mValue = value;
         break;
     }
     case UpdateType::SetFloatOverride: {
         float value{};
-        if (auto status = stream.readFloat(value); !status) return status;
+        _SCULK_READ(stream.readFloat(value));
         mValue = value;
         break;
     }
@@ -55,4 +55,4 @@ Result<> PlayerUpdateEntityOverridesPacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

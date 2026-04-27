@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/command/CommandSoftEnumData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CommandSoftEnumData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -15,8 +15,8 @@ void CommandSoftEnumData::write(BinaryStream& stream) const {
 }
 
 Result<> CommandSoftEnumData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return stream.readArray(mValues, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

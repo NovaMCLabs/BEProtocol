@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/AutomationClientConnectPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds AutomationClientConnectPacket::getId() const noexcept {
     return MinecraftPacketIds::AutomationClientConnect;
@@ -19,4 +19,4 @@ void AutomationClientConnectPacket::write(BinaryStream& stream) const { stream.w
 
 Result<> AutomationClientConnectPacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mWebSocketUrl); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

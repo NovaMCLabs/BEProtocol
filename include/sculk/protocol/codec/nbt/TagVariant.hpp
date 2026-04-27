@@ -15,7 +15,7 @@
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 #include <variant>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct TagVariant {
     using VariantType = std::variant<
@@ -43,4 +43,4 @@ struct TagVariant {
     [[nodiscard]] TagType getType() const noexcept;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeClimateData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeClimateData::write(BinaryStream& stream) const {
     stream.writeFloat(mTemperature);
@@ -17,10 +17,10 @@ void BiomeClimateData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeClimateData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mTemperature); !status) return status;
-    if (auto status = stream.readFloat(mDownfall); !status) return status;
-    if (auto status = stream.readFloat(mSnowAccumulationMin); !status) return status;
+    _SCULK_READ(stream.readFloat(mTemperature));
+    _SCULK_READ(stream.readFloat(mDownfall));
+    _SCULK_READ(stream.readFloat(mSnowAccumulationMin));
     return stream.readFloat(mSnowAccumulationMax);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

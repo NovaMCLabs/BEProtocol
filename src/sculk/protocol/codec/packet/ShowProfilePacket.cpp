@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ShowProfilePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ShowProfilePacket::getId() const noexcept { return MinecraftPacketIds::ShowProfile; }
 
@@ -17,4 +17,4 @@ void ShowProfilePacket::write(BinaryStream& stream) const { stream.writeString(m
 
 Result<> ShowProfilePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mXuid); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

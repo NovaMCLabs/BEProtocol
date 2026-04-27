@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/ServerTelemetryData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ServerTelemetryData::write(BinaryStream& stream) const {
     stream.writeString(mServerId);
@@ -17,10 +17,10 @@ void ServerTelemetryData::write(BinaryStream& stream) const {
 }
 
 Result<> ServerTelemetryData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mServerId); !status) return status;
-    if (auto status = stream.readString(mScenarioId); !status) return status;
-    if (auto status = stream.readString(mWorldId); !status) return status;
+    _SCULK_READ(stream.readString(mServerId));
+    _SCULK_READ(stream.readString(mScenarioId));
+    _SCULK_READ(stream.readString(mWorldId));
     return stream.readString(mOwnerId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

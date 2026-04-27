@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerStatsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerStatsPacket::getId() const noexcept { return MinecraftPacketIds::ServerStats; }
 
@@ -19,8 +19,8 @@ void ServerStatsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ServerStatsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mServerTime); !status) return status;
+    _SCULK_READ(stream.readFloat(mServerTime));
     return stream.readFloat(mNetworkTime);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

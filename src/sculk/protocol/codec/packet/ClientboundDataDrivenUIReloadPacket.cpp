@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundDataDrivenUIReloadPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ClientboundDataDrivenUIReloadPacket::getId() const noexcept {
     return MinecraftPacketIds::ClientboundDataDrivenUIReload;
@@ -21,4 +21,4 @@ void ClientboundDataDrivenUIReloadPacket::write(BinaryStream&) const {}
 
 Result<> ClientboundDataDrivenUIReloadPacket::read(ReadOnlyBinaryStream&) { return {}; }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

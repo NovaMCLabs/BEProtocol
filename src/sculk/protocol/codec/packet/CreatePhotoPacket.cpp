@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CreatePhotoPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CreatePhotoPacket::getId() const noexcept { return MinecraftPacketIds::CreatePhoto; }
 
@@ -20,9 +20,9 @@ void CreatePhotoPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CreatePhotoPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt64(mRawId); !status) return status;
-    if (auto status = stream.readString(mPhotoName); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt64(mRawId));
+    _SCULK_READ(stream.readString(mPhotoName));
     return stream.readString(mPhotoItemName);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

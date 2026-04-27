@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class CurrentCmdVersion : int {
     Invalid                                      = -1,
@@ -63,4 +63,4 @@ enum class CurrentCmdVersion : int {
     Latest                                                                            = 48,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

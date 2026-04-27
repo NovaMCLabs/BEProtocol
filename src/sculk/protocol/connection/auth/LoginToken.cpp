@@ -9,7 +9,7 @@
 #include "../../codec/utility/Reflection.hpp"
 #include "sculk/protocol/connection/encryption/Base64Url.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 Result<> LoginToken::load(std::string_view compactJwt) {
     const auto first = compactJwt.find('.');
@@ -55,4 +55,4 @@ std::string LoginToken::saveAndSign(std::string_view rsaPrivateKey) {
     return signRS256(rsaPrivateKey);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

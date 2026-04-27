@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PhotoTransferPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PhotoTransferPacket::getId() const noexcept { return MinecraftPacketIds::PhotoTransfer; }
 
@@ -24,13 +24,13 @@ void PhotoTransferPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PhotoTransferPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mPhotoName); !status) return status;
-    if (auto status = stream.readString(mPhotoData); !status) return status;
-    if (auto status = stream.readString(mBookId); !status) return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mSourceType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readSignedInt64(mOwnerId); !status) return status;
+    _SCULK_READ(stream.readString(mPhotoName));
+    _SCULK_READ(stream.readString(mPhotoData));
+    _SCULK_READ(stream.readString(mBookId));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mSourceType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readSignedInt64(mOwnerId));
     return stream.readString(mNewPhotoName);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

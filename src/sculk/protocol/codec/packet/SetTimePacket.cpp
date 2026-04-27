@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SetTimePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SetTimePacket::getId() const noexcept { return MinecraftPacketIds::SetTime; }
 
@@ -17,4 +17,4 @@ void SetTimePacket::write(BinaryStream& stream) const { stream.writeVarInt(mTime
 
 Result<> SetTimePacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mTime); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

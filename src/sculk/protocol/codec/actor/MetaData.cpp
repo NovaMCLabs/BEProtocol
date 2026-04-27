@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/MetaData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void MetaData::write(BinaryStream& stream) const {
     stream.writeArray(mDataItems, [&](const DataItem& item) {
@@ -32,11 +32,8 @@ void MetaData::write(BinaryStream& stream) const {
 
 Result<> MetaData::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mDataItems, [&](DataItem& item) {
-        if (auto status = stream.readEnum(item.mId, &ReadOnlyBinaryStream::readUnsignedVarInt); !status) return status;
-        if (auto status = stream.readVariantIndex<std::uint32_t>(item.mData, &ReadOnlyBinaryStream::readUnsignedVarInt);
-            !status) {
-            return status;
-        }
+        _SCULK_READ(stream.readEnum(item.mId, &ReadOnlyBinaryStream::readUnsignedVarInt));
+        _SCULK_READ(stream.readVariantIndex<std::uint32_t>(item.mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
         return std::visit(
             Overload{
                 [&](uint8_t& data) { return stream.readByte(data); },
@@ -54,4 +51,4 @@ Result<> MetaData::read(ReadOnlyBinaryStream& stream) {
     });
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

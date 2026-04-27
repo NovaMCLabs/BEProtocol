@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MultiplayerSettingsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MultiplayerSettingsPacket::getId() const noexcept { return MinecraftPacketIds::MultiplayerSettings; }
 
@@ -21,4 +21,4 @@ Result<> MultiplayerSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mType, &ReadOnlyBinaryStream::readVarInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

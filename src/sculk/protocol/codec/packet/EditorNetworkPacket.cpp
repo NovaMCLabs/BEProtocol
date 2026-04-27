@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/EditorNetworkPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds EditorNetworkPacket::getId() const noexcept { return MinecraftPacketIds::EditorNetwork; }
 
@@ -20,9 +20,9 @@ void EditorNetworkPacket::write(BinaryStream& stream) const {
 }
 
 Result<> EditorNetworkPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mRouteToManager); !status) return status;
-    if (auto status = stream.readString(mRawVariantName); !status) return status;
+    _SCULK_READ(stream.readBool(mRouteToManager));
+    _SCULK_READ(stream.readString(mRawVariantName));
     return stream.readString(mRawVariantData);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

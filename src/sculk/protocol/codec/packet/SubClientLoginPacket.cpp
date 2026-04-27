@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SubClientLoginPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SubClientLoginPacket::getId() const noexcept { return MinecraftPacketIds::SubClientLogin; }
 
@@ -17,4 +17,4 @@ void SubClientLoginPacket::write(BinaryStream& stream) const { mConnectionReques
 
 Result<> SubClientLoginPacket::read(ReadOnlyBinaryStream& stream) { return mConnectionRequest.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

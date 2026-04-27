@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/OnScreenTextureAnimationPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds OnScreenTextureAnimationPacket::getId() const noexcept {
     return MinecraftPacketIds::OnScreenTextureAnimation;
@@ -21,4 +21,4 @@ Result<> OnScreenTextureAnimationPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedInt(mEffectId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

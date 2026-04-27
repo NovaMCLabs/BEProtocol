@@ -10,11 +10,11 @@
 #include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class InventorySlotPacket : public IPacket {
 public:
-    std::uint32_t              mInventoryId{};
+    std::uint8_t               mInventoryId{};
     std::uint32_t              mSlot{};
     FullContainerName          mFullContainerName{};
     NetworkItemStackDescriptor mStorageItem{};
@@ -30,4 +30,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

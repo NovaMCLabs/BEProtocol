@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/packet/ServerboundDataDrivenScreenClosedPacket.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ServerboundDataDrivenScreenClosedPacket::getId() const noexcept {
     return MinecraftPacketIds::ServerboundDataDrivenScreenClosed;
@@ -24,8 +24,8 @@ void ServerboundDataDrivenScreenClosedPacket::write(BinaryStream& stream) const 
 }
 
 Result<> ServerboundDataDrivenScreenClosedPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readOptional(mFormId, &ReadOnlyBinaryStream::readUnsignedInt); !status) return status;
+    _SCULK_READ(stream.readOptional(mFormId, &ReadOnlyBinaryStream::readUnsignedInt));
     return utils::readEnumName(stream, mCloseReason);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

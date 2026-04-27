@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ResourcePacksReadyForValidationPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ResourcePacksReadyForValidationPacket::getId() const noexcept {
     return MinecraftPacketIds::ResourcePacksReadyForValidation;
@@ -21,4 +21,4 @@ void ResourcePacksReadyForValidationPacket::write(BinaryStream&) const {}
 
 Result<> ResourcePacksReadyForValidationPacket::read(ReadOnlyBinaryStream&) { return {}; }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

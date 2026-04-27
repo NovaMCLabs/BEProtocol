@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SpawnParticleEffectPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds SpawnParticleEffectPacket::getId() const noexcept { return MinecraftPacketIds::SpawnParticleEffect; }
 
@@ -22,11 +22,11 @@ void SpawnParticleEffectPacket::write(BinaryStream& stream) const {
 }
 
 Result<> SpawnParticleEffectPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mDimensionId); !status) return status;
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readString(mEffectName); !status) return status;
+    _SCULK_READ(stream.readByte(mDimensionId));
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readString(mEffectName));
     return stream.readOptional(mMolangVariableMap, &ReadOnlyBinaryStream::readString);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

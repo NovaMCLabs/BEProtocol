@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/item/ItemData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ItemData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -18,11 +18,11 @@ void ItemData::write(BinaryStream& stream) const {
 }
 
 Result<> ItemData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readSignedShort(mId); !status) return status;
-    if (auto status = stream.readBool(mIsComponentBased); !status) return status;
-    if (auto status = stream.readEnum(mVersion, &ReadOnlyBinaryStream::readVarInt); !status) return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readSignedShort(mId));
+    _SCULK_READ(stream.readBool(mIsComponentBased));
+    _SCULK_READ(stream.readEnum(mVersion, &ReadOnlyBinaryStream::readVarInt));
     return mComponentData.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

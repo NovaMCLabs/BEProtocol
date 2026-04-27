@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/command/CommandData.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CommandData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -21,15 +21,13 @@ void CommandData::write(BinaryStream& stream) const {
 }
 
 Result<> CommandData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readString(mDescription); !status) return status;
-    if (auto status = stream.readUnsignedShort(mFlags); !status) return status;
-    if (auto status = utils::readEnumName(stream, mCommandPermissionLevel); !status) return status;
-    if (auto status = stream.readSignedInt(mAliasEnum); !status) return status;
-    if (auto status = stream.readArray(mChainedSubcommandIndexes, &ReadOnlyBinaryStream::readUnsignedInt); !status) {
-        return status;
-    }
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readString(mDescription));
+    _SCULK_READ(stream.readUnsignedShort(mFlags));
+    _SCULK_READ(utils::readEnumName(stream, mCommandPermissionLevel));
+    _SCULK_READ(stream.readSignedInt(mAliasEnum));
+    _SCULK_READ(stream.readArray(mChainedSubcommandIndexes, &ReadOnlyBinaryStream::readUnsignedInt));
     return stream.readArray(mOverloads, &CommandOverloadData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

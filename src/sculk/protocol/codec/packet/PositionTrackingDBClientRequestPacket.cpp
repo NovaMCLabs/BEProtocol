@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PositionTrackingDBClientRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PositionTrackingDBClientRequestPacket::getId() const noexcept {
     return MinecraftPacketIds::PositionTrackingDBClientRequest;
@@ -23,8 +23,8 @@ void PositionTrackingDBClientRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PositionTrackingDBClientRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
     return stream.readVarInt(mPositionTrackingId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

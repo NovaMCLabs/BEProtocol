@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class CompressionAlgorithm : std::uint16_t {
     None   = static_cast<std::uint16_t>(-1),
@@ -16,4 +16,4 @@ enum class CompressionAlgorithm : std::uint16_t {
     Snappy = 1,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

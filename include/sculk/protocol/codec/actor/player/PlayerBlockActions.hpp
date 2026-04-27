@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/actor/player/PlayerActionType.hpp"
 #include "sculk/protocol/codec/level/block/BlockPos.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct PlayerBlockActionData {
     PlayerActionType mActionType{};
@@ -29,4 +29,4 @@ struct PlayerBlockActions {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

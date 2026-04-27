@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerboundDiagnosticsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ServerboundDiagnosticsPacket::MemoryCategoryCounter::write(BinaryStream& stream) const {
     stream.writeEnum(mType, &BinaryStream::writeByte);
@@ -15,8 +15,36 @@ void ServerboundDiagnosticsPacket::MemoryCategoryCounter::write(BinaryStream& st
 }
 
 Result<> ServerboundDiagnosticsPacket::MemoryCategoryCounter::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     return stream.readUnsignedInt64(mCurrentBytes);
+}
+
+void ServerboundDiagnosticsPacket::EntityDiagnosticTimingInfo::write(BinaryStream& stream) const {
+    stream.writeString(mDisplayName);
+    stream.writeString(mEntity);
+    stream.writeUnsignedInt64(mTimeInNanoseconds);
+    stream.writeByte(mPercentOfTotal);
+}
+
+Result<> ServerboundDiagnosticsPacket::EntityDiagnosticTimingInfo::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readString(mDisplayName));
+    _SCULK_READ(stream.readString(mEntity));
+    _SCULK_READ(stream.readUnsignedInt64(mTimeInNanoseconds));
+    return stream.readByte(mPercentOfTotal);
+}
+
+void ServerboundDiagnosticsPacket::SystemDiagnosticTimingInfo::write(BinaryStream& stream) const {
+    stream.writeString(mDisplayName);
+    stream.writeUnsignedInt64(mSystemIndex);
+    stream.writeUnsignedInt64(mTimeInNanoseconds);
+    stream.writeByte(mPercentOfTotal);
+}
+
+Result<> ServerboundDiagnosticsPacket::SystemDiagnosticTimingInfo::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readString(mDisplayName));
+    _SCULK_READ(stream.readUnsignedInt64(mSystemIndex));
+    _SCULK_READ(stream.readUnsignedInt64(mTimeInNanoseconds));
+    return stream.readByte(mPercentOfTotal);
 }
 
 MinecraftPacketIds ServerboundDiagnosticsPacket::getId() const noexcept {
@@ -35,19 +63,23 @@ void ServerboundDiagnosticsPacket::write(BinaryStream& stream) const {
     stream.writeFloat(mAvgRemainderTimePercent);
     stream.writeFloat(mAvgUnaccountedTimePercent);
     stream.writeArray(mMemoryCategoryValues, &MemoryCategoryCounter::write);
+    stream.writeArray(mEntityDiagnostics, &EntityDiagnosticTimingInfo::write);
+    stream.writeArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::write);
 }
 
 Result<> ServerboundDiagnosticsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mAvgFps); !status) return status;
-    if (auto status = stream.readFloat(mAvgServerSimTickTimeMS); !status) return status;
-    if (auto status = stream.readFloat(mAvgClientSimTickTimeMS); !status) return status;
-    if (auto status = stream.readFloat(mAvgBeginFrameTimeMS); !status) return status;
-    if (auto status = stream.readFloat(mAvgInputTimeMS); !status) return status;
-    if (auto status = stream.readFloat(mAvgRenderTimeMS); !status) return status;
-    if (auto status = stream.readFloat(mAvgEndFrameTimeMS); !status) return status;
-    if (auto status = stream.readFloat(mAvgRemainderTimePercent); !status) return status;
-    if (auto status = stream.readFloat(mAvgUnaccountedTimePercent); !status) return status;
-    return stream.readArray(mMemoryCategoryValues, &MemoryCategoryCounter::read);
+    _SCULK_READ(stream.readFloat(mAvgFps));
+    _SCULK_READ(stream.readFloat(mAvgServerSimTickTimeMS));
+    _SCULK_READ(stream.readFloat(mAvgClientSimTickTimeMS));
+    _SCULK_READ(stream.readFloat(mAvgBeginFrameTimeMS));
+    _SCULK_READ(stream.readFloat(mAvgInputTimeMS));
+    _SCULK_READ(stream.readFloat(mAvgRenderTimeMS));
+    _SCULK_READ(stream.readFloat(mAvgEndFrameTimeMS));
+    _SCULK_READ(stream.readFloat(mAvgRemainderTimePercent));
+    _SCULK_READ(stream.readFloat(mAvgUnaccountedTimePercent));
+    _SCULK_READ(stream.readArray(mMemoryCategoryValues, &MemoryCategoryCounter::read));
+    _SCULK_READ(stream.readArray(mEntityDiagnostics, &EntityDiagnosticTimingInfo::read));
+    return stream.readArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

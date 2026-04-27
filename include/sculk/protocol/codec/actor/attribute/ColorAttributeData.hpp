@@ -9,26 +9,18 @@
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
-
-struct Color255RGBAData {
-    std::variant<std::string, std::array<std::int32_t, 4>> mColor{};
-
-    void write(BinaryStream& stream) const;
-
-    [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
-};
+namespace sculk::protocol::inline abi_v975 {
 
 enum class ColorAttributeOperation : std::int32_t {
-    Override   = 0,
-    AlphaBlend = 1,
-    Add        = 2,
-    Subtract   = 3,
-    Multiply   = 4,
+    OVERRIDE    = 0,
+    ALPHA_BLEND = 1,
+    ADD         = 2,
+    SUBTRACT    = 3,
+    MULTIPLY    = 4,
 };
 
 struct ColorAttributeData {
-    Color255RGBAData        mValue{"#00000000"};
+    std::string             mValue{};
     ColorAttributeOperation mOperation{};
 
     void write(BinaryStream& stream) const;
@@ -36,4 +28,4 @@ struct ColorAttributeData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

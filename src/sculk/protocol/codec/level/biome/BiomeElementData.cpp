@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeElementData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeElementData::write(BinaryStream& stream) const {
     stream.writeFloat(mNoiseFrequencyScale);
@@ -21,14 +21,14 @@ void BiomeElementData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeElementData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mNoiseFrequencyScale); !status) return status;
-    if (auto status = stream.readFloat(mNoiseLowerBound); !status) return status;
-    if (auto status = stream.readFloat(mNoiseUpperBound); !status) return status;
-    if (auto status = stream.readVarInt(mHeightMinType); !status) return status;
-    if (auto status = stream.readSignedShort(mHeightMin); !status) return status;
-    if (auto status = stream.readVarInt(mHeightMaxType); !status) return status;
-    if (auto status = stream.readSignedShort(mHeightMax); !status) return status;
+    _SCULK_READ(stream.readFloat(mNoiseFrequencyScale));
+    _SCULK_READ(stream.readFloat(mNoiseLowerBound));
+    _SCULK_READ(stream.readFloat(mNoiseUpperBound));
+    _SCULK_READ(stream.readVarInt(mHeightMinType));
+    _SCULK_READ(stream.readSignedShort(mHeightMin));
+    _SCULK_READ(stream.readVarInt(mHeightMaxType));
+    _SCULK_READ(stream.readSignedShort(mHeightMax));
     return mAdjustedMaterials.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

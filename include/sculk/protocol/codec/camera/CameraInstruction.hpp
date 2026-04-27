@@ -10,7 +10,7 @@
 #include "sculk/protocol/codec/utility/math/Vec2.hpp"
 #include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct CameraInstruction {
     struct FadeInstruction {
@@ -149,4 +149,4 @@ struct CameraInstruction {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

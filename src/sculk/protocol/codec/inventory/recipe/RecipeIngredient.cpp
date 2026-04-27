@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/recipe/RecipeIngredient.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void RecipeIngredient::write(BinaryStream& stream) const {
     stream.writeVariantIndex<std::uint8_t>(mDescriptor, &BinaryStream::writeByte);
@@ -37,35 +37,33 @@ void RecipeIngredient::write(BinaryStream& stream) const {
 }
 
 Result<> RecipeIngredient::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint8_t>(mDescriptor, &ReadOnlyBinaryStream::readByte); !status)
-        return status;
-    if (auto status = std::visit(
+    _SCULK_READ(stream.readVariantIndex<std::uint8_t>(mDescriptor, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(
+        std::visit(
             Overload{
                 [&](InternalItemDescriptor& descriptor) {
-                    if (auto status = stream.readSignedShort(descriptor.mId); !status) return status;
+                    _SCULK_READ(stream.readSignedShort(descriptor.mId));
                     if (descriptor.mId != 0) {
-                        if (auto status = stream.readSignedShort(descriptor.mAux); !status) return status;
+                        _SCULK_READ(stream.readSignedShort(descriptor.mAux));
                     }
                     return Result<>{};
                 },
                 [&](MolangDescriptor& descriptor) {
-                    if (auto status = stream.readString(descriptor.mMolangFullName); !status) return status;
+                    _SCULK_READ(stream.readString(descriptor.mMolangFullName));
                     return stream.readByte(descriptor.mMolangVersion);
                 },
                 [&](ItemTagDescriptor& descriptor) { return stream.readString(descriptor.mItemTag); },
                 [&](DeferredDescriptor& descriptor) {
-                    if (auto status = stream.readString(descriptor.mDeferredFullName); !status) return status;
+                    _SCULK_READ(stream.readString(descriptor.mDeferredFullName));
                     return stream.readUnsignedShort(descriptor.mAux);
                 },
                 [&](ComplexAliasDescriptor& descriptor) { return stream.readString(descriptor.mName); },
                 [&](std::monostate&) { return Result<>{}; }
             },
             mDescriptor
-        );
-        !status) {
-        return status;
-    }
+        )
+    );
     return stream.readVarInt(mStackSize);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

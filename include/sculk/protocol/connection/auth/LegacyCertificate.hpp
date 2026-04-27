@@ -9,7 +9,7 @@
 #include "sculk/protocol/connection/encryption/JsonWebToken.hpp"
 #include <unordered_map>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class LegacyCertificate : public JsonWebToken {
 public:
@@ -29,4 +29,4 @@ public:
     [[nodiscard]] std::string saveAndSign(std::string_view eccPrivateKey);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

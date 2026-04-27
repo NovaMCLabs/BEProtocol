@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/EducationSettingsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void EducationSettingsPacket::AgentCapabilities::write(BinaryStream& stream) const {
     stream.writeOptional(mCanModifyBlocks, &BinaryStream::writeBool);
@@ -23,7 +23,7 @@ void EducationSettingsPacket::ExternalLinkSettings::write(BinaryStream& stream) 
 }
 
 Result<> EducationSettingsPacket::ExternalLinkSettings::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mUrl); !status) return status;
+    _SCULK_READ(stream.readString(mUrl));
     return stream.readString(mDisplayName);
 }
 
@@ -45,17 +45,16 @@ void EducationSettingsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> EducationSettingsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mCodeBuilderDefaultUrl); !status) return status;
-    if (auto status = stream.readString(mCodeBuilderTitle); !status) return status;
-    if (auto status = stream.readBool(mCanResizeCodeBuilder); !status) return status;
-    if (auto status = stream.readBool(mDisableLegacyTitleBar); !status) return status;
-    if (auto status = stream.readString(mPostProcessFilter); !status) return status;
-    if (auto status = stream.readString(mScreenshotBorderResourcePath); !status) return status;
-    if (auto status = stream.readOptional(mAgentCapabilities, &AgentCapabilities::read); !status) return status;
-    if (auto status = stream.readOptional(mCodeBuilderOverrideUrl, &ReadOnlyBinaryStream::readString); !status)
-        return status;
-    if (auto status = stream.readBool(mAlwaysFalse); !status) return status;
+    _SCULK_READ(stream.readString(mCodeBuilderDefaultUrl));
+    _SCULK_READ(stream.readString(mCodeBuilderTitle));
+    _SCULK_READ(stream.readBool(mCanResizeCodeBuilder));
+    _SCULK_READ(stream.readBool(mDisableLegacyTitleBar));
+    _SCULK_READ(stream.readString(mPostProcessFilter));
+    _SCULK_READ(stream.readString(mScreenshotBorderResourcePath));
+    _SCULK_READ(stream.readOptional(mAgentCapabilities, &AgentCapabilities::read));
+    _SCULK_READ(stream.readOptional(mCodeBuilderOverrideUrl, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readBool(mAlwaysFalse));
     return stream.readOptional(mExternalLinkSettings, &ExternalLinkSettings::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

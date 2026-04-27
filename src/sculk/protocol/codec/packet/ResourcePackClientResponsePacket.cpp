@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ResourcePackClientResponsePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ResourcePackClientResponsePacket::getId() const noexcept {
     return MinecraftPacketIds::ResourcePackClientResponse;
@@ -26,14 +26,14 @@ void ResourcePackClientResponsePacket::write(BinaryStream& stream) const {
 }
 
 Result<> ResourcePackClientResponsePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readByte(mResponse); !status) return status;
+    _SCULK_READ(stream.readByte(mResponse));
     std::uint16_t size{};
-    if (auto status = stream.readUnsignedShort(size); !status) return status;
+    _SCULK_READ(stream.readUnsignedShort(size));
     mPackIds.resize(size);
     for (std::uint16_t i = 0; i < size; ++i) {
-        if (auto status = stream.readString(mPackIds[i]); !status) return status;
+        _SCULK_READ(stream.readString(mPackIds[i]));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

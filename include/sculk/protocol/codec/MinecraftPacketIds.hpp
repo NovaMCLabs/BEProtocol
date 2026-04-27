@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class MinecraftPacketIds : int {
     KeepAlive                                = 0,
@@ -241,7 +241,7 @@ enum class MinecraftPacketIds : int {
     PlayerUpdateEntityOverrides              = 325,
     PlayerLocation                           = 326,
     ClientboundControlSchemeSet              = 327,
-    DebugDrawer                              = 328,
+    PrimitiveShapes                          = 328,
     ServerboundPackSettingChange             = 329,
     ClientboundDataStore                     = 330,
     GraphicsParameterOverride                = 331,
@@ -259,7 +259,9 @@ enum class MinecraftPacketIds : int {
     ServerboundDataDrivenScreenClosed        = 343,
     SyncWorldClocks                          = 344,
     ClientboundAttributeLayerSync            = 345,
-    EndId                                    = 346,
+    ServerStoreInfo                          = 346,
+    ServerPresenceInfo                       = 347,
+    EndId                                    = 348,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

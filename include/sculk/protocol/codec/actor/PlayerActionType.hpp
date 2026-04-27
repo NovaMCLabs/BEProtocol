@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class PlayerActionType : int {
     Unknown                         = -1,
@@ -52,4 +52,4 @@ enum class PlayerActionType : int {
     Count                           = 38,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

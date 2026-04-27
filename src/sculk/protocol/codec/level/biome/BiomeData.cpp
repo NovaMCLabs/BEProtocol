@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeData::write(BinaryStream& stream) const {
     stream.writeSignedShort(mStringIndexToBiomeName);
@@ -15,8 +15,8 @@ void BiomeData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedShort(mStringIndexToBiomeName); !status) return status;
+    _SCULK_READ(stream.readSignedShort(mStringIndexToBiomeName));
     return mBiomeDefinitionData.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

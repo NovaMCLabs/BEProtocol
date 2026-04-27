@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerInputPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerInputPacket::getId() const noexcept { return MinecraftPacketIds::PlayerInput_Deprecated; }
 
@@ -20,9 +20,9 @@ void PlayerInputPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerInputPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mMove.read(stream); !status) return status;
-    if (auto status = stream.readBool(mJumping); !status) return status;
+    _SCULK_READ(mMove.read(stream));
+    _SCULK_READ(stream.readBool(mJumping));
     return stream.readBool(mSneaking);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

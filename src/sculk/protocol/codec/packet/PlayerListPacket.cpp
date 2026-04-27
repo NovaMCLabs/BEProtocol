@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerListPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void PlayerListEntry::write(BinaryStream& stream) const {
     mUUID.write(stream);
@@ -24,16 +24,16 @@ void PlayerListEntry::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerListEntry::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mUUID.read(stream); !status) return status;
-    if (auto status = stream.readVarInt64(mActorUniqueId); !status) return status;
-    if (auto status = stream.readString(mPlayerName); !status) return status;
-    if (auto status = stream.readString(mXuid); !status) return status;
-    if (auto status = stream.readString(mPlatformChatId); !status) return status;
-    if (auto status = stream.readSignedInt(mBuildPlatform); !status) return status;
-    if (auto status = mSerializedSkin.read(stream); !status) return status;
-    if (auto status = stream.readBool(mIsTeacher); !status) return status;
-    if (auto status = stream.readBool(mIsHost); !status) return status;
-    if (auto status = stream.readBool(mIsSubClient); !status) return status;
+    _SCULK_READ(mUUID.read(stream));
+    _SCULK_READ(stream.readVarInt64(mActorUniqueId));
+    _SCULK_READ(stream.readString(mPlayerName));
+    _SCULK_READ(stream.readString(mXuid));
+    _SCULK_READ(stream.readString(mPlatformChatId));
+    _SCULK_READ(stream.readSignedInt(mBuildPlatform));
+    _SCULK_READ(mSerializedSkin.read(stream));
+    _SCULK_READ(stream.readBool(mIsTeacher));
+    _SCULK_READ(stream.readBool(mIsHost));
+    _SCULK_READ(stream.readBool(mIsSubClient));
     return stream.readSignedInt(mColor);
 }
 
@@ -59,23 +59,23 @@ void PlayerListPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerListPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
     std::uint32_t entryCount{};
-    if (auto status = stream.readUnsignedVarInt(entryCount); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(entryCount));
     mPlayerEntryList.resize(entryCount);
     if (mAction == ActionType::Add) {
         for (PlayerListEntry& entry : mPlayerEntryList) {
-            if (auto status = entry.read(stream); !status) return status;
+            _SCULK_READ(entry.read(stream));
         }
         for (PlayerListEntry& entry : mPlayerEntryList) {
-            if (auto status = stream.readBool(entry.mSkinTrusted); !status) return status;
+            _SCULK_READ(stream.readBool(entry.mSkinTrusted));
         }
     } else {
         for (PlayerListEntry& entry : mPlayerEntryList) {
-            if (auto status = entry.mUUID.read(stream); !status) return status;
+            _SCULK_READ(entry.mUUID.read(stream));
         }
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

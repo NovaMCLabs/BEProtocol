@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ItemStackRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ItemStackRequestPacket::getId() const noexcept { return MinecraftPacketIds::ItemStackRequest; }
 
@@ -17,4 +17,4 @@ void ItemStackRequestPacket::write(BinaryStream& stream) const { mRequest.write(
 
 Result<> ItemStackRequestPacket::read(ReadOnlyBinaryStream& stream) { return mRequest.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

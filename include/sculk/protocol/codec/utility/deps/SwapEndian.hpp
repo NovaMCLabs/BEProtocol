@@ -11,7 +11,7 @@
 #include <bit>
 #include <type_traits>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 template <typename T>
     requires std::is_trivially_copyable_v<T>
@@ -25,4 +25,4 @@ template <typename T>
     }
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

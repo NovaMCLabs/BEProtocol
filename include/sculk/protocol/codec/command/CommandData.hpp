@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/command/CommandOverloadData.hpp"
 #include "sculk/protocol/codec/command/CommandPermissionLevel.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct CommandData {
     std::string                      mName{};
@@ -25,4 +25,4 @@ struct CommandData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

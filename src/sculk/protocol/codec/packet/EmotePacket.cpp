@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/EmotePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds EmotePacket::getId() const noexcept { return MinecraftPacketIds::Emote; }
 
@@ -23,12 +23,12 @@ void EmotePacket::write(BinaryStream& stream) const {
 }
 
 Result<> EmotePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = stream.readString(mEmoteId); !status) return status;
-    if (auto status = stream.readUnsignedVarInt(mEmoteLengthTicks); !status) return status;
-    if (auto status = stream.readString(mXuid); !status) return status;
-    if (auto status = stream.readString(mPlatformId); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(stream.readString(mEmoteId));
+    _SCULK_READ(stream.readUnsignedVarInt(mEmoteLengthTicks));
+    _SCULK_READ(stream.readString(mXuid));
+    _SCULK_READ(stream.readString(mPlatformId));
     return stream.readByte(mFlags);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

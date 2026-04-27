@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/TransferPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds TransferPacket::getId() const noexcept { return MinecraftPacketIds::Transfer; }
 
@@ -20,9 +20,9 @@ void TransferPacket::write(BinaryStream& stream) const {
 }
 
 Result<> TransferPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mServerAddress); !status) return status;
-    if (auto status = stream.readUnsignedShort(mServerPort); !status) return status;
+    _SCULK_READ(stream.readString(mServerAddress));
+    _SCULK_READ(stream.readUnsignedShort(mServerPort));
     return stream.readBool(mReloadWorld);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

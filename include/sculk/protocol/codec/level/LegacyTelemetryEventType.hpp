@@ -7,7 +7,7 @@
 
 #pragma once
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class LegacyTelemetryEventType : int {
     Achievement                     = 0,
@@ -44,4 +44,4 @@ enum class LegacyTelemetryEventType : int {
     ItemUsedEvent                   = 31,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

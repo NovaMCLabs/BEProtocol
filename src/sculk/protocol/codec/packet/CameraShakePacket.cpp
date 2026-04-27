@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CameraShakePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CameraShakePacket::getId() const noexcept { return MinecraftPacketIds::CameraShake; }
 
@@ -21,10 +21,10 @@ void CameraShakePacket::write(BinaryStream& stream) const {
 }
 
 Result<> CameraShakePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mIntensity); !status) return status;
-    if (auto status = stream.readFloat(mSeconds); !status) return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readFloat(mIntensity));
+    _SCULK_READ(stream.readFloat(mSeconds));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     return stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

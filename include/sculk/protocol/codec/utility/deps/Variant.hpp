@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <variant>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 namespace detail {
 
@@ -43,4 +43,4 @@ Result<> emplace_variant(Var& v, std::size_t idx _SCULK_SL_PARAMETER_DEF) noexce
     return detail::emplace_variant_impl(v, idx _SCULK_SL_PARAM_PASS, std::make_index_sequence<N>{});
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

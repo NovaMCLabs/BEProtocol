@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/command/CommandParameterData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CommandParameterData::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -17,10 +17,10 @@ void CommandParameterData::write(BinaryStream& stream) const {
 }
 
 Result<> CommandParameterData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
-    if (auto status = stream.readUnsignedInt(mParseSymbol); !status) return status;
-    if (auto status = stream.readBool(mIsOptional); !status) return status;
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readUnsignedInt(mParseSymbol));
+    _SCULK_READ(stream.readBool(mIsOptional));
     return stream.readByte(mOptions);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/actor/player/LocatorBar.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void LocatorBarWorldPosition::write(BinaryStream& stream) const {
     mPosition.write(stream);
@@ -15,7 +15,7 @@ void LocatorBarWorldPosition::write(BinaryStream& stream) const {
 }
 
 Result<> LocatorBarWorldPosition::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPosition.read(stream); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt(mDimensionType);
 }
 
@@ -27,20 +27,21 @@ void LocatorBarServerWaypointPayload::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mUpdateFlag);
     stream.writeOptional(mIsVisible, &BinaryStream::writeBool);
     stream.writeOptional(mWorldPosition, &LocatorBarWorldPosition::write);
-    stream.writeOptional(mTextureId, &BinaryStream::writeUnsignedInt);
+    stream.writeOptional(mTexturePath, &BinaryStream::writeString);
+    stream.writeOptional(mIconSize, &Vec2::write);
     stream.writeOptional(mColor, &BinaryStream::writeSignedInt);
     stream.writeOptional(mClientPositionAuthority, &BinaryStream::writeBool);
     stream.writeOptional(mActorUniqueId, &BinaryStream::writeVarInt64);
 }
 
 Result<> LocatorBarServerWaypointPayload::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt(mUpdateFlag); !status) return status;
-    if (auto status = stream.readOptional(mIsVisible, &ReadOnlyBinaryStream::readBool); !status) return status;
-    if (auto status = stream.readOptional(mWorldPosition, &LocatorBarWorldPosition::read); !status) return status;
-    if (auto status = stream.readOptional(mTextureId, &ReadOnlyBinaryStream::readUnsignedInt); !status) return status;
-    if (auto status = stream.readOptional(mColor, &ReadOnlyBinaryStream::readSignedInt); !status) return status;
-    if (auto status = stream.readOptional(mClientPositionAuthority, &ReadOnlyBinaryStream::readBool); !status)
-        return status;
+    _SCULK_READ(stream.readUnsignedInt(mUpdateFlag));
+    _SCULK_READ(stream.readOptional(mIsVisible, &ReadOnlyBinaryStream::readBool));
+    _SCULK_READ(stream.readOptional(mWorldPosition, &LocatorBarWorldPosition::read));
+    _SCULK_READ(stream.readOptional(mTexturePath, &ReadOnlyBinaryStream::readString));
+    _SCULK_READ(stream.readOptional(mIconSize, &Vec2::read));
+    _SCULK_READ(stream.readOptional(mColor, &ReadOnlyBinaryStream::readSignedInt));
+    _SCULK_READ(stream.readOptional(mClientPositionAuthority, &ReadOnlyBinaryStream::readBool));
     return stream.readOptional(mActorUniqueId, &ReadOnlyBinaryStream::readVarInt64);
 }
 
@@ -51,9 +52,9 @@ void LocatorBarWaypointPayload::write(BinaryStream& stream) const {
 }
 
 Result<> LocatorBarWaypointPayload::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mGroupHandle.read(stream); !status) return status;
-    if (auto status = mServerWaypointPayload.read(stream); !status) return status;
+    _SCULK_READ(mGroupHandle.read(stream));
+    _SCULK_READ(mServerWaypointPayload.read(stream));
     return stream.readEnum(mActionFlag, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

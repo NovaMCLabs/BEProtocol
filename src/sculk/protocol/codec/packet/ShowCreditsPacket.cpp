@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ShowCreditsPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds ShowCreditsPacket::getId() const noexcept { return MinecraftPacketIds::ShowCredits; }
 
@@ -19,8 +19,8 @@ void ShowCreditsPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ShowCreditsPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mPlayerRuntimeId); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mPlayerRuntimeId));
     return stream.readEnum(mCreditsState, &ReadOnlyBinaryStream::readVarInt);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,17 +7,18 @@
 
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/BoolAttributeData.hpp"
+#include "../../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BoolAttributeData::write(BinaryStream& stream) const {
     stream.writeBool(mValue);
-    stream.writeEnum(mOperation, &BinaryStream::writeSignedInt);
+    utils::writeEnumName(stream, mOperation);
 }
 
 Result<> BoolAttributeData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mValue); !status) return status;
-    return stream.readEnum(mOperation, &ReadOnlyBinaryStream::readSignedInt);
+    _SCULK_READ(stream.readBool(mValue));
+    return utils::readEnumName(stream, mOperation);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/StructureTemplateDataResponsePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds StructureTemplateDataResponsePacket::getId() const noexcept {
     return MinecraftPacketIds::StructureTemplateDataResponse;
@@ -27,12 +27,12 @@ void StructureTemplateDataResponsePacket::write(BinaryStream& stream) const {
 }
 
 Result<> StructureTemplateDataResponsePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mStructureName); !status) return status;
-    if (auto status = stream.readBool(mSuccess); !status) return status;
+    _SCULK_READ(stream.readString(mStructureName));
+    _SCULK_READ(stream.readBool(mSuccess));
     if (mSuccess) {
-        if (auto status = mNbt.read(stream); !status) return status;
+        _SCULK_READ(mNbt.read(stream));
     }
     return stream.readEnum(mResponseType, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

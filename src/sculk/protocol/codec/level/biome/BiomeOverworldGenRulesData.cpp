@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeOverworldGenRulesData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeOverworldGenRulesData::write(BinaryStream& stream) const {
     stream.writeArray(mHillsTransformations, &BiomeWeightedData::write);
@@ -19,15 +19,13 @@ void BiomeOverworldGenRulesData::write(BinaryStream& stream) const {
     stream.writeArray(mClimate, &BiomeWeightedTemperatureData::write);
 }
 Result<> BiomeOverworldGenRulesData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mHillsTransformations, &BiomeWeightedData::read); !status) return status;
-    if (auto status = stream.readArray(mMutateTransformations, &BiomeWeightedData::read); !status) return status;
-    if (auto status = stream.readArray(mRiverTransformations, &BiomeWeightedData::read); !status) return status;
-    if (auto status = stream.readArray(mShoreTransformations, &BiomeWeightedData::read); !status) return status;
-    if (auto status = stream.readArray(mPreHillsEdge, &BiomeConditionalTransformationData::read); !status)
-        return status;
-    if (auto status = stream.readArray(mPreShoreEdge, &BiomeConditionalTransformationData::read); !status)
-        return status;
+    _SCULK_READ(stream.readArray(mHillsTransformations, &BiomeWeightedData::read));
+    _SCULK_READ(stream.readArray(mMutateTransformations, &BiomeWeightedData::read));
+    _SCULK_READ(stream.readArray(mRiverTransformations, &BiomeWeightedData::read));
+    _SCULK_READ(stream.readArray(mShoreTransformations, &BiomeWeightedData::read));
+    _SCULK_READ(stream.readArray(mPreHillsEdge, &BiomeConditionalTransformationData::read));
+    _SCULK_READ(stream.readArray(mPreShoreEdge, &BiomeConditionalTransformationData::read));
     return stream.readArray(mClimate, &BiomeWeightedTemperatureData::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

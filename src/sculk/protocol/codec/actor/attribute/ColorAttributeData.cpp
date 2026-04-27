@@ -7,50 +7,18 @@
 
 #pragma once
 #include "sculk/protocol/codec/actor/attribute/ColorAttributeData.hpp"
+#include "../../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
-
-void Color255RGBAData::write(BinaryStream& stream) const {
-    stream.writeVariantIndex<std::uint32_t>(mColor, &BinaryStream::writeUnsignedVarInt);
-    std::visit(
-        Overload{
-            [&](const std::string& value) { stream.writeString(value); },
-            [&](const std::array<int32_t, 4>& value) {
-                for (auto channel : value) {
-                    stream.writeSignedInt(channel);
-                }
-            },
-        },
-        mColor
-    );
-}
-
-Result<> Color255RGBAData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVariantIndex<std::uint32_t>(mColor, &ReadOnlyBinaryStream::readUnsignedVarInt);
-        !status)
-        return status;
-    return std::visit(
-        Overload{
-            [&](std::string& value) { return stream.readString(value); },
-            [&](std::array<int32_t, 4>& value) {
-                for (auto& channel : value) {
-                    if (auto status = stream.readSignedInt(channel); !status) return status;
-                }
-                return Result<>{};
-            },
-        },
-        mColor
-    );
-}
+namespace sculk::protocol::inline abi_v975 {
 
 void ColorAttributeData::write(BinaryStream& stream) const {
-    mValue.write(stream);
-    stream.writeEnum(mOperation, &BinaryStream::writeSignedInt);
+    stream.writeString(mValue);
+    utils::writeEnumName(stream, mOperation);
 }
 
 Result<> ColorAttributeData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mValue.read(stream); !status) return status;
-    return stream.readEnum(mOperation, &ReadOnlyBinaryStream::readSignedInt);
+    _SCULK_READ(stream.readString(mValue));
+    return utils::readEnumName(stream, mOperation);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

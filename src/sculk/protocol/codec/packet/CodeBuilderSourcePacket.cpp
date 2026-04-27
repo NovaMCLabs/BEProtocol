@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CodeBuilderSourcePacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds CodeBuilderSourcePacket::getId() const noexcept { return MinecraftPacketIds::CodeBuilderSource; }
 
@@ -20,9 +20,9 @@ void CodeBuilderSourcePacket::write(BinaryStream& stream) const {
 }
 
 Result<> CodeBuilderSourcePacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mOperation, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readEnum(mCategory, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mOperation, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mCategory, &ReadOnlyBinaryStream::readByte));
     return stream.readEnum(mCodeStatus, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

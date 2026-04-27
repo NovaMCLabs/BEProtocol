@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/PlayerToggleCrafterSlotRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds PlayerToggleCrafterSlotRequestPacket::getId() const noexcept {
     return MinecraftPacketIds::PlayerToggleCrafterSlotRequest;
@@ -26,11 +26,11 @@ void PlayerToggleCrafterSlotRequestPacket::write(BinaryStream& stream) const {
 }
 
 Result<> PlayerToggleCrafterSlotRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mPosX); !status) return status;
-    if (auto status = stream.readSignedInt(mPosY); !status) return status;
-    if (auto status = stream.readSignedInt(mPosZ); !status) return status;
-    if (auto status = stream.readByte(mSlotIndex); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mPosX));
+    _SCULK_READ(stream.readSignedInt(mPosY));
+    _SCULK_READ(stream.readSignedInt(mPosZ));
+    _SCULK_READ(stream.readByte(mSlotIndex));
     return stream.readBool(mIsDisabled);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

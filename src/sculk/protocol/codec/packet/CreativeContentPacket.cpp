@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CreativeContentPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CreativeContentPacket::WriteEntry::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt(mNetId);
@@ -16,8 +16,8 @@ void CreativeContentPacket::WriteEntry::write(BinaryStream& stream) const {
 }
 
 Result<> CreativeContentPacket::WriteEntry::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt(mNetId); !status) return status;
-    if (auto status = mItem.read(stream); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt(mNetId));
+    _SCULK_READ(mItem.read(stream));
     return stream.readUnsignedVarInt(mGroupIndex);
 }
 
@@ -28,8 +28,8 @@ void CreativeContentPacket::Group::write(BinaryStream& stream) const {
 }
 
 Result<> CreativeContentPacket::Group::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedInt(mCategory); !status) return status;
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readSignedInt(mCategory));
+    _SCULK_READ(stream.readString(mName));
     return mIcon.read(stream);
 }
 
@@ -43,8 +43,8 @@ void CreativeContentPacket::write(BinaryStream& stream) const {
 }
 
 Result<> CreativeContentPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readArray(mGroups, &Group::read); !status) return status;
+    _SCULK_READ(stream.readArray(mGroups, &Group::read));
     return stream.readArray(mWriteEntries, &WriteEntry::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/nbt/ListTag.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ListTag::serialize(BinaryStream& stream) const {
     stream.writeEnum(mType, &BinaryStream::writeByte);
@@ -19,15 +19,15 @@ void ListTag::serialize(BinaryStream& stream) const {
 }
 
 Result<> ListTag::deserialize(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     std::int32_t size{};
-    if (auto status = stream.readVarInt(size); !status) return status;
+    _SCULK_READ(stream.readVarInt(size));
     mValue.resize(size);
     for (std::int32_t i = 0; i < size; ++i) {
         mValue[i].emplace(mType);
-        if (auto status = mValue[i].deserialize(stream); !status) return status;
+        _SCULK_READ(mValue[i].deserialize(stream));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

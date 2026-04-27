@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/level/block/BlockProperty.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BlockProperty::write(BinaryStream& stream) const {
     stream.writeString(mName);
@@ -16,8 +16,8 @@ void BlockProperty::write(BinaryStream& stream) const {
 }
 
 Result<> BlockProperty::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mName); !status) return status;
+    _SCULK_READ(stream.readString(mName));
     return mNbt.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

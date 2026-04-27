@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/JigsawStructureDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds JigsawStructureDataPacket::getId() const noexcept { return MinecraftPacketIds::JigsawStructureData; }
 
@@ -17,4 +17,4 @@ void JigsawStructureDataPacket::write(BinaryStream& stream) const { mData.write(
 
 Result<> JigsawStructureDataPacket::read(ReadOnlyBinaryStream& stream) { return mData.read(stream); }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ResourcePackStackPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void ResourcePackStackPacket::PackInfo::write(BinaryStream& stream) const {
     stream.writeString(mId);
@@ -16,8 +16,8 @@ void ResourcePackStackPacket::PackInfo::write(BinaryStream& stream) const {
 }
 
 Result<> ResourcePackStackPacket::PackInfo::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mId); !status) return status;
-    if (auto status = stream.readString(mVersion); !status) return status;
+    _SCULK_READ(stream.readString(mId));
+    _SCULK_READ(stream.readString(mVersion));
     return stream.readString(mSubPackName);
 }
 
@@ -34,11 +34,11 @@ void ResourcePackStackPacket::write(BinaryStream& stream) const {
 }
 
 Result<> ResourcePackStackPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mTexturePackRequired); !status) return status;
-    if (auto status = stream.readArray(mTexturePackList, &PackInfo::read); !status) return status;
-    if (auto status = stream.readString(mBaseGameVersion); !status) return status;
-    if (auto status = mExperiments.read(stream); !status) return status;
+    _SCULK_READ(stream.readBool(mTexturePackRequired));
+    _SCULK_READ(stream.readArray(mTexturePackList, &PackInfo::read));
+    _SCULK_READ(stream.readString(mBaseGameVersion));
+    _SCULK_READ(mExperiments.read(stream));
     return stream.readBool(mIncludeEditorPacks);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

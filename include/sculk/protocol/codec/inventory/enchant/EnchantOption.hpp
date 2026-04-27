@@ -6,13 +6,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "EnchantType.hpp"
 #include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
 #include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct Enchant {
-    std::uint8_t mType{};
+    EnchantType  mType{};
     std::uint8_t mLevel{};
 
     void write(BinaryStream& stream) const;
@@ -42,4 +43,4 @@ struct EnchantOption {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

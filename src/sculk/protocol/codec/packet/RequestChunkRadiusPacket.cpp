@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RequestChunkRadiusPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RequestChunkRadiusPacket::getId() const noexcept { return MinecraftPacketIds::RequestChunkRadius; }
 
@@ -19,8 +19,8 @@ void RequestChunkRadiusPacket::write(BinaryStream& stream) const {
 }
 
 Result<> RequestChunkRadiusPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mChunkRadius); !status) return status;
+    _SCULK_READ(stream.readVarInt(mChunkRadius));
     return stream.readByte(mMaxChunkRadius);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/TextPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds TextPacket::getId() const noexcept { return MinecraftPacketIds::Text; }
 
@@ -37,29 +37,28 @@ void TextPacket::write(BinaryStream& stream) const {
 }
 
 Result<> TextPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readBool(mLocalize); !status) return status;
-    if (auto status = stream.readVariantIndex<std::uint8_t>(mBody, &ReadOnlyBinaryStream::readByte); !status)
-        return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = std::visit(
+    _SCULK_READ(stream.readBool(mLocalize));
+    _SCULK_READ(stream.readVariantIndex<std::uint8_t>(mBody, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(
+        std::visit(
             Overload{
                 [&](TextPacket::MessageOnly& body) { return stream.readString(body.mMessage); },
                 [&](TextPacket::AuthorAndMessage& body) {
-                    if (auto status = stream.readString(body.mPlayerName); !status) return status;
+                    _SCULK_READ(stream.readString(body.mPlayerName));
                     return stream.readString(body.mMessage);
                 },
                 [&](TextPacket::MessageAndParams& body) {
-                    if (auto status = stream.readString(body.mMessage); !status) return status;
+                    _SCULK_READ(stream.readString(body.mMessage));
                     return stream.readArray(body.mParameters, &ReadOnlyBinaryStream::readString);
                 },
             },
             mBody
-        );
-        !status)
-        return status;
-    if (auto status = stream.readString(mXuid); !status) return status;
-    if (auto status = stream.readString(mPlatformId); !status) return status;
+        )
+    );
+    _SCULK_READ(stream.readString(mXuid));
+    _SCULK_READ(stream.readString(mPlatformId));
     return stream.readString(mFilteredMessage);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

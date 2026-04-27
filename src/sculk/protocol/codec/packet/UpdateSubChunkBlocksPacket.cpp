@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateSubChunkBlocksPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateSubChunkBlocksPacket::getId() const noexcept {
     return MinecraftPacketIds::UpdateSubChunkBlocks;
@@ -22,9 +22,9 @@ void UpdateSubChunkBlocksPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateSubChunkBlocksPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mSubChunkBlockPosition.read(stream); !status) return status;
-    if (auto status = stream.readArray(mBlocksChangeStandards, &SubChunkBlockChangeInfo::read); !status) return status;
+    _SCULK_READ(mSubChunkBlockPosition.read(stream));
+    _SCULK_READ(stream.readArray(mBlocksChangeStandards, &SubChunkBlockChangeInfo::read));
     return stream.readArray(mBlocksChangeExtras, &SubChunkBlockChangeInfo::read);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

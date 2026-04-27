@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeConditionalTransformationData {
     std::vector<BiomeWeightedData> mTransformsInto{};
@@ -24,4 +24,4 @@ struct BiomeConditionalTransformationData {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

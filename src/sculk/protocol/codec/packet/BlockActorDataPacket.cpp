@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/BlockActorDataPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds BlockActorDataPacket::getId() const noexcept { return MinecraftPacketIds::BlockActorData; }
 
@@ -19,8 +19,8 @@ void BlockActorDataPacket::write(BinaryStream& stream) const {
 }
 
 Result<> BlockActorDataPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mBlockPosition.read(stream); !status) return status;
+    _SCULK_READ(mBlockPosition.read(stream));
     return mActorDataTags.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

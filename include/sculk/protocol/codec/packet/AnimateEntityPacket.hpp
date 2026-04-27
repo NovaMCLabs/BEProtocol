@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/level/MolangVersion.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 class AnimateEntityPacket : public IPacket {
 public:
@@ -31,4 +31,4 @@ public:
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

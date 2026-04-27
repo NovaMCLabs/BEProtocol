@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/item/NetworkItemInstanceDescriptor.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void NetworkItemInstanceDescriptor::write(BinaryStream& stream) const {
     if (mId == 0) {
@@ -22,15 +22,15 @@ void NetworkItemInstanceDescriptor::write(BinaryStream& stream) const {
 }
 
 Result<> NetworkItemInstanceDescriptor::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mId));
     if (mId == 0) {
         return {};
     } else {
-        if (auto status = stream.readUnsignedShort(mStackSize); !status) return status;
-        if (auto status = stream.readUnsignedVarInt(mAux); !status) return status;
-        if (auto status = stream.readVarInt(mBlockRuntimeId); !status) return status;
+        _SCULK_READ(stream.readUnsignedShort(mStackSize));
+        _SCULK_READ(stream.readUnsignedVarInt(mAux));
+        _SCULK_READ(stream.readVarInt(mBlockRuntimeId));
         return stream.readString(mUserData);
     }
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

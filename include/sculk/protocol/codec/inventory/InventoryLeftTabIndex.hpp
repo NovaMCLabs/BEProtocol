@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class InventoryLeftTabIndex : std::int32_t {
     None               = 0,
@@ -20,4 +20,4 @@ enum class InventoryLeftTabIndex : std::int32_t {
     Survival           = 6,
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

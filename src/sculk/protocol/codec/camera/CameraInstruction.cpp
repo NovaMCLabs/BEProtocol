@@ -8,7 +8,7 @@
 #include "sculk/protocol/codec/camera/CameraInstruction.hpp"
 #include "../utility/EnumName.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void CameraInstruction::FadeInstruction::TimeOption::write(BinaryStream& stream) const {
     stream.writeFloat(mFadeInTime);
@@ -17,8 +17,8 @@ void CameraInstruction::FadeInstruction::TimeOption::write(BinaryStream& stream)
 }
 
 Result<> CameraInstruction::FadeInstruction::TimeOption::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mFadeInTime); !status) return status;
-    if (auto status = stream.readFloat(mHoldTime); !status) return status;
+    _SCULK_READ(stream.readFloat(mFadeInTime));
+    _SCULK_READ(stream.readFloat(mHoldTime));
     return stream.readFloat(mFadeOutTime);
 }
 
@@ -29,8 +29,8 @@ void CameraInstruction::FadeInstruction::ColorOption::write(BinaryStream& stream
 }
 
 Result<> CameraInstruction::FadeInstruction::ColorOption::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mRed); !status) return status;
-    if (auto status = stream.readFloat(mGreen); !status) return status;
+    _SCULK_READ(stream.readFloat(mRed));
+    _SCULK_READ(stream.readFloat(mGreen));
     return stream.readFloat(mBlue);
 }
 
@@ -40,7 +40,7 @@ void CameraInstruction::FadeInstruction::write(BinaryStream& stream) const {
 }
 
 Result<> CameraInstruction::FadeInstruction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readOptional(mTime, &TimeOption::read); !status) return status;
+    _SCULK_READ(stream.readOptional(mTime, &TimeOption::read));
     return stream.readOptional(mColor, &ColorOption::read);
 }
 
@@ -50,7 +50,7 @@ void CameraInstruction::SetInstruction::EaseOption::write(BinaryStream& stream) 
 }
 
 Result<> CameraInstruction::SetInstruction::EaseOption::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readEnum(mEasingType, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(stream.readEnum(mEasingType, &ReadOnlyBinaryStream::readByte));
     return stream.readFloat(mEasingTime);
 }
 
@@ -67,14 +67,14 @@ void CameraInstruction::SetInstruction::write(BinaryStream& stream) const {
 }
 
 Result<> CameraInstruction::SetInstruction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedInt(mPresetIndex); !status) return status;
-    if (auto status = stream.readOptional(mEase, &EaseOption::read); !status) return status;
-    if (auto status = stream.readOptional(mPos, &Vec3::read); !status) return status;
-    if (auto status = stream.readOptional(mRot, &Vec2::read); !status) return status;
-    if (auto status = stream.readOptional(mFacing, &Vec3::read); !status) return status;
-    if (auto status = stream.readOptional(mViewOffset, &Vec2::read); !status) return status;
-    if (auto status = stream.readOptional(mEntityOffset, &Vec3::read); !status) return status;
-    if (auto status = stream.readOptional(mDefault, &ReadOnlyBinaryStream::readBool); !status) return status;
+    _SCULK_READ(stream.readUnsignedInt(mPresetIndex));
+    _SCULK_READ(stream.readOptional(mEase, &EaseOption::read));
+    _SCULK_READ(stream.readOptional(mPos, &Vec3::read));
+    _SCULK_READ(stream.readOptional(mRot, &Vec2::read));
+    _SCULK_READ(stream.readOptional(mFacing, &Vec3::read));
+    _SCULK_READ(stream.readOptional(mViewOffset, &Vec2::read));
+    _SCULK_READ(stream.readOptional(mEntityOffset, &Vec3::read));
+    _SCULK_READ(stream.readOptional(mDefault, &ReadOnlyBinaryStream::readBool));
     return stream.readBool(mRemoveIgnoreStartingValuesComponent);
 }
 
@@ -84,7 +84,7 @@ void CameraInstruction::TargetInstruction::write(BinaryStream& stream) const {
 }
 
 Result<> CameraInstruction::TargetInstruction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readOptional(mTargetCenterOffset, &Vec3::read); !status) return status;
+    _SCULK_READ(stream.readOptional(mTargetCenterOffset, &Vec3::read));
     return stream.readSignedInt64(mTargetActorId);
 }
 
@@ -96,9 +96,9 @@ void CameraInstruction::FovInstruction::write(BinaryStream& stream) const {
 }
 
 Result<> CameraInstruction::FovInstruction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mFieldOfView); !status) return status;
-    if (auto status = stream.readFloat(mEaseTime); !status) return status;
-    if (auto status = utils::readEnumName(stream, mEaseType); !status) return status;
+    _SCULK_READ(stream.readFloat(mFieldOfView));
+    _SCULK_READ(stream.readFloat(mEaseTime));
+    _SCULK_READ(utils::readEnumName(stream, mEaseType));
     return stream.readBool(mClear);
 }
 
@@ -109,8 +109,8 @@ void CameraInstruction::SplineInstruction::SplineProgressOption::write(BinaryStr
 }
 
 Result<> CameraInstruction::SplineInstruction::SplineProgressOption::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mKeyFrameValue); !status) return status;
-    if (auto status = stream.readFloat(mKeyFrameTime); !status) return status;
+    _SCULK_READ(stream.readFloat(mKeyFrameValue));
+    _SCULK_READ(stream.readFloat(mKeyFrameTime));
     return utils::readEnumName(stream, mKeyFrameEasingFunc);
 }
 
@@ -121,8 +121,8 @@ void CameraInstruction::SplineInstruction::RotationOption::write(BinaryStream& s
 }
 
 Result<> CameraInstruction::SplineInstruction::RotationOption::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mKeyFrameValues.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mKeyFrameTimes); !status) return status;
+    _SCULK_READ(mKeyFrameValues.read(stream));
+    _SCULK_READ(stream.readFloat(mKeyFrameTimes));
     return utils::readEnumName(stream, mKeyFrameEasingFunc);
 }
 
@@ -137,12 +137,12 @@ void CameraInstruction::SplineInstruction::write(BinaryStream& stream) const {
 }
 
 Result<> CameraInstruction::SplineInstruction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readFloat(mTotalTime); !status) return status;
-    if (auto status = stream.readEnum(mType, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readArray(mCurve, &Vec3::read); !status) return status;
-    if (auto status = stream.readArray(mProgressKeyFrames, &SplineProgressOption::read); !status) return status;
-    if (auto status = stream.readArray(mRotationOptions, &RotationOption::read); !status) return status;
-    if (auto status = stream.readOptional(mSplineIdentifier, &ReadOnlyBinaryStream::readString); !status) return status;
+    _SCULK_READ(stream.readFloat(mTotalTime));
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readArray(mCurve, &Vec3::read));
+    _SCULK_READ(stream.readArray(mProgressKeyFrames, &SplineProgressOption::read));
+    _SCULK_READ(stream.readArray(mRotationOptions, &RotationOption::read));
+    _SCULK_READ(stream.readOptional(mSplineIdentifier, &ReadOnlyBinaryStream::readString));
     return stream.readOptional(mLoadFromJson, &ReadOnlyBinaryStream::readBool);
 }
 
@@ -167,15 +167,15 @@ void CameraInstruction::write(BinaryStream& stream) const {
 }
 
 Result<> CameraInstruction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readOptional(mSet, &SetInstruction::read); !status) return status;
-    if (auto status = stream.readOptional(mClear, &ReadOnlyBinaryStream::readBool); !status) return status;
-    if (auto status = stream.readOptional(mFade, &FadeInstruction::read); !status) return status;
-    if (auto status = stream.readOptional(mTarget, &TargetInstruction::read); !status) return status;
-    if (auto status = stream.readOptional(mRemoveTarget, &ReadOnlyBinaryStream::readBool); !status) return status;
-    if (auto status = stream.readOptional(mFieldOfView, &FovInstruction::read); !status) return status;
-    if (auto status = stream.readOptional(mSpline, &SplineInstruction::read); !status) return status;
-    if (auto status = stream.readOptional(mAttach, &AttachToEntityInstruction::read); !status) return status;
+    _SCULK_READ(stream.readOptional(mSet, &SetInstruction::read));
+    _SCULK_READ(stream.readOptional(mClear, &ReadOnlyBinaryStream::readBool));
+    _SCULK_READ(stream.readOptional(mFade, &FadeInstruction::read));
+    _SCULK_READ(stream.readOptional(mTarget, &TargetInstruction::read));
+    _SCULK_READ(stream.readOptional(mRemoveTarget, &ReadOnlyBinaryStream::readBool));
+    _SCULK_READ(stream.readOptional(mFieldOfView, &FovInstruction::read));
+    _SCULK_READ(stream.readOptional(mSpline, &SplineInstruction::read));
+    _SCULK_READ(stream.readOptional(mAttach, &AttachToEntityInstruction::read));
     return stream.readOptional(mDetachFromEntity, &ReadOnlyBinaryStream::readBool);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

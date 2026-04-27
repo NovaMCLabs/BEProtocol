@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/RespawnPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds RespawnPacket::getId() const noexcept { return MinecraftPacketIds::Respawn; }
 
@@ -20,9 +20,9 @@ void RespawnPacket::write(BinaryStream& stream) const {
 }
 
 Result<> RespawnPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = stream.readEnum(mState, &ReadOnlyBinaryStream::readByte); !status) return status;
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(stream.readEnum(mState, &ReadOnlyBinaryStream::readByte));
     return stream.readUnsignedVarInt64(mActorRuntimeId);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

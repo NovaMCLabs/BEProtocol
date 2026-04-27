@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/MovePlayerPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds MovePlayerPacket::getId() const noexcept { return MinecraftPacketIds::MovePlayer; }
 std::string_view   MovePlayerPacket::getName() const noexcept { return "MovePlayerPacket"; }
@@ -28,18 +28,18 @@ void MovePlayerPacket::write(BinaryStream& stream) const {
 }
 
 Result<> MovePlayerPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readUnsignedVarInt64(mActorRuntimeId); !status) return status;
-    if (auto status = mPosition.read(stream); !status) return status;
-    if (auto status = mRotation.read(stream); !status) return status;
-    if (auto status = stream.readFloat(mYHeadRotation); !status) return status;
-    if (auto status = stream.readEnum(mPositionMode, &ReadOnlyBinaryStream::readByte); !status) return status;
-    if (auto status = stream.readBool(mOnGround); !status) return status;
-    if (auto status = stream.readUnsignedVarInt64(mRidingRuntimeId); !status) return status;
+    _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
+    _SCULK_READ(mPosition.read(stream));
+    _SCULK_READ(mRotation.read(stream));
+    _SCULK_READ(stream.readFloat(mYHeadRotation));
+    _SCULK_READ(stream.readEnum(mPositionMode, &ReadOnlyBinaryStream::readByte));
+    _SCULK_READ(stream.readBool(mOnGround));
+    _SCULK_READ(stream.readUnsignedVarInt64(mRidingRuntimeId));
     if (mPositionMode == PositionMode::Teleport) {
-        if (auto status = stream.readSignedInt(mTeleportationCause); !status) return status;
-        if (auto status = stream.readSignedInt(mSourceActorType); !status) return status;
+        _SCULK_READ(stream.readSignedInt(mTeleportationCause));
+        _SCULK_READ(stream.readSignedInt(mSourceActorType));
     }
     return stream.readUnsignedVarInt64(mTick);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

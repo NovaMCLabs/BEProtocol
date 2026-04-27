@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/UpdateSoftEnumPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 MinecraftPacketIds UpdateSoftEnumPacket::getId() const noexcept { return MinecraftPacketIds::UpdateSoftEnum; }
 
@@ -20,9 +20,9 @@ void UpdateSoftEnumPacket::write(BinaryStream& stream) const {
 }
 
 Result<> UpdateSoftEnumPacket::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readString(mEnumName); !status) return status;
-    if (auto status = stream.readArray(mEnumValues, &ReadOnlyBinaryStream::readString); !status) return status;
+    _SCULK_READ(stream.readString(mEnumName));
+    _SCULK_READ(stream.readArray(mEnumValues, &ReadOnlyBinaryStream::readString));
     return stream.readEnum(mUpdateType, &ReadOnlyBinaryStream::readByte);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

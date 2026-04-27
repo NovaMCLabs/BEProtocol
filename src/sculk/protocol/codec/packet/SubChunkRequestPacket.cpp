@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/packet/SubChunkRequestPacket.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void SubChunkRequestPacket::SubChunkPosOffset::write(BinaryStream& stream) const {
     stream.writeSignedChar(mX);
@@ -16,8 +16,8 @@ void SubChunkRequestPacket::SubChunkPosOffset::write(BinaryStream& stream) const
 }
 
 Result<> SubChunkRequestPacket::SubChunkPosOffset::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readSignedChar(mX); !status) return status;
-    if (auto status = stream.readSignedChar(mY); !status) return status;
+    _SCULK_READ(stream.readSignedChar(mX));
+    _SCULK_READ(stream.readSignedChar(mY));
     return stream.readSignedChar(mZ);
 }
 
@@ -36,14 +36,14 @@ void SubChunkRequestPacket::write(BinaryStream& stream) const {
 
 Result<> SubChunkRequestPacket::read(ReadOnlyBinaryStream& stream) {
     std::uint32_t size{};
-    if (auto status = stream.readVarInt(mDimensionType); !status) return status;
-    if (auto status = mCenterPos.read(stream); !status) return status;
-    if (auto status = stream.readUnsignedInt(size); !status) return status;
+    _SCULK_READ(stream.readVarInt(mDimensionType));
+    _SCULK_READ(mCenterPos.read(stream));
+    _SCULK_READ(stream.readUnsignedInt(size));
     mSubChunkPosOffsetList.resize(size);
     for (SubChunkPosOffset& offset : mSubChunkPosOffsetList) {
-        if (auto status = offset.read(stream); !status) return status;
+        _SCULK_READ(offset.read(stream));
     }
     return {};
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

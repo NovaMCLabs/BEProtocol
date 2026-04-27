@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 enum class PlayStatus : std::int32_t {
     LoginSuccess                             = 0,
@@ -23,4 +23,4 @@ enum class PlayStatus : std::int32_t {
     LoginFailedEditorMismatchVanillaToEditor = 9
 };
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

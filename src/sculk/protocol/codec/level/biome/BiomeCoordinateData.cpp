@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/level/biome/BiomeCoordinateData.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void BiomeCoordinateData::write(BinaryStream& stream) const {
     stream.writeVarInt(mMinValueType);
@@ -20,13 +20,13 @@ void BiomeCoordinateData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeCoordinateData::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mMinValueType); !status) return status;
-    if (auto status = stream.readSignedShort(mMinValue); !status) return status;
-    if (auto status = stream.readVarInt(mMaxValueType); !status) return status;
-    if (auto status = stream.readSignedShort(mMaxValue); !status) return status;
-    if (auto status = stream.readUnsignedInt(mGridOffset); !status) return status;
-    if (auto status = stream.readUnsignedInt(mGridStepSize); !status) return status;
+    _SCULK_READ(stream.readVarInt(mMinValueType));
+    _SCULK_READ(stream.readSignedShort(mMinValue));
+    _SCULK_READ(stream.readVarInt(mMaxValueType));
+    _SCULK_READ(stream.readSignedShort(mMaxValue));
+    _SCULK_READ(stream.readUnsignedInt(mGridOffset));
+    _SCULK_READ(stream.readUnsignedInt(mGridStepSize));
     return stream.readVarInt(mDistribution);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975

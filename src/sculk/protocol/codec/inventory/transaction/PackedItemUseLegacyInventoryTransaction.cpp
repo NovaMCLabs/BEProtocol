@@ -7,7 +7,7 @@
 
 #include "sculk/protocol/codec/inventory/transaction/PackedItemUseLegacyInventoryTransaction.hpp"
 
-namespace sculk::protocol::inline abi_v944 {
+namespace sculk::protocol::inline abi_v975 {
 
 void PackedItemUseLegacyInventoryTransaction::write(BinaryStream& stream) const {
     stream.writeVarInt(mLegacyRequestRawId);
@@ -19,12 +19,12 @@ void PackedItemUseLegacyInventoryTransaction::write(BinaryStream& stream) const 
 }
 
 Result<> PackedItemUseLegacyInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
-    if (auto status = stream.readVarInt(mLegacyRequestRawId); !status) return status;
+    _SCULK_READ(stream.readVarInt(mLegacyRequestRawId));
     if (mLegacyRequestRawId < -1 && (mLegacyRequestRawId & 1) == 0) {
-        if (auto status = stream.readArray(mLegacySetItemSlots, &LegacySetItemSlot::read); !status) return status;
+        _SCULK_READ(stream.readArray(mLegacySetItemSlots, &LegacySetItemSlot::read));
     }
-    if (auto status = mTransactionActions.read(stream); !status) return status;
+    _SCULK_READ(mTransactionActions.read(stream));
     return mItemUseTransaction.read(stream);
 }
 
-} // namespace sculk::protocol::inline abi_v944
+} // namespace sculk::protocol::inline abi_v975
