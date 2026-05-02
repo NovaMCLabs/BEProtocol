@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
+#include "sculk/protocol/codec/inventory/item/NetworkItemInstanceDescriptor.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
@@ -14,7 +14,7 @@ namespace sculk::protocol::inline abi_v975 {
 class MobEquipmentPacket : public IPacket {
 public:
     std::uint64_t              mRuntimeId{};
-    NetworkItemStackDescriptor mItem{};
+    NetworkItemInstanceDescriptor mItem{};
     std::uint8_t               mSlotByte{};
     std::uint8_t               mSelectedSlotByte{};
     std::uint8_t               mContainerIdByte{};
