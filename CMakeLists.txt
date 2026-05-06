@@ -18,7 +18,7 @@ set(REFLECTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     reflection
     GIT_REPOSITORY https://github.com/SculkCatalystMC/Reflection.git
-    GIT_TAG v1.4.0
+    GIT_TAG main
 )
 FetchContent_MakeAvailable(reflection)
 
