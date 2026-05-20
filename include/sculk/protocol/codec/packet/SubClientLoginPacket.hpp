@@ -13,7 +13,7 @@ namespace sculk::protocol::inline abi_v975 {
 
 class SubClientLoginPacket : public IPacket {
 public:
-    ConnectionRequest mConnectionRequest{};
+    std::string mRawConnectionRequest{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

@@ -13,8 +13,8 @@ namespace sculk::protocol::inline abi_v975 {
 
 class LoginPacket : public IPacket {
 public:
-    ConnectionRequest mConnectionRequest{};
-    std::int32_t      mNetworkVersion{};
+    std::int32_t mNetworkVersion{};
+    std::string  mRawConnectionRequest{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

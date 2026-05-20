@@ -15,12 +15,12 @@ std::string_view LoginPacket::getName() const noexcept { return "LoginPacket"; }
 
 void LoginPacket::write(BinaryStream& stream) const {
     stream.writeSignedBigEndianInt(mNetworkVersion);
-    mConnectionRequest.write(stream);
+    stream.writeString(mRawConnectionRequest);
 }
 
 Result<> LoginPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readSignedBigEndianInt(mNetworkVersion));
-    return mConnectionRequest.read(stream);
+    return stream.readString(mRawConnectionRequest);
 }
 
 } // namespace sculk::protocol::inline abi_v975

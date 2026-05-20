@@ -5,13 +5,13 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-#include "sculk/protocol/connection/auth/ClientProperties.hpp"
-#include "../../codec/utility/Reflection.hpp"
+#include "sculk/protocol/connection/auth/LegacyCertificate.hpp"
+#include "../utility/Reflection.hpp"
 #include "sculk/protocol/connection/encryption/Base64Url.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
-Result<> ClientProperties::load(std::string_view compactJwt) {
+Result<> LegacyCertificate::load(std::string_view compactJwt) {
     const auto first = compactJwt.find('.');
     const auto last  = compactJwt.rfind('.');
     if (first == std::string::npos || last == std::string::npos || first == last) {
@@ -23,7 +23,7 @@ Result<> ClientProperties::load(std::string_view compactJwt) {
         return error_utils::makeError("Failed to deserialize JWT header");
     }
     if (mHeader.alg != JsonWebToken::Algorithm::ES384) {
-        return error_utils::makeError("Invalid JWT Alogorithm: expected ES384 for ClientProperties");
+        return error_utils::makeError("Invalid JWT Alogorithm: expected ES384 for LegacyCertificate");
     }
 
     mRawPayload      = compactJwt.substr(first + 1, last - first - 1);
@@ -35,8 +35,8 @@ Result<> ClientProperties::load(std::string_view compactJwt) {
     if (auto status = utils::deserialize_from_json(mPayload, *payloadJson); !status) {
         return error_utils::makeError("Failed to deserialize JWT payload");
     }
-    if (auto status = utils::deserialize_from_json(mClientPropertiesPayload, *payloadJson); !status) {
-        return error_utils::makeError("Failed to deserialize JWT payload into ClientPropertiesPayload");
+    if (auto status = utils::deserialize_from_json(mCertificatePayload, *payloadJson); !status) {
+        return error_utils::makeError("Failed to deserialize JWT payload into CertificatePayload");
     }
 
     mSignature = base64url::decode(compactJwt.substr(last + 1));
@@ -47,9 +47,9 @@ Result<> ClientProperties::load(std::string_view compactJwt) {
     return Result<>{};
 }
 
-std::string ClientProperties::saveAndSign(std::string_view eccPrivateKey) {
+std::string LegacyCertificate::saveAndSign(std::string_view eccPrivateKey) {
     mRawHeader       = base64url::encode(utils::serialize_json(mHeader));
-    auto payloadJson = utils::serialize_to_json(mClientPropertiesPayload);
+    auto payloadJson = utils::serialize_to_json(mCertificatePayload);
     payloadJson.merge_patch(utils::serialize_to_json(mPayload));
     mRawPayload = base64url::encode(payloadJson.dump(-1));
     return signES384(eccPrivateKey);

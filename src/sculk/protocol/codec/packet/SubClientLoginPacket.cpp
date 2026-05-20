@@ -13,8 +13,8 @@ MinecraftPacketIds SubClientLoginPacket::getId() const noexcept { return Minecra
 
 std::string_view SubClientLoginPacket::getName() const noexcept { return "SubClientLoginPacket"; }
 
-void SubClientLoginPacket::write(BinaryStream& stream) const { mConnectionRequest.write(stream); }
+void SubClientLoginPacket::write(BinaryStream& stream) const { stream.writeString(mRawConnectionRequest); }
 
-Result<> SubClientLoginPacket::read(ReadOnlyBinaryStream& stream) { return mConnectionRequest.read(stream); }
+Result<> SubClientLoginPacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mRawConnectionRequest); }
 
 } // namespace sculk::protocol::inline abi_v975

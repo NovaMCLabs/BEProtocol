@@ -13,7 +13,6 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeScatterParamData {
-
     enum class CoordinateEvaluationOrder : std::int32_t {
         XYZ = 0,
         XZY = 1,
