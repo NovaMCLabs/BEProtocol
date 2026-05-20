@@ -13,7 +13,7 @@ void DimensionDataPacket::DimensionDefinition::write(BinaryStream& stream) const
     stream.writeString(mName);
     stream.writeVarInt(mHeightMax);
     stream.writeVarInt(mHeightMin);
-    stream.writeVarInt(mGeneratorType);
+    stream.writeEnum(mGeneratorType, &BinaryStream::writeVarInt);
     stream.writeVarInt(mDimensionType);
 }
 
@@ -21,7 +21,7 @@ Result<> DimensionDataPacket::DimensionDefinition::read(ReadOnlyBinaryStream& st
     _SCULK_READ(stream.readString(mName));
     _SCULK_READ(stream.readVarInt(mHeightMax));
     _SCULK_READ(stream.readVarInt(mHeightMin));
-    _SCULK_READ(stream.readVarInt(mGeneratorType));
+    _SCULK_READ(stream.readEnum(mGeneratorType, &ReadOnlyBinaryStream::readVarInt));
     return stream.readVarInt(mDimensionType);
 }
 

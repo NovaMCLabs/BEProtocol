@@ -13,14 +13,24 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeScatterParamData {
+
+    enum class CoordinateEvaluationOrder : std::int32_t {
+        XYZ = 0,
+        XZY = 1,
+        YXZ = 2,
+        YZX = 3,
+        ZXY = 4,
+        ZYX = 5,
+    };
+
     std::vector<BiomeCoordinateData> mCoordinate{};
-    std::int32_t                     mEvalOrder{};
+    CoordinateEvaluationOrder        mEvalOrder{};
     std::int32_t                     mChancePercentType{};
-    std::int16_t                     mChancePercent{};
+    std::uint16_t                    mChancePercent{};
     std::int32_t                     mChanceNumeartor{};
     std::int32_t                     mChanceDenominator{};
     std::int32_t                     mIterationsType{};
-    std::int16_t                     mIterations{};
+    std::uint16_t                    mIterations{};
 
     void write(BinaryStream& stream) const;
 

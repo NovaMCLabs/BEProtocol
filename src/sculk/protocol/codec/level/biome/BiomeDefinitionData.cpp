@@ -10,7 +10,7 @@
 namespace sculk::protocol::inline abi_v975 {
 
 void BiomeDefinitionData::write(BinaryStream& stream) const {
-    stream.writeSignedShort(mBiomeId);
+    stream.writeUnsignedShort(mBiomeId);
     stream.writeFloat(mTemperature);
     stream.writeFloat(mDownfall);
     stream.writeFloat(mFoliageSnow);
@@ -23,7 +23,7 @@ void BiomeDefinitionData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeDefinitionData::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readSignedShort(mBiomeId));
+    _SCULK_READ(stream.readUnsignedShort(mBiomeId));
     _SCULK_READ(stream.readFloat(mTemperature));
     _SCULK_READ(stream.readFloat(mDownfall));
     _SCULK_READ(stream.readFloat(mFoliageSnow));

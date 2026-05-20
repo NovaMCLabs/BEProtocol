@@ -10,20 +10,20 @@
 namespace sculk::protocol::inline abi_v975 {
 
 void BiomeSurfaceMaterialData::write(BinaryStream& stream) const {
-    stream.writeSignedInt(mTopBlock);
-    stream.writeSignedInt(mMidBlock);
-    stream.writeSignedInt(mSeaFloorBlock);
-    stream.writeSignedInt(mFoundationBlock);
-    stream.writeSignedInt(mSeaBlock);
+    stream.writeUnsignedInt(mTopBlock);
+    stream.writeUnsignedInt(mMidBlock);
+    stream.writeUnsignedInt(mSeaFloorBlock);
+    stream.writeUnsignedInt(mFoundationBlock);
+    stream.writeUnsignedInt(mSeaBlock);
     stream.writeSignedInt(mSeaFloorDepth);
 }
 
 Result<> BiomeSurfaceMaterialData::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readSignedInt(mTopBlock));
-    _SCULK_READ(stream.readSignedInt(mMidBlock));
-    _SCULK_READ(stream.readSignedInt(mSeaFloorBlock));
-    _SCULK_READ(stream.readSignedInt(mFoundationBlock));
-    _SCULK_READ(stream.readSignedInt(mSeaBlock));
+    _SCULK_READ(stream.readUnsignedInt(mTopBlock));
+    _SCULK_READ(stream.readUnsignedInt(mMidBlock));
+    _SCULK_READ(stream.readUnsignedInt(mSeaFloorBlock));
+    _SCULK_READ(stream.readUnsignedInt(mFoundationBlock));
+    _SCULK_READ(stream.readUnsignedInt(mSeaBlock));
     return stream.readSignedInt(mSeaFloorDepth);
 }
 

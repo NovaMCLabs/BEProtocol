@@ -11,22 +11,22 @@ namespace sculk::protocol::inline abi_v975 {
 
 void BiomeCoordinateData::write(BinaryStream& stream) const {
     stream.writeVarInt(mMinValueType);
-    stream.writeSignedShort(mMinValue);
+    stream.writeUnsignedShort(mMinValue);
     stream.writeVarInt(mMaxValueType);
-    stream.writeSignedShort(mMaxValue);
+    stream.writeUnsignedShort(mMaxValue);
     stream.writeUnsignedInt(mGridOffset);
     stream.writeUnsignedInt(mGridStepSize);
-    stream.writeVarInt(mDistribution);
+    stream.writeEnum(mDistributionType, &BinaryStream::writeVarInt);
 }
 
 Result<> BiomeCoordinateData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt(mMinValueType));
-    _SCULK_READ(stream.readSignedShort(mMinValue));
+    _SCULK_READ(stream.readUnsignedShort(mMinValue));
     _SCULK_READ(stream.readVarInt(mMaxValueType));
-    _SCULK_READ(stream.readSignedShort(mMaxValue));
+    _SCULK_READ(stream.readUnsignedShort(mMaxValue));
     _SCULK_READ(stream.readUnsignedInt(mGridOffset));
     _SCULK_READ(stream.readUnsignedInt(mGridStepSize));
-    return stream.readVarInt(mDistribution);
+    return stream.readEnum(mDistributionType, &ReadOnlyBinaryStream::readVarInt);
 }
 
 } // namespace sculk::protocol::inline abi_v975

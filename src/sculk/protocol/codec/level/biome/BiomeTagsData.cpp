@@ -9,10 +9,10 @@
 
 namespace sculk::protocol::inline abi_v975 {
 
-void BiomeTagsData::write(BinaryStream& stream) const { stream.writeArray(mTags, &BinaryStream::writeSignedShort); }
+void BiomeTagsData::write(BinaryStream& stream) const { stream.writeArray(mTags, &BinaryStream::writeUnsignedShort); }
 
 Result<> BiomeTagsData::read(ReadOnlyBinaryStream& stream) {
-    return stream.readArray(mTags, &ReadOnlyBinaryStream::readSignedShort);
+    return stream.readArray(mTags, &ReadOnlyBinaryStream::readUnsignedShort);
 }
 
 } // namespace sculk::protocol::inline abi_v975

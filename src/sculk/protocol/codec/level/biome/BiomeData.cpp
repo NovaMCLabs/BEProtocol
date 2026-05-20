@@ -10,12 +10,12 @@
 namespace sculk::protocol::inline abi_v975 {
 
 void BiomeData::write(BinaryStream& stream) const {
-    stream.writeSignedShort(mStringIndexToBiomeName);
+    stream.writeUnsignedShort(mStringIndexToBiomeName);
     mBiomeDefinitionData.write(stream);
 }
 
 Result<> BiomeData::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readSignedShort(mStringIndexToBiomeName));
+    _SCULK_READ(stream.readUnsignedShort(mStringIndexToBiomeName));
     return mBiomeDefinitionData.read(stream);
 }
 

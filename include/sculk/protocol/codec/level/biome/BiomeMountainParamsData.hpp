@@ -12,12 +12,12 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeMountainParamsData {
-    std::int32_t mSteepBlock{};
-    bool         mNorthSlopes{};
-    bool         mSouthSlopes{};
-    bool         mWestSlopes{};
-    bool         mEastSlopes{};
-    bool         mTopSlideEnabled{};
+    std::uint32_t mSteepBlock{};
+    bool          mNorthSlopes{};
+    bool          mSouthSlopes{};
+    bool          mWestSlopes{};
+    bool          mEastSlopes{};
+    bool          mTopSlideEnabled{};
 
     void write(BinaryStream& stream) const;
 

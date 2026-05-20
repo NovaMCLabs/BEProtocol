@@ -13,11 +13,21 @@ namespace sculk::protocol::inline abi_v975 {
 class DimensionDataPacket : public IPacket {
 public:
     struct DimensionDefinition {
-        std::string  mName{};
-        std::int32_t mHeightMax{};
-        std::int32_t mHeightMin{};
-        std::int32_t mGeneratorType{};
-        std::int32_t mDimensionType{};
+        enum class GeneratorType : std::int32_t {
+            Legacy    = 0,
+            Overworld = 1,
+            Flat      = 2,
+            Nether    = 3,
+            TheEnd    = 4,
+            Void      = 5,
+            Undefined = 6,
+        };
+
+        std::string   mName{};
+        std::int32_t  mHeightMax{};
+        std::int32_t  mHeightMin{};
+        GeneratorType mGeneratorType{};
+        std::int32_t  mDimensionType{};
 
         void write(BinaryStream& stream) const;
 

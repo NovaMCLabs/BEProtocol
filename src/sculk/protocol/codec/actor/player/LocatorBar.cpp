@@ -24,7 +24,7 @@ void LocatorBarWaypointHandle::write(BinaryStream& stream) const { mUUID.write(s
 Result<> LocatorBarWaypointHandle::read(ReadOnlyBinaryStream& stream) { return mUUID.read(stream); }
 
 void LocatorBarServerWaypointPayload::write(BinaryStream& stream) const {
-    stream.writeUnsignedInt(mUpdateFlag);
+    stream.writeEnum(mUpdateFlag, &BinaryStream::writeUnsignedInt);
     stream.writeOptional(mIsVisible, &BinaryStream::writeBool);
     stream.writeOptional(mWorldPosition, &LocatorBarWorldPosition::write);
     stream.writeOptional(mTexturePath, &BinaryStream::writeString);
@@ -35,7 +35,7 @@ void LocatorBarServerWaypointPayload::write(BinaryStream& stream) const {
 }
 
 Result<> LocatorBarServerWaypointPayload::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readUnsignedInt(mUpdateFlag));
+    _SCULK_READ(stream.readEnum(mUpdateFlag, &ReadOnlyBinaryStream::readUnsignedInt));
     _SCULK_READ(stream.readOptional(mIsVisible, &ReadOnlyBinaryStream::readBool));
     _SCULK_READ(stream.readOptional(mWorldPosition, &LocatorBarWorldPosition::read));
     _SCULK_READ(stream.readOptional(mTexturePath, &ReadOnlyBinaryStream::readString));

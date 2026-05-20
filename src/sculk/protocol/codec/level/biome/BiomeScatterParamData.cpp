@@ -11,24 +11,24 @@ namespace sculk::protocol::inline abi_v975 {
 
 void BiomeScatterParamData::write(BinaryStream& stream) const {
     stream.writeArray(mCoordinate, &BiomeCoordinateData::write);
-    stream.writeVarInt(mEvalOrder);
+    stream.writeEnum(mEvalOrder, &BinaryStream::writeVarInt);
     stream.writeVarInt(mChancePercentType);
-    stream.writeSignedShort(mChancePercent);
+    stream.writeUnsignedShort(mChancePercent);
     stream.writeSignedInt(mChanceNumeartor);
     stream.writeSignedInt(mChanceDenominator);
     stream.writeVarInt(mIterationsType);
-    stream.writeSignedShort(mIterations);
+    stream.writeUnsignedShort(mIterations);
 }
 
 Result<> BiomeScatterParamData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mCoordinate, &BiomeCoordinateData::read));
-    _SCULK_READ(stream.readVarInt(mEvalOrder));
+    _SCULK_READ(stream.readEnum(mEvalOrder, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readVarInt(mChancePercentType));
-    _SCULK_READ(stream.readSignedShort(mChancePercent));
+    _SCULK_READ(stream.readUnsignedShort(mChancePercent));
     _SCULK_READ(stream.readSignedInt(mChanceNumeartor));
     _SCULK_READ(stream.readSignedInt(mChanceDenominator));
     _SCULK_READ(stream.readVarInt(mIterationsType));
-    return stream.readSignedShort(mIterations);
+    return stream.readUnsignedShort(mIterations);
 }
 
 } // namespace sculk::protocol::inline abi_v975

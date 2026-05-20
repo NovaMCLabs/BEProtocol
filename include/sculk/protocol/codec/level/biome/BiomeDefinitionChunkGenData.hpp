@@ -24,22 +24,23 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeDefinitionChunkGenData {
+    enum class VillageType : std::uint8_t {
+        Desert  = 0,
+        Ice     = 1,
+        Savanna = 2,
+        Taiga   = 3,
+        Default = 4,
+    };
+
     std::optional<BiomeClimateData>                   mClimate{};
     std::optional<BiomeConsolidatedFeaturesData>      mConsolidatedFeatures{};
     std::optional<BiomeMountainParamsData>            mMountainParams{};
     std::optional<BiomeSurfaceMaterialAdjustmentData> mSurfaceMaterialAdjustments{};
-    std::optional<BiomeSurfaceMaterialData>           mSurfaceMaterials{};
-    bool                                              mHasDefaultOverworldSurface{};
-    bool                                              mHasSwampSurface{};
-    bool                                              mHasFrozenOceanSurface{};
-    bool                                              mHasTheEndSurface{};
-    std::optional<BiomeMesaSurfaceData>               mMesaSurface{};
-    std::optional<BiomeCappedSurfaceData>             mCappedSurface{};
     std::optional<BiomeOverworldGenRulesData>         mOverworldGenRules{};
     std::optional<BiomeMultinoiseGenRulesData>        mMultinoiseGenRules{};
     std::optional<BiomeLegacyWorldGenRulesData>       mLegacyWorldGenRules{};
     std::optional<BiomeReplacementData>               mBiomeReplacementData{};
-    std::optional<std::uint8_t>                       mVillageType{};
+    std::optional<VillageType>                        mVillageType{};
     std::optional<BiomeSurfaceBuilderData>            mSurfaceBuilderData{};
     std::optional<BiomeSurfaceBuilderData>            mSubSurfaceBuilderData{};
 

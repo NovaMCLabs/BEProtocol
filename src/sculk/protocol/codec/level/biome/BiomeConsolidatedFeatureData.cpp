@@ -11,17 +11,17 @@ namespace sculk::protocol::inline abi_v975 {
 
 void BiomeConsolidatedFeatureData::write(BinaryStream& stream) const {
     mScatter.write(stream);
-    stream.writeSignedShort(mFeature);
-    stream.writeSignedShort(mIdentifier);
-    stream.writeSignedShort(mPass);
+    stream.writeUnsignedShort(mFeature);
+    stream.writeUnsignedShort(mIdentifier);
+    stream.writeUnsignedShort(mPass);
     stream.writeBool(mCanUseInternal);
 }
 
 Result<> BiomeConsolidatedFeatureData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mScatter.read(stream));
-    _SCULK_READ(stream.readSignedShort(mFeature));
-    _SCULK_READ(stream.readSignedShort(mIdentifier));
-    _SCULK_READ(stream.readSignedShort(mPass));
+    _SCULK_READ(stream.readUnsignedShort(mFeature));
+    _SCULK_READ(stream.readUnsignedShort(mIdentifier));
+    _SCULK_READ(stream.readUnsignedShort(mPass));
     return stream.readBool(mCanUseInternal);
 }
 

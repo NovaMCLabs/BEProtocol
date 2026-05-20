@@ -12,7 +12,7 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeTagsData {
-    std::vector<std::int16_t> mTags{};
+    std::vector<std::uint16_t> mTags{};
 
     void write(BinaryStream& stream) const;
 

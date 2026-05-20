@@ -13,7 +13,7 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeData {
-    std::int16_t        mStringIndexToBiomeName{};
+    std::uint16_t       mStringIndexToBiomeName{};
     BiomeDefinitionData mBiomeDefinitionData{};
 
     void write(BinaryStream& stream) const;

@@ -14,9 +14,9 @@ namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeConsolidatedFeatureData {
     BiomeScatterParamData mScatter{};
-    std::int16_t          mFeature{};
-    std::int16_t          mIdentifier{};
-    std::int16_t          mPass{};
+    std::uint16_t         mFeature{};
+    std::uint16_t         mIdentifier{};
+    std::uint16_t         mPass{};
     bool                  mCanUseInternal{};
 
     void write(BinaryStream& stream) const;

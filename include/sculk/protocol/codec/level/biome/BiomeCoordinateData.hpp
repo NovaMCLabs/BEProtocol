@@ -12,13 +12,23 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeCoordinateData {
-    std::int32_t  mMinValueType{};
-    std::int16_t  mMinValue{};
-    std::int32_t  mMaxValueType{};
-    std::int16_t  mMaxValue{};
-    std::uint32_t mGridOffset{};
-    std::uint32_t mGridStepSize{};
-    std::int32_t  mDistribution{};
+    enum class RandomDistributionType : std::int32_t {
+        SingleValued    = 0,
+        Uniform         = 1,
+        Gaussian        = 2,
+        InverseGaussian = 3,
+        FixedGrid       = 4,
+        JitteredGrid    = 5,
+        Triangle        = 6
+    };
+
+    std::int32_t           mMinValueType{};
+    std::uint16_t          mMinValue{};
+    std::int32_t           mMaxValueType{};
+    std::uint16_t          mMaxValue{};
+    std::uint32_t          mGridOffset{};
+    std::uint32_t          mGridStepSize{};
+    RandomDistributionType mDistributionType{};
 
     void write(BinaryStream& stream) const;
 

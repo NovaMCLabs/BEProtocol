@@ -12,12 +12,12 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeSurfaceMaterialData {
-    std::int32_t mTopBlock{};
-    std::int32_t mMidBlock{};
-    std::int32_t mSeaFloorBlock{};
-    std::int32_t mFoundationBlock{};
-    std::int32_t mSeaBlock{};
-    std::int32_t mSeaFloorDepth{};
+    std::uint32_t mTopBlock{};
+    std::uint32_t mMidBlock{};
+    std::uint32_t mSeaFloorBlock{};
+    std::uint32_t mFoundationBlock{};
+    std::uint32_t mSeaBlock{};
+    std::int32_t  mSeaFloorDepth{};
 
     void write(BinaryStream& stream) const;
 

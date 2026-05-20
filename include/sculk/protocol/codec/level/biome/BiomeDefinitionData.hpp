@@ -14,7 +14,7 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct BiomeDefinitionData {
-    std::int16_t                               mBiomeId{};
+    std::uint16_t                              mBiomeId{};
     float                                      mTemperature{};
     float                                      mDownfall{};
     float                                      mFoliageSnow{};

@@ -10,7 +10,7 @@
 namespace sculk::protocol::inline abi_v975 {
 
 void BiomeMountainParamsData::write(BinaryStream& stream) const {
-    stream.writeSignedInt(mSteepBlock);
+    stream.writeUnsignedInt(mSteepBlock);
     stream.writeBool(mNorthSlopes);
     stream.writeBool(mSouthSlopes);
     stream.writeBool(mWestSlopes);
@@ -19,7 +19,7 @@ void BiomeMountainParamsData::write(BinaryStream& stream) const {
 }
 
 Result<> BiomeMountainParamsData::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readSignedInt(mSteepBlock));
+    _SCULK_READ(stream.readUnsignedInt(mSteepBlock));
     _SCULK_READ(stream.readBool(mNorthSlopes));
     _SCULK_READ(stream.readBool(mSouthSlopes));
     _SCULK_READ(stream.readBool(mWestSlopes));

@@ -40,7 +40,17 @@ struct LocatorBarWaypointHandle {
 };
 
 struct LocatorBarServerWaypointPayload {
-    std::uint32_t                          mUpdateFlag{};
+    enum class UpdateFlags : std::uint32_t {
+        Position                = 1u << 0,
+        Visibility              = 1u << 1,
+        TexturePath             = 1u << 2,
+        IconSize                = 1u << 3,
+        Color                   = 1u << 4,
+        ClientPositionAuthority = 1u << 5,
+        All                     = Position | Visibility | TexturePath | Color | ClientPositionAuthority | IconSize,
+    };
+
+    UpdateFlags                            mUpdateFlag{};
     std::optional<bool>                    mIsVisible{};
     std::optional<LocatorBarWorldPosition> mWorldPosition{};
     std::optional<std::string>             mTexturePath{};
