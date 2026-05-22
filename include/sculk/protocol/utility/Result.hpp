@@ -9,7 +9,7 @@
 #include <expected>
 #include <string_view>
 
-#ifdef SCULK_PROTOCOL_DETAIL_ERROR
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
 #include <format>
 #include <source_location>
 #include <string>
@@ -17,7 +17,7 @@
 
 namespace sculk::protocol::inline abi_v975 {
 
-#ifdef SCULK_PROTOCOL_DETAIL_ERROR
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
 #define _SCULK_SL_PARAM_DEFAULT , std::source_location location = std::source_location::current()
 #define _SCULK_SL_PARAMETER_DEF , std::source_location location
 #define _SCULK_SL_PARAM_PASS    , location
@@ -30,14 +30,14 @@ namespace sculk::protocol::inline abi_v975 {
 #endif
 
 struct ErrorInfo {
-#ifdef SCULK_PROTOCOL_DETAIL_ERROR
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
     std::source_location mLocation{};
     std::string          mMessage{};
 #else
     std::string_view mMessage{};
 #endif
 
-#ifdef SCULK_PROTOCOL_DETAIL_ERROR
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
     [[nodiscard]] constexpr ErrorInfo(std::string_view message, std::source_location location)
     : mMessage(message),
       mLocation(location) {}
@@ -64,7 +64,7 @@ using Result = std::expected<T, ErrorInfo>;
 
 namespace error_utils {
 
-#ifdef SCULK_PROTOCOL_DETAIL_ERROR
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
 [[nodiscard]] constexpr std::unexpected<ErrorInfo>
 makeError(std::string_view error, std::source_location location = std::source_location::current()) {
     return std::unexpected(ErrorInfo(error, location));
