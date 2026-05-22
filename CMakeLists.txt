@@ -8,16 +8,6 @@ include(FetchContent)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
-set(OPENSSL_USE_STATIC_LIBS ON)
-find_package(OpenSSL REQUIRED)
-
-FetchContent_Declare(
-    reflection
-    GIT_REPOSITORY https://github.com/SculkCatalystMC/Reflection.git
-    GIT_TAG main
-)
-FetchContent_MakeAvailable(reflection)
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -25,7 +15,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(PROTOCOL_ENABLE_DETAIL_ERROR "Enable detailed error information" OFF)
 option(PROTOCOL_DISABLE_CODEC "Disable codec features" OFF)
 option(PROTOCOL_DISABLE_AUTHENTICATION "Disable authentication features" OFF)
-option(PROTOCOL_DISABLE_CONNECTION "Disable connection features" OFF)
+option(PROTOCOL_DISABLE_CONNECTION "Disable connection features" ON)
 
 if(NOT PROTOCOL_DISABLE_CONNECTION AND PROTOCOL_DISABLE_CODEC)
     message(FATAL_ERROR
@@ -62,12 +52,35 @@ if(NOT PROTOCOL_DISABLE_CONNECTION)
 endif()
 
 add_library(Protocol STATIC)
+add_library(Protocol::Protocol ALIAS Protocol)
+
+if(NOT PROTOCOL_DISABLE_AUTHENTICATION OR NOT PROTOCOL_DISABLE_CONNECTION)
+    set(OPENSSL_USE_STATIC_LIBS ON)
+    find_package(OpenSSL 3 REQUIRED)
+    target_link_libraries(Protocol PRIVATE OpenSSL::Crypto)
+
+    FetchContent_Declare(
+        reflection
+        GIT_REPOSITORY https://github.com/SculkCatalystMC/Reflection.git
+        GIT_TAG main
+    )
+    FetchContent_MakeAvailable(reflection)
+    target_link_libraries(Protocol PRIVATE $<BUILD_INTERFACE:reflection::reflection>)
+else()
+    if(NOT PROTOCOL_DISABLE_CODEC)
+        FetchContent_Declare(
+            magic_enum
+            GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+            GIT_TAG v0.9.7
+        )
+        FetchContent_MakeAvailable(magic_enum)
+        target_link_libraries(Protocol PRIVATE $<BUILD_INTERFACE:magic_enum::magic_enum>)
+    endif()
+endif()
 
 if(PROTOCOL_SOURCES)
     target_sources(Protocol PRIVATE ${PROTOCOL_SOURCES})
 endif()
-
-add_library(Protocol::Protocol ALIAS Protocol)
 
 set_target_properties(Protocol PROPERTIES
     POSITION_INDEPENDENT_CODE ON
@@ -75,7 +88,6 @@ set_target_properties(Protocol PROPERTIES
 )
 
 target_compile_features(Protocol PUBLIC cxx_std_23)
-target_link_libraries(Protocol PRIVATE reflection::reflection OpenSSL::Crypto)
 
 target_include_directories(Protocol PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

@@ -141,5 +141,4 @@ Result<ConnectionRequest> ConnectionRequest::create(
     };
 }
 
-
 } // namespace sculk::protocol::inline abi_v975
