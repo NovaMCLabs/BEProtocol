@@ -34,12 +34,19 @@ namespace sculk::protocol::inline abi_v975 {
     }                                                                                                                  \
     const auto& PART##Json = *PART##JsonOpt;
 
-#define SCULK_CERTIFICATE_DESERIALIZE(PART, FIELD)                                                                     \
+#define SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(PART, FIELD)                                                            \
     if (!PART##Json.contains(#FIELD)) {                                                                                \
         return error_utils::makeError("Certificate JSON does not contain a valid field '" #FIELD "'");                 \
     }                                                                                                                  \
     if (!reflection::jsonc::deserialize<false, false>(PART.FIELD, PART##Json[#FIELD], options)) {                      \
         return error_utils::makeError("Failed to deserialize certificate " #PART " field '" #FIELD "'");               \
+    }
+
+#define SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(PART, FIELD)                                                            \
+    if (PART##Json.contains(#FIELD)) {                                                                                 \
+        if (!reflection::jsonc::deserialize<false, false>(PART.FIELD, PART##Json[#FIELD], options)) {                  \
+            return error_utils::makeError("Failed to deserialize certificate " #PART " field '" #FIELD "'");           \
+        }                                                                                                              \
     }
 
 bool Certificate::verify(std::string_view publicKeyPem) const {
@@ -91,24 +98,24 @@ Result<Certificate> Certificate::fromString(std::string_view certificateStr) {
     auto   rawHeader = certificateStr.substr(0, first);
     Header header{};
     SCULK_CERTIFICATE_PARSE_JSON(header, rawHeader);
-    SCULK_CERTIFICATE_DESERIALIZE(header, alg);
+    SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(header, alg);
     if (header.alg != "ES384") {
         return error_utils::makeError("certificate signing algorithm must be ES384");
     }
-    SCULK_CERTIFICATE_DESERIALIZE(header, x5u);
-    SCULK_CERTIFICATE_DESERIALIZE(header, x5t);
+    SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(header, x5u);
+    SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(header, x5t);
 
     auto    rawPayload = certificateStr.substr(first + 1, last - first - 1);
     Payload payload{};
     SCULK_CERTIFICATE_PARSE_JSON(payload, rawPayload);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, nbf);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, exp);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, identityPublicKey);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, certificateAuthority);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, randomNonce);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, iss);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, iat);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, extraData);
+    SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(payload, nbf);
+    SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(payload, exp);
+    SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(payload, identityPublicKey);
+    SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(payload, certificateAuthority);
+    SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(payload, randomNonce);
+    SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(payload, iss);
+    SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(payload, iat);
+    SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(payload, extraData);
 
     auto signature = certificateStr.substr(last + 1);
 
