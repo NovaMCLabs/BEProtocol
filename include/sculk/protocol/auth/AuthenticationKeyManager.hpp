@@ -9,22 +9,26 @@
 #include "AuthenticationType.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <chrono>
+#include <optional>
 #include <string>
 
 namespace sculk::protocol::inline abi_v975 {
 
 class AuthenticationKeyManager {
-    AuthenticationType   mAuthenticationType{};
-    std::string          mLegacyCertificateChainPublicKeyPem{};
-    std::string          mLegacyCertificateChainPrivateKeyPem{};
-    std::chrono::seconds mValidityLeeway{60};
+    AuthenticationType                                   mAuthenticationType{};
+    std::string                                          mLegacyCertificateChainPublicKeyPem{};
+    std::string                                          mLegacyCertificateChainPrivateKeyPem{};
+    std::chrono::seconds                                 mValidityLeeway{60};
+    std::optional<std::chrono::system_clock::time_point> mValidityTime{};
 
 public:
     [[nodiscard]] constexpr AuthenticationType getAuthenticationType() const { return mAuthenticationType; }
 
     [[nodiscard]] constexpr std::chrono::seconds getValidityLeeway() const { return mValidityLeeway; }
 
-    std::chrono::system_clock::time_point getCurrentTime() const { return std::chrono::system_clock::now(); }
+    std::chrono::system_clock::time_point getValidityTime() const {
+        return mValidityTime.value_or(std::chrono::system_clock::now());
+    }
 
     [[nodiscard]] constexpr std::string_view getLegacyCertificateChainPublicKeyPem() const {
         return mLegacyCertificateChainPublicKeyPem;
@@ -38,6 +42,8 @@ public:
     constexpr void setAuthenticationType(AuthenticationType authType) { mAuthenticationType = authType; }
 
     constexpr void setValidityLeeway(std::chrono::seconds leeway) { mValidityLeeway = leeway; }
+
+    constexpr void setValidityTime(std::chrono::system_clock::time_point validityTime) { mValidityTime = validityTime; }
 
     constexpr void
     setLegacyCertificateChainPublicKeyPemPair(std::string_view publicKeyPem, std::string_view privateKeyPem) {

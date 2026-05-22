@@ -147,7 +147,7 @@ Result<> LegacyCertificateChain::verify(const AuthenticationKeyManager& authenti
     const bool hasClient = mClientCertificate.has_value();
     const bool hasMojang = mMojangCertificate.has_value();
 
-    auto now          = std::chrono::system_clock::now();
+    auto now          = authenticationKeyManager.getValidityTime();
     auto leeway       = authenticationKeyManager.getValidityLeeway();
     auto publicKeyPem = authenticationKeyManager.getLegacyCertificateChainPublicKeyPem();
 
@@ -267,7 +267,7 @@ Result<> LegacyCertificateChain::signSelfSigned(
 }
 
 Result<> LegacyCertificateChain::sign(const AuthenticationKeyManager& publicKeyManager) {
-    auto now      = publicKeyManager.getCurrentTime();
+    auto now      = publicKeyManager.getValidityTime();
     auto authType = publicKeyManager.getAuthenticationType();
     if (authType == AuthenticationType::Full) {
         return signFull(
