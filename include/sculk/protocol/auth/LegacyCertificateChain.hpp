@@ -34,7 +34,7 @@ public:
         std::int64_t                nbf{};
         std::int64_t                exp{};
         std::string                 identityPublicKey{};
-        std::optional<bool>         certficateAuthority{};
+        std::optional<bool>         certificateAuthority{};
         std::optional<std::int64_t> randomNonce{};
         std::optional<std::string>  iss{};
         std::optional<std::int64_t> iat{};
@@ -49,10 +49,7 @@ public:
     std::string mSignature{};
 
 public:
-    [[nodiscard]] bool checkTimeValidity(
-        std::chrono::system_clock::time_point now    = std::chrono::system_clock::now(),
-        std::chrono::seconds                  leeway = std::chrono::seconds(30)
-    ) const {
+    [[nodiscard]] bool checkTimeValidity(std::chrono::seconds leeway, std::chrono::system_clock::time_point now) const {
         auto nowSec = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
         if (mPayload.nbf > nowSec + leeway.count()) {
             return false;
@@ -74,13 +71,14 @@ public:
 
     [[nodiscard]] bool verify(std::string_view publicKeyPem) const;
 
-    [[nodiscard]] bool sign(std::string_view privateKeyPem);
+    [[nodiscard]] bool sign(std::string_view privateKeyPem, std::chrono::system_clock::time_point now);
 
 public:
     [[nodiscard]] static Result<Certificate> fromString(std::string_view certificateStr);
 };
 
 class LegacyCertificateChain {
+public:
     std::optional<Certificate> mClientCertificate{};
     std::optional<Certificate> mMojangCertificate{};
     Certificate                mLoginCertificate{};
@@ -102,7 +100,16 @@ public:
                                   : mLoginCertificate.mPayload.identityPublicKey;
     }
 
-    [[nodiscard]] bool verify(std::string_view publicKeyPem) const;
+    [[nodiscard]] Result<> verify(std::string_view publicKeyPem, std::chrono::seconds leeway) const;
+
+    [[nodiscard]] Result<>
+    signFull(std::string_view privateKeyPem, std::string_view publicKeyPem, std::chrono::system_clock::time_point now);
+
+    [[nodiscard]] Result<> signSelfSigned(
+        std::string_view                      privateKeyPem,
+        std::string_view                      publicKeyPem,
+        std::chrono::system_clock::time_point now
+    );
 
     [[nodiscard]] std::string toString() const;
 

@@ -12,6 +12,7 @@
 #include <memory>
 #include <openssl/bio.h>
 #include <openssl/core_names.h>
+#include <openssl/ec.h>
 #include <openssl/ecdsa.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -29,6 +30,43 @@ using PkeyPtr     = std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)>;
 using EcdsaSigPtr = std::unique_ptr<ECDSA_SIG, decltype(&ECDSA_SIG_free)>;
 using BignumPtr   = std::unique_ptr<BIGNUM, decltype(&BN_free)>;
 using MdCtxPtr    = std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)>;
+using PkeyCtxPtr  = std::unique_ptr<EVP_PKEY_CTX, decltype(&EVP_PKEY_CTX_free)>;
+
+[[nodiscard]] inline std::string_view trimPemContent(std::string_view pem) {
+    constexpr std::string_view whitespace = " \t\r\n";
+    auto                       begin      = pem.find_first_not_of(whitespace);
+    if (begin == std::string_view::npos) {
+        return {};
+    }
+    auto end = pem.find_last_not_of(whitespace);
+    return pem.substr(begin, end - begin + 1);
+}
+
+[[nodiscard]] inline std::string_view normalizePemForRead(std::string_view pem, bool isPrivate, std::string& ownedPem) {
+    auto trimmedPem = trimPemContent(pem);
+    if (trimmedPem.empty()) {
+        return {};
+    }
+
+    if (trimmedPem.find("-----BEGIN ") != std::string_view::npos) {
+        return trimmedPem;
+    }
+
+    ownedPem.clear();
+    if (isPrivate) {
+        ownedPem.reserve(trimmedPem.size() + 54);
+        ownedPem.append("-----BEGIN PRIVATE KEY-----\n");
+        ownedPem.append(trimmedPem);
+        ownedPem.append("\n-----END PRIVATE KEY-----\n");
+    } else {
+        ownedPem.reserve(trimmedPem.size() + 52);
+        ownedPem.append("-----BEGIN PUBLIC KEY-----\n");
+        ownedPem.append(trimmedPem);
+        ownedPem.append("\n-----END PUBLIC KEY-----\n");
+    }
+
+    return ownedPem;
+}
 
 [[nodiscard]] inline bool isEs384Key(const EVP_PKEY* key) {
     if (!key || EVP_PKEY_base_id(key) != EVP_PKEY_EC || EVP_PKEY_get_bits(key) != 384) {
@@ -54,8 +92,66 @@ using MdCtxPtr    = std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)>;
 
 [[nodiscard]] inline MdCtxPtr makeMdCtx() { return MdCtxPtr(EVP_MD_CTX_new(), EVP_MD_CTX_free); }
 
+[[nodiscard]] inline bool generateES384KeyPair(std::string& outPublicKeyPem, std::string& outPrivateKeyPem) {
+    outPublicKeyPem.clear();
+    outPrivateKeyPem.clear();
+
+    PkeyCtxPtr pkeyCtx(EVP_PKEY_CTX_new_id(EVP_PKEY_EC, nullptr), EVP_PKEY_CTX_free);
+    if (!pkeyCtx) {
+        return false;
+    }
+
+    if (EVP_PKEY_keygen_init(pkeyCtx.get()) != 1) {
+        return false;
+    }
+    if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pkeyCtx.get(), NID_secp384r1) != 1) {
+        return false;
+    }
+
+    EVP_PKEY* rawKey = nullptr;
+    if (EVP_PKEY_keygen(pkeyCtx.get(), &rawKey) != 1) {
+        return false;
+    }
+
+    PkeyPtr key(rawKey, EVP_PKEY_free);
+    if (!isEs384Key(key.get())) {
+        return false;
+    }
+
+    BioPtr publicBio(BIO_new(BIO_s_mem()), BIO_free);
+    BioPtr privateBio(BIO_new(BIO_s_mem()), BIO_free);
+    if (!publicBio || !privateBio) {
+        return false;
+    }
+
+    if (PEM_write_bio_PUBKEY(publicBio.get(), key.get()) != 1) {
+        return false;
+    }
+    if (PEM_write_bio_PrivateKey(privateBio.get(), key.get(), nullptr, nullptr, 0, nullptr, nullptr) != 1) {
+        return false;
+    }
+
+    char* publicData  = nullptr;
+    long  publicLen   = BIO_get_mem_data(publicBio.get(), &publicData);
+    char* privateData = nullptr;
+    long  privateLen  = BIO_get_mem_data(privateBio.get(), &privateData);
+    if (publicLen <= 0 || privateLen <= 0 || !publicData || !privateData) {
+        return false;
+    }
+
+    outPublicKeyPem.assign(publicData, static_cast<std::size_t>(publicLen));
+    outPrivateKeyPem.assign(privateData, static_cast<std::size_t>(privateLen));
+    return true;
+}
+
 [[nodiscard]] inline PkeyPtr loadPublicKey(std::string_view pem) {
-    BioPtr bio(BIO_new_mem_buf(pem.data(), static_cast<int>(pem.size())), BIO_free);
+    std::string      ownedPem{};
+    std::string_view normalizedPem = normalizePemForRead(pem, false, ownedPem);
+    if (normalizedPem.empty()) {
+        return PkeyPtr(nullptr, EVP_PKEY_free);
+    }
+
+    BioPtr bio(BIO_new_mem_buf(normalizedPem.data(), static_cast<int>(normalizedPem.size())), BIO_free);
     if (!bio) {
         return PkeyPtr(nullptr, EVP_PKEY_free);
     }
@@ -68,7 +164,13 @@ using MdCtxPtr    = std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)>;
 }
 
 [[nodiscard]] inline PkeyPtr loadPrivateKey(std::string_view pem) {
-    BioPtr bio(BIO_new_mem_buf(pem.data(), static_cast<int>(pem.size())), BIO_free);
+    std::string      ownedPem{};
+    std::string_view normalizedPem = normalizePemForRead(pem, true, ownedPem);
+    if (normalizedPem.empty()) {
+        return PkeyPtr(nullptr, EVP_PKEY_free);
+    }
+
+    BioPtr bio(BIO_new_mem_buf(normalizedPem.data(), static_cast<int>(normalizedPem.size())), BIO_free);
     if (!bio) {
         return PkeyPtr(nullptr, EVP_PKEY_free);
     }

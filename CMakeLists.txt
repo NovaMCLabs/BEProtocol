@@ -13,12 +13,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(PROTOCOL_ENABLE_DETAIL_ERRORS "Enable detailed error information" OFF)
-
-# Backward compatibility for old variable name.
-if(DEFINED PROTOCOL_ENABLE_DETAIL_ERROR AND NOT DEFINED PROTOCOL_ENABLE_DETAIL_ERRORS)
-    set(PROTOCOL_ENABLE_DETAIL_ERRORS ${PROTOCOL_ENABLE_DETAIL_ERROR})
-endif()
-
 option(PROTOCOL_DISABLE_CODEC "Disable codec features" OFF)
 option(PROTOCOL_DISABLE_AUTHENTICATION "Disable authentication features" OFF)
 option(PROTOCOL_DISABLE_CONNECTION "Disable connection features" ON)

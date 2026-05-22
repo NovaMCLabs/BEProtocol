@@ -47,7 +47,14 @@ bool Certificate::verify(std::string_view publicKeyPem) const {
     return es384::verifyES384Signature(signingInput, mSignature, publicKeyPem);
 }
 
-bool Certificate::sign(std::string_view privateKeyPem) {
+bool Certificate::sign(std::string_view privateKeyPem, std::chrono::system_clock::time_point now) {
+    mPayload.exp =
+        std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch() + std::chrono::hours(3)).count();
+    mPayload.nbf = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+    if (mPayload.iat.has_value()) {
+        mPayload.iat = mPayload.nbf;
+    }
+
     SCULK_CERTIFICATE_SERIALIZE_OPTION_INIT();
 
     SCULK_CERTIFICATE_CREATE_JSON(header, mHeader);
@@ -60,7 +67,7 @@ bool Certificate::sign(std::string_view privateKeyPem) {
     SCULK_CERTIFICATE_SERIALIZE(payload, nbf);
     SCULK_CERTIFICATE_SERIALIZE(payload, exp);
     SCULK_CERTIFICATE_SERIALIZE(payload, identityPublicKey);
-    SCULK_CERTIFICATE_SERIALIZE(payload, certficateAuthority);
+    SCULK_CERTIFICATE_SERIALIZE(payload, certificateAuthority);
     SCULK_CERTIFICATE_SERIALIZE(payload, randomNonce);
     SCULK_CERTIFICATE_SERIALIZE(payload, iss);
     SCULK_CERTIFICATE_SERIALIZE(payload, iat);
@@ -97,7 +104,7 @@ Result<Certificate> Certificate::fromString(std::string_view certificateStr) {
     SCULK_CERTIFICATE_DESERIALIZE(payload, nbf);
     SCULK_CERTIFICATE_DESERIALIZE(payload, exp);
     SCULK_CERTIFICATE_DESERIALIZE(payload, identityPublicKey);
-    SCULK_CERTIFICATE_DESERIALIZE(payload, certficateAuthority);
+    SCULK_CERTIFICATE_DESERIALIZE(payload, certificateAuthority);
     SCULK_CERTIFICATE_DESERIALIZE(payload, randomNonce);
     SCULK_CERTIFICATE_DESERIALIZE(payload, iss);
     SCULK_CERTIFICATE_DESERIALIZE(payload, iat);
@@ -129,11 +136,142 @@ std::string LegacyCertificateChain::toString() const {
     return certChainJson.dump();
 }
 
-bool LegacyCertificateChain::verify(std::string_view publicKeyPem) const {
-    (void)publicKeyPem;
-    // TODO: Implement actual verification logic
-    return true;
+Result<> LegacyCertificateChain::verify(std::string_view publicKeyPem, std::chrono::seconds leeway) const {
+    const bool hasClient = mClientCertificate.has_value();
+    const bool hasMojang = mMojangCertificate.has_value();
+    auto       now       = std::chrono::system_clock::now();
+
+    if (hasClient && hasMojang) {
+        const auto& clientCert = *mClientCertificate;
+        const auto& mojangCert = *mMojangCertificate;
+        const auto& loginCert  = mLoginCertificate;
+
+        if (clientCert.mHeader.x5u != loginCert.mPayload.identityPublicKey) {
+            return error_utils::makeError("Client certificate does not match login certificate");
+        }
+        if (!clientCert.checkTimeValidity(leeway, now)) {
+            return error_utils::makeError("Client certificate time validity check failed");
+        }
+        if (!clientCert.verify(clientCert.mHeader.x5u)) {
+            return error_utils::makeError("Client certificate signature verification failed");
+        }
+
+        if (mojangCert.mHeader.x5u != clientCert.mPayload.identityPublicKey) {
+            return error_utils::makeError("Mojang certificate does not match client certificate");
+        }
+        if (mojangCert.mHeader.x5u != publicKeyPem) {
+            return error_utils::makeError("Mojang certificate does not match provided public key");
+        }
+        if (!mojangCert.checkTimeValidity(leeway, now)) {
+            return error_utils::makeError("Mojang certificate time validity check failed");
+        }
+        if (!mojangCert.checkIssuer("Mojang")) {
+            return error_utils::makeError("Mojang certificate issuer check failed");
+        }
+        if (!mojangCert.verify(publicKeyPem)) {
+            return error_utils::makeError("Mojang certificate signature verification failed");
+        }
+
+        if (loginCert.mHeader.x5u != mojangCert.mPayload.identityPublicKey) {
+            return error_utils::makeError("Login certificate does not match mojang certificate");
+        }
+        if (!loginCert.checkTimeValidity(leeway, now)) {
+            return error_utils::makeError("Login certificate time validity check failed");
+        }
+        if (!loginCert.checkIssuer("Mojang")) {
+            return error_utils::makeError("Login certificate issuer check failed");
+        }
+        if (!loginCert.verify(loginCert.mHeader.x5u)) {
+            return error_utils::makeError("Login certificate signature verification failed");
+        }
+    } else if (!hasClient && !hasMojang) {
+        const auto& loginCert = mLoginCertificate;
+
+        if (!loginCert.checkTimeValidity(leeway, now)) {
+            return error_utils::makeError("Login certificate time validity check failed");
+        }
+        if (!loginCert.verify(loginCert.mHeader.x5u)) {
+            return error_utils::makeError("Login certificate signature verification failed");
+        }
+    }
+
+    return {};
 }
+
+Result<> LegacyCertificateChain::signFull(
+    std::string_view                      privateKeyPem,
+    std::string_view                      publicKeyPem,
+    std::chrono::system_clock::time_point now
+) {
+    if (!mClientCertificate.has_value() || !mMojangCertificate.has_value()) {
+        return error_utils::makeError("Missing client or Mojang certificate");
+    }
+
+    std::string publicKey1{};
+    std::string privateKey1{};
+    std::string publicKey3{};
+    std::string privateKey3{};
+    es384::generateES384KeyPair(publicKey1, privateKey1);
+    es384::generateES384KeyPair(publicKey3, privateKey3);
+
+    mClientCertificate->mHeader.x5u                = publicKey1;
+    mClientCertificate->mPayload.identityPublicKey = publicKey3;
+    if (!mClientCertificate->sign(privateKey1, now)) {
+        return error_utils::makeError("Failed to sign client certificate");
+    }
+
+    mMojangCertificate->mHeader.x5u                = publicKeyPem;
+    mMojangCertificate->mPayload.identityPublicKey = publicKey1;
+    if (!mMojangCertificate->sign(privateKeyPem, now)) {
+        return error_utils::makeError("Failed to sign Mojang certificate");
+    }
+
+    mLoginCertificate.mHeader.x5u                = publicKey3;
+    mLoginCertificate.mPayload.identityPublicKey = publicKeyPem;
+    if (!mLoginCertificate.sign(privateKey3, now)) {
+        return error_utils::makeError("Failed to sign login certificate");
+    }
+
+    return {};
+}
+
+Result<> LegacyCertificateChain::signSelfSigned(
+    std::string_view                      privateKeyPem,
+    std::string_view                      publicKeyPem,
+    std::chrono::system_clock::time_point now
+) {
+    mClientCertificate.reset();
+    mMojangCertificate.reset();
+
+    mLoginCertificate.mHeader.x5u                = publicKeyPem;
+    mLoginCertificate.mPayload.identityPublicKey = publicKeyPem;
+    if (!mLoginCertificate.sign(privateKeyPem, now)) {
+        return error_utils::makeError("Failed to sign login certificate");
+    }
+
+    return {};
+}
+
+#define SCULK_CERTIFICATE_PARSE(PART, INDEX)                                                                           \
+    if (!certJson["chain"][INDEX].is_string()) {                                                                       \
+        return error_utils::makeError("Certificate JSON 'chain' field must be an array of strings");                   \
+    }                                                                                                                  \
+    auto PART##CertStr = certJson["chain"][INDEX].get<std::string>();                                                  \
+    auto PART##CertOpt = Certificate::fromString(PART##CertStr);                                                       \
+    if (!PART##CertOpt) {                                                                                              \
+        return error_utils::makeError("Failed to parse " #PART " certificate");                                        \
+    }                                                                                                                  \
+    auto PART##Cert = *PART##CertOpt;
+
+#define SCULK_CERTIFICATE_CHECK_HEADER(PART, FIELD)                                                                    \
+    if (!PART##Cert.mHeader.FIELD.has_value()) {                                                                       \
+        return error_utils::makeError(#PART " certificate does not contain a valid '" #FIELD "' header field");        \
+    }
+
+#define SCULK_CERTIFICATE_CHECK_PAYLOAD(PART, FIELD)                                                                   \
+    if (!PART##Cert.mPayload.FIELD.has_value()) {                                                                      \
+        return error_utils::makeError(#PART " certificate does not contain a valid '" #FIELD "' payload field");       \
+    }
 
 Result<LegacyCertificateChain> LegacyCertificateChain::fromString(std::string_view certificateChainJsonStr) {
     auto certJsonOpt = jsonc::json::parse(certificateChainJsonStr);
@@ -148,16 +286,34 @@ Result<LegacyCertificateChain> LegacyCertificateChain::fromString(std::string_vi
 
     std::size_t certCount = certJson["chain"].size();
     if (certCount == 1) {
-        // TODO: offline mode, only login certificate is present
+        SCULK_CERTIFICATE_PARSE(login, 0);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, extraData);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, randomNonce);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, iss);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, iat);
+        return LegacyCertificateChain{.mLoginCertificate = std::move(*loginCertOpt)};
     } else if (certCount == 3) {
-        // TODO: online mode, client and login certificates are present
-    } else {
-        return error_utils::makeError("Certificate JSON 'chain' field must contain either 1 or 3 certificates");
+        SCULK_CERTIFICATE_PARSE(client, 0);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(client, certificateAuthority);
+        SCULK_CERTIFICATE_PARSE(mojang, 1);
+        SCULK_CERTIFICATE_CHECK_HEADER(mojang, x5t);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(mojang, certificateAuthority);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(mojang, randomNonce);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(mojang, iss);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(mojang, iat);
+        SCULK_CERTIFICATE_PARSE(login, 2);
+        SCULK_CERTIFICATE_CHECK_HEADER(login, x5t);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, extraData);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, randomNonce);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, iss);
+        SCULK_CERTIFICATE_CHECK_PAYLOAD(login, iat);
+        return LegacyCertificateChain{
+            .mClientCertificate = std::move(*clientCertOpt),
+            .mMojangCertificate = std::move(*mojangCertOpt),
+            .mLoginCertificate  = std::move(*loginCertOpt)
+        };
     }
-
-    // TODO: Implement actual parsing logic to populate the LegacyCertificateChain object based on the JSON structure
-
-    return LegacyCertificateChain{};
+    return error_utils::makeError("Certificate JSON 'chain' field must contain either 1 or 3 certificates");
 }
 
 } // namespace sculk::protocol::inline abi_v975
