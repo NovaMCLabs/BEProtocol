@@ -69,9 +69,9 @@ Result<> AuthenticationKeyManager::generateAndSetLegacySelfSignedCertificateChai
 }
 
 Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking() {
-    mAuthenticationType                 = AuthenticationType::Full;
-    mLegacyCertificateChainPublicKeyPem = MOJANG_PUBLIC_KEY_PEM;
-    mValidityLeeway                     = std::chrono::seconds(60);
+    mAuthenticationType = AuthenticationType::Full;
+    mLegacyCertificateChainPublicKeyPems.emplace_back(MOJANG_PUBLIC_KEY_PEM);
+    mValidityLeeway = std::chrono::seconds(60);
     // TODO: RS256 token
     return {};
 }

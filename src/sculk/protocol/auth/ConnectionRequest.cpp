@@ -29,8 +29,10 @@ namespace sculk::protocol::inline abi_v975 {
 
 Result<> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     if (mLoginToken) {
-        // TODO: Implement login token verification logic
-        return {};
+        if (!mLoginToken->verify(authenticationKeyManager)) {
+            return error_utils::makeError("Login token verification failed");
+        }
+        return mClientProperties.verify(mLoginToken->getClientPublicKey());
     }
 
     if (mLegacyCertificateChain) {
@@ -44,26 +46,26 @@ Result<> ConnectionRequest::verify(const AuthenticationKeyManager& authenticatio
 }
 
 Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationKeyManager) {
-    bool success{false};
+    if (!mLoginToken && !mLegacyCertificateChain) {
+        return error_utils::makeError(
+            "ConnectionRequest must have either a login token or a legacy certificate chain to sign"
+        );
+    }
 
-    if (mLoginToken) {
-        // TODO: Implement login token signing logic
+    if (mLoginToken) { // TODO: check if login token signing is supported with the given authentication type
+        if (!mLoginToken->sign(authenticationKeyManager)) {
+            return error_utils::makeError("Login token signing failed");
+        }
     }
 
     if (mLegacyCertificateChain
         && authenticationKeyManager.legacyCertificateChainSigningInitialized(mAuthenticationType)) {
-        if (mLegacyCertificateChain->sign(authenticationKeyManager)) {
-            success = true;
+        if (!mLegacyCertificateChain->sign(authenticationKeyManager)) {
+            return error_utils::makeError("Legacy certificate chain signing failed");
         }
     }
 
-    if (success) {
-        return {};
-    }
-
-    return error_utils::makeError(
-        "ConnectionRequest must have either a login token or a legacy certificate chain to sign"
-    );
+    return {};
 }
 
 std::string ConnectionRequest::toString() const {

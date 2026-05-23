@@ -87,7 +87,7 @@ public:
 public:
     [[nodiscard]] std::string_view getIdentity() const { return mLoginCertificate.mPayload.extraData->identity; }
 
-    [[nodiscard]] std::string_view getDisplayName() const { return mLoginCertificate.mPayload.extraData->displayName; }
+    [[nodiscard]] std::string_view getXboxName() const { return mLoginCertificate.mPayload.extraData->displayName; }
 
     [[nodiscard]] std::string_view getXUID() const { return mLoginCertificate.mPayload.extraData->XUID; }
 

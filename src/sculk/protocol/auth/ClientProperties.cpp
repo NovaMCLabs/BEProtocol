@@ -28,9 +28,8 @@ constexpr std::string_view removeLeadingCharacter(std::string_view key) {
 
 #define SCULK_CLIENT_PROPERTIES_SERIALIZE(PART, FIELD)                                                                 \
     auto FIELD = reflection::jsonc::serialize<false, false>(PART.FIELD, removeLeadingCharacter, options);              \
-    if (!FIELD.is_null()) {                                                                                            \
-        PART##Json[removeLeadingCharacter(#FIELD)] = FIELD;                                                            \
-    }
+    PART##Json[removeLeadingCharacter(#FIELD)] = FIELD;
+
 
 #define SCULK_CLIENT_PROPERTIES_PARSE_JSON(PART, RAW)                                                                  \
     auto PART##JsonStr = base64url::decodeChecked(RAW);                                                                \
@@ -45,7 +44,7 @@ constexpr std::string_view removeLeadingCharacter(std::string_view key) {
 
 #define SCULK_CLIENT_PROPERTIES_DESERIALIZE_REQUIRED(PART, FIELD)                                                      \
     if (!PART##Json.contains(removeLeadingCharacter(#FIELD))) {                                                        \
-        return error_utils::makeError("Client properties JSON does not contain a valid field '" #FIELD "'");           \
+        return error_utils::makeError("Client properties " #PART " JSON does not contain a valid field '" #FIELD "'"); \
     }                                                                                                                  \
     if (!reflection::jsonc::deserialize<false, false>(                                                                 \
             PART.FIELD,                                                                                                \
@@ -160,7 +159,6 @@ Result<ClientProperties> ClientProperties::fromString(std::string_view rawClient
 
     auto   rawHeader = rawClientProperties.substr(0, first);
     Header header{};
-
     SCULK_CLIENT_PROPERTIES_PARSE_JSON(header, rawHeader);
     SCULK_CLIENT_PROPERTIES_DESERIALIZE_REQUIRED(header, alg);
     if (header.alg != "ES384") {
