@@ -29,7 +29,7 @@ public:
         std::optional<std::int64_t> iat{};
         std::string                 mid{};
         std::optional<std::string>  tid{};
-        std::optional<std::string>  pfcd{};
+        std::optional<std::int64_t> pfcd{};
         std::string                 cpk{};
         int                         ap{};
         std::string                 xid{};
