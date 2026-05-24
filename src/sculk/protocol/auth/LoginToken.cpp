@@ -67,8 +67,8 @@ namespace sculk::protocol::inline abi_v975 {
         }                                                                                                              \
     }
 
-Result<> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
-    auto        authType     = authenticationKeyManager.getAuthenticationType();
+Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+    auto        authType     = authenticationKeyManager.getVerifyAuthenticationType();
     std::string signingInput = std::format("{}.{}", mRawHeader, mRawPayload);
 
     auto timeNow = authenticationKeyManager.getValidityTime();
@@ -82,7 +82,23 @@ Result<> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyMan
         return error_utils::makeError("Login token audience is invalid");
     }
 
-    if (authType == AuthenticationType::Full) {
+    if (authType == AuthenticationType::SelfSigned) {
+        if (mHeader.alg == "ES384") {
+            SCULK_LOGIN_TOKEN_CHECK_HEADER(x5u);
+            SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(leguuid);
+            SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(nid);
+            SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(nname);
+            SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(pid);
+            SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(pname);
+
+            if (!es384::verifyES384Signature(signingInput, mSignature, *mHeader.x5u)) {
+                return error_utils::makeError("Failed to verify login token signature");
+            }
+            return AuthenticationType::SelfSigned;
+        }
+    }
+
+    if (authType == AuthenticationType::Full || authType == AuthenticationType::SelfSigned) {
         if (mHeader.alg != "RS256") {
             return error_utils::makeError("Unsupported algorithm in login token header for full authentication");
         }
@@ -115,25 +131,9 @@ Result<> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyMan
         if (!rs256::verifyRS256Signature(signingInput, mSignature, *keyId)) {
             return error_utils::makeError("Failed to verify login token signature");
         }
-        return {};
-
-    } else if (authType == AuthenticationType::SelfSigned) {
-        if (mHeader.alg != "ES384") {
-            return error_utils::makeError("Unsupported algorithm in login token header for self-signed authentication");
-        }
-
-        SCULK_LOGIN_TOKEN_CHECK_HEADER(x5u);
-        SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(leguuid);
-        SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(nid);
-        SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(nname);
-        SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(pid);
-        SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(pname);
-
-        if (!es384::verifyES384Signature(signingInput, mSignature, *mHeader.x5u)) {
-            return error_utils::makeError("Failed to verify login token signature");
-        }
-        return {};
+        return AuthenticationType::Full;
     }
+
     return error_utils::makeError("Guest authentication does not support login token verification");
 }
 
@@ -215,7 +215,7 @@ Result<> LoginToken::signSelfSigned(const AuthenticationKeyManager& authenticati
 }
 
 Result<> LoginToken::sign(const AuthenticationKeyManager& authenticationKeyManager) {
-    auto authType = authenticationKeyManager.getAuthenticationType();
+    auto authType = authenticationKeyManager.getSigningAuthenticationType();
 
     auto now = authenticationKeyManager.getSigningTime();
     mPayload.exp =

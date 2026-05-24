@@ -25,7 +25,28 @@ public:
     ClientProperties                      mClientProperties{};
 
 public:
-    [[nodiscard]] Result<> verify(const AuthenticationKeyManager& publicKeyManager) const;
+    [[nodiscard]] std::string_view getXUID() const {
+        if (mLoginToken) {
+            return mLoginToken->getXUID();
+        }
+        if (mLegacyCertificateChain) {
+            return mLegacyCertificateChain->getXUID();
+        }
+        return {};
+    }
+
+    [[nodiscard]] std::string_view getXboxName() const {
+        if (mLoginToken) {
+            return mLoginToken->getXboxName();
+        }
+        if (mLegacyCertificateChain) {
+            return mLegacyCertificateChain->getXboxName();
+        }
+        return {};
+    }
+
+public:
+    [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& publicKeyManager) const;
 
     [[nodiscard]] Result<> sign(const AuthenticationKeyManager& authenticationKeyManager);
 

@@ -6,10 +6,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include <cstdint>
 
 namespace sculk::protocol::inline abi_v975 {
 
-enum class AuthenticationType : int {
+enum class AuthenticationType : std::int8_t {
     Full       = 0,
     Guest      = 1,
     SelfSigned = 2,

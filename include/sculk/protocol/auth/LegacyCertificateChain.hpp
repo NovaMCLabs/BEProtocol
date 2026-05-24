@@ -97,7 +97,7 @@ public:
                                   : mLoginCertificate.mPayload.identityPublicKey;
     }
 
-    [[nodiscard]] Result<> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
+    [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
 
     [[nodiscard]] Result<>
     signFull(const AuthenticationKeyManager& authenticationKeyManager, std::chrono::system_clock::time_point now);

@@ -24,7 +24,8 @@ public:
     };
 
 private:
-    AuthenticationType                                   mAuthenticationType{};
+    AuthenticationType                                   mVerifyAuthenticationType{};
+    AuthenticationType                                   mSigningAuthenticationType{};
     std::unordered_map<std::string, std::string>         mLoginTokenPublicKeysPemByKeyId{};
     std::optional<std::pair<std::string, KeyPair>>       mLoginTokenKeyPairsAndKeyId{};
     std::string                                          mLoginTokenExpectedIssuer{};
@@ -40,7 +41,7 @@ private:
 public:
     AuthenticationKeyManager() = default;
 
-    [[nodiscard]] constexpr AuthenticationType getAuthenticationType() const { return mAuthenticationType; }
+    [[nodiscard]] constexpr AuthenticationType getVerifyAuthenticationType() const { return mVerifyAuthenticationType; }
 
     [[nodiscard]] constexpr std::chrono::seconds getValidityLeeway() const { return mValidityLeeway; }
 
@@ -68,6 +69,10 @@ public:
     [[nodiscard]] Result<KeyPair> generateRandomRS256KeyPair() const;
 
 public:
+    [[nodiscard]] constexpr AuthenticationType getSigningAuthenticationType() const {
+        return mSigningAuthenticationType;
+    }
+
     [[nodiscard]] std::chrono::system_clock::time_point getSigningTime() const {
         return mSigningTime.value_or(std::chrono::system_clock::now());
     }
@@ -185,16 +190,18 @@ public:
 
 public:
     [[nodiscard]] Result<KeyPair> getClientPropertiesKeyPair() const {
-        if (mAuthenticationType == AuthenticationType::Full) {
+        if (mSigningAuthenticationType == AuthenticationType::Full) {
             return getLegacyCertificateChainClientKeyPair();
-        } else if (mAuthenticationType == AuthenticationType::SelfSigned) {
+        } else if (mSigningAuthenticationType == AuthenticationType::SelfSigned) {
             return getLegacyCertificateChainLoginKeyPair();
         }
         return error_utils::makeError("Unsupported authentication type for getting client properties key pair");
     }
 
 public:
-    constexpr void setAuthenticationType(AuthenticationType authType) { mAuthenticationType = authType; }
+    constexpr void setVerifyAuthenticationType(AuthenticationType authType) { mVerifyAuthenticationType = authType; }
+
+    constexpr void setSigningAuthenticationType(AuthenticationType authType) { mSigningAuthenticationType = authType; }
 
     constexpr void setValidityLeeway(std::chrono::seconds leeway) { mValidityLeeway = leeway; }
 

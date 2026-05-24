@@ -61,7 +61,7 @@ public:
     [[nodiscard]] std::string_view getXUID() const { return mPayload.xid; }
 
 public:
-    [[nodiscard]] Result<> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
+    [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
 
     [[nodiscard]] Result<> signFull(const AuthenticationKeyManager& authenticationKeyManager);
 

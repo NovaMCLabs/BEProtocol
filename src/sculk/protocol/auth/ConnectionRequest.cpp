@@ -27,19 +27,19 @@ struct serializer<sculk::protocol::AuthenticationType> {
 
 namespace sculk::protocol::inline abi_v975 {
 
-Result<> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+Result<AuthenticationType> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     if (mLoginToken) {
-        if (!mLoginToken->verify(authenticationKeyManager)) {
-            return error_utils::makeError("Login token verification failed");
+        if (!mClientProperties.verify(mLoginToken->getClientPublicKey())) {
+            return error_utils::makeError("Client properties verification failed");
         }
-        return mClientProperties.verify(mLoginToken->getClientPublicKey());
+        return mLoginToken->verify(authenticationKeyManager);
     }
 
     if (mLegacyCertificateChain) {
-        if (!mLegacyCertificateChain->verify(authenticationKeyManager)) {
-            return error_utils::makeError("Legacy certificate chain verification failed");
+        if (!mClientProperties.verify(mLegacyCertificateChain->getClientPublicKey())) {
+            return error_utils::makeError("Client properties verification failed");
         }
-        return mClientProperties.verify(mLegacyCertificateChain->getClientPublicKey());
+        return mLegacyCertificateChain->verify(authenticationKeyManager);
     }
 
     return error_utils::makeError("ConnectionRequest must have either a login token or a legacy certificate chain");

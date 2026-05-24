@@ -143,78 +143,88 @@ std::string LegacyCertificateChain::toString() const {
     return certChainJson.dump(-1);
 }
 
-Result<> LegacyCertificateChain::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+Result<AuthenticationType>
+LegacyCertificateChain::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     const bool hasClient = mClientCertificate.has_value();
     const bool hasMojang = mMojangCertificate.has_value();
 
     auto now           = authenticationKeyManager.getValidityTime();
     auto leeway        = authenticationKeyManager.getValidityLeeway();
     auto publicKeyPems = authenticationKeyManager.getLegacyCertificateChainPublicKeyPems();
+    auto authType      = authenticationKeyManager.getVerifyAuthenticationType();
 
-    if (hasClient && hasMojang) {
-        const auto& clientCert = *mClientCertificate;
-        const auto& mojangCert = *mMojangCertificate;
-        const auto& loginCert  = mLoginCertificate;
+    if (authType == AuthenticationType::SelfSigned) {
+        if (!hasClient && !hasMojang) {
+            const auto& loginCert = mLoginCertificate;
 
-        if (clientCert.mHeader.x5u != loginCert.mPayload.identityPublicKey) {
-            return error_utils::makeError("Client certificate does not match login certificate");
-        }
-        if (!clientCert.checkTimeValidity(leeway, now)) {
-            return error_utils::makeError("Client certificate time validity check failed");
-        }
-        if (!clientCert.verify(clientCert.mHeader.x5u)) {
-            return error_utils::makeError("Client certificate signature verification failed");
-        }
-
-        if (mojangCert.mHeader.x5u != clientCert.mPayload.identityPublicKey) {
-            return error_utils::makeError("Mojang certificate does not match client certificate");
-        }
-        bool        foundMatchingKey = false;
-        std::string mojangPublicKeyPem{};
-        for (const auto& publicKeyPem : publicKeyPems) {
-            if (mojangCert.mHeader.x5u == publicKeyPem) {
-                foundMatchingKey   = true;
-                mojangPublicKeyPem = publicKeyPem;
-                break;
+            if (!loginCert.checkTimeValidity(leeway, now)) {
+                return error_utils::makeError("Login certificate time validity check failed");
             }
-        }
-        if (!foundMatchingKey) {
-            return error_utils::makeError("Mojang certificate does not match any provided public key");
-        }
-        if (!mojangCert.checkTimeValidity(leeway, now)) {
-            return error_utils::makeError("Mojang certificate time validity check failed");
-        }
-        if (!mojangCert.checkIssuer("Mojang")) {
-            return error_utils::makeError("Mojang certificate issuer check failed");
-        }
-        if (!mojangCert.verify(mojangPublicKeyPem)) {
-            return error_utils::makeError("Mojang certificate signature verification failed");
-        }
-
-        if (loginCert.mHeader.x5u != mojangCert.mPayload.identityPublicKey) {
-            return error_utils::makeError("Login certificate does not match mojang certificate");
-        }
-        if (!loginCert.checkTimeValidity(leeway, now)) {
-            return error_utils::makeError("Login certificate time validity check failed");
-        }
-        if (!loginCert.checkIssuer("Mojang")) {
-            return error_utils::makeError("Login certificate issuer check failed");
-        }
-        if (!loginCert.verify(loginCert.mHeader.x5u)) {
-            return error_utils::makeError("Login certificate signature verification failed");
-        }
-    } else if (!hasClient && !hasMojang) {
-        const auto& loginCert = mLoginCertificate;
-
-        if (!loginCert.checkTimeValidity(leeway, now)) {
-            return error_utils::makeError("Login certificate time validity check failed");
-        }
-        if (!loginCert.verify(loginCert.mHeader.x5u)) {
-            return error_utils::makeError("Login certificate signature verification failed");
+            if (!loginCert.verify(loginCert.mHeader.x5u)) {
+                return error_utils::makeError("Login certificate signature verification failed");
+            }
+            return AuthenticationType::SelfSigned;
         }
     }
 
-    return {};
+    if (authType == AuthenticationType::Full || authType == AuthenticationType::SelfSigned) {
+        if (hasClient && hasMojang) {
+            const auto& clientCert = *mClientCertificate;
+            const auto& mojangCert = *mMojangCertificate;
+            const auto& loginCert  = mLoginCertificate;
+
+            if (clientCert.mHeader.x5u != loginCert.mPayload.identityPublicKey) {
+                return error_utils::makeError("Client certificate does not match login certificate");
+            }
+            if (!clientCert.checkTimeValidity(leeway, now)) {
+                return error_utils::makeError("Client certificate time validity check failed");
+            }
+            if (!clientCert.verify(clientCert.mHeader.x5u)) {
+                return error_utils::makeError("Client certificate signature verification failed");
+            }
+
+            if (mojangCert.mHeader.x5u != clientCert.mPayload.identityPublicKey) {
+                return error_utils::makeError("Mojang certificate does not match client certificate");
+            }
+            bool        foundMatchingKey = false;
+            std::string mojangPublicKeyPem{};
+            for (const auto& publicKeyPem : publicKeyPems) {
+                if (mojangCert.mHeader.x5u == publicKeyPem) {
+                    foundMatchingKey   = true;
+                    mojangPublicKeyPem = publicKeyPem;
+                    break;
+                }
+            }
+            if (!foundMatchingKey) {
+                return error_utils::makeError("Mojang certificate does not match any provided public key");
+            }
+            if (!mojangCert.checkTimeValidity(leeway, now)) {
+                return error_utils::makeError("Mojang certificate time validity check failed");
+            }
+            if (!mojangCert.checkIssuer("Mojang")) {
+                return error_utils::makeError("Mojang certificate issuer check failed");
+            }
+            if (!mojangCert.verify(mojangPublicKeyPem)) {
+                return error_utils::makeError("Mojang certificate signature verification failed");
+            }
+
+            if (loginCert.mHeader.x5u != mojangCert.mPayload.identityPublicKey) {
+                return error_utils::makeError("Login certificate does not match mojang certificate");
+            }
+            if (!loginCert.checkTimeValidity(leeway, now)) {
+                return error_utils::makeError("Login certificate time validity check failed");
+            }
+            if (!loginCert.checkIssuer("Mojang")) {
+                return error_utils::makeError("Login certificate issuer check failed");
+            }
+            if (!loginCert.verify(loginCert.mHeader.x5u)) {
+                return error_utils::makeError("Login certificate signature verification failed");
+            }
+            return AuthenticationType::Full;
+        }
+    }
+
+    return error_utils::makeError("Invalid certificate chain format for the current authentication type");
 }
 
 Result<> LegacyCertificateChain::signFull(
@@ -282,7 +292,7 @@ Result<> LegacyCertificateChain::signSelfSigned(
 
 Result<> LegacyCertificateChain::sign(const AuthenticationKeyManager& publicKeyManager) {
     auto now      = publicKeyManager.getSigningTime();
-    auto authType = publicKeyManager.getAuthenticationType();
+    auto authType = publicKeyManager.getSigningAuthenticationType();
     if (authType == AuthenticationType::Full) {
         return signFull(publicKeyManager, now);
     } else if (authType == AuthenticationType::SelfSigned) {

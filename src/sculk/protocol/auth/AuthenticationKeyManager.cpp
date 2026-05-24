@@ -54,7 +54,7 @@ Result<> AuthenticationKeyManager::generateAndSetLegacyFullCertificateChainKeyPa
     }
     mLegacyCertificateLoginKeyPair = std::move(*loginResult);
 
-    mAuthenticationType = AuthenticationType::Full;
+    mSigningAuthenticationType = AuthenticationType::Full;
     return {};
 }
 
@@ -65,7 +65,7 @@ Result<> AuthenticationKeyManager::generateAndSetLegacySelfSignedCertificateChai
     }
     mLegacyCertificateLoginKeyPair = std::move(*loginResult);
 
-    mAuthenticationType = AuthenticationType::SelfSigned;
+    mSigningAuthenticationType = AuthenticationType::SelfSigned;
     return {};
 }
 
@@ -101,8 +101,8 @@ struct MojangPublicKeyFetchResult {
 };
 
 Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeoutSeconds) {
-    mAuthenticationType = AuthenticationType::Full;
-    mValidityLeeway     = std::chrono::seconds(60);
+    mVerifyAuthenticationType = AuthenticationType::Full;
+    mValidityLeeway           = std::chrono::seconds(60);
     mLegacyCertificateChainPublicKeyPems.emplace_back(MOJANG_PUBLIC_KEY_PEM);
 
     // https://client.discovery.minecraft-services.net/api/v1.0/discovery/MinecraftPE/builds/1.0.0.0
