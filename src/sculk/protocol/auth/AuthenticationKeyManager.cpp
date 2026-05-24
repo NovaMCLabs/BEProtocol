@@ -98,14 +98,17 @@ struct MojangPublicKeyFetchResult {
     } result;
 };
 
-Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking() {
+Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeoutSeconds) {
     mAuthenticationType = AuthenticationType::Full;
     mValidityLeeway     = std::chrono::seconds(60);
     mLegacyCertificateChainPublicKeyPems.emplace_back(MOJANG_PUBLIC_KEY_PEM);
 
     // https://client.discovery.minecraft-services.net/api/v1.0/discovery/MinecraftPE/builds/1.0.0.0
     httplib::SSLClient serviceClient("client.discovery.minecraft-services.net");
-    httplib::Result    serviceRes = serviceClient.Get("/api/v1.0/discovery/MinecraftPE/builds/1.0.0.0");
+    serviceClient.set_connection_timeout(timeoutSeconds);
+    serviceClient.set_read_timeout(timeoutSeconds);
+    serviceClient.set_write_timeout(timeoutSeconds);
+    httplib::Result serviceRes = serviceClient.Get("/api/v1.0/discovery/MinecraftPE/builds/1.0.0.0");
     if (!serviceRes || serviceRes->status != 200) {
         return error_utils::makeError("Failed to fetch Mojang service from Internet");
     }
@@ -119,9 +122,12 @@ Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking() {
     }
     mLoginTokenExpectedIssuer = fetchResult.result.serviceEnvironments.auth.prod.issuer;
 
-    //  {auth service base URL)/.well-known/openid-configuration
+    //  {auth service base URL)/.well-known/keys
     httplib::SSLClient keyClient(fetchResult.result.serviceEnvironments.auth.prod.serviceUri);
-    httplib::Result    keyRes = keyClient.Get("/.well-known/openid-configuration");
+    keyClient.set_connection_timeout(timeoutSeconds);
+    keyClient.set_read_timeout(timeoutSeconds);
+    keyClient.set_write_timeout(timeoutSeconds);
+    httplib::Result keyRes = keyClient.Get("/.well-known/keys");
     if (!keyRes || keyRes->status != 200) {
         return error_utils::makeError("Failed to fetch Mojang public key from Internet");
     }

@@ -202,10 +202,12 @@ public:
 
     constexpr void setSigningTime(std::chrono::system_clock::time_point signingTime) { mSigningTime = signingTime; }
 
-    Result<> initMojangPublicKeyBlocking();
+    Result<> initMojangPublicKeyBlocking(std::size_t timeoutSeconds);
 
-    std::future<Result<>> initMojangPublicKeyAsync() {
-        return std::async(std::launch::async, [this]() { return initMojangPublicKeyBlocking(); });
+    std::future<Result<>> initMojangPublicKeyAsync(std::size_t timeoutSeconds) {
+        return std::async(std::launch::async, [this, timeoutSeconds]() {
+            return initMojangPublicKeyBlocking(timeoutSeconds);
+        });
     }
 };
 
