@@ -33,13 +33,35 @@ private:
     constexpr Result<> read(T* target _SCULK_SL_PARAMETER_DEF) noexcept {
         static_assert(std::is_trivially_copyable_v<T>, "ReadOnlyBinaryStream::read requires trivially copyable type");
         if (mHasOverflowed) {
-            return error_utils::makeError("ReadOnlyBinaryStream::read overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::read overflowed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::read overflowed");
+#endif
         }
         std::size_t newReadPointer = mReadPointer + sizeof(T);
 
         if (newReadPointer < mReadPointer || newReadPointer > mBufferView.size()) {
             mHasOverflowed = true;
-            return error_utils::makeError("ReadOnlyBinaryStream::read overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::read overflowed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::read overflowed");
+#endif
         }
 
         std::copy_n(
@@ -77,7 +99,19 @@ public:
         std::size_t newPointer = mReadPointer + length;
         if (newPointer < mReadPointer || newPointer > mBufferView.size()) {
             mHasOverflowed = true;
-            return error_utils::makeError("ReadOnlyBinaryStream::ignoreBytes overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::ignoreBytes overflowed: mReadPointer={}, length={}, size={}",
+                    mReadPointer,
+                    length,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::ignoreBytes overflowed");
+#endif
         }
         mReadPointer = newPointer;
         return {};
@@ -95,7 +129,19 @@ public:
 
     [[nodiscard]] constexpr Result<> readBytes(void* target, std::size_t num _SCULK_SL_PARAM_DEFAULT) noexcept {
         if (mHasOverflowed) {
-            return error_utils::makeError("ReadOnlyBinaryStream::readBytes overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readBytes overflowed: mReadPointer={}, num={}, size={}",
+                    mReadPointer,
+                    num,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readBytes overflowed");
+#endif
         }
         if (num == 0) {
             return {};
@@ -105,7 +151,19 @@ public:
 
         if (newPointer < mReadPointer || newPointer > mBufferView.size()) {
             mHasOverflowed = true;
-            return error_utils::makeError("ReadOnlyBinaryStream::readBytes overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readBytes overflowed: mReadPointer={}, num={}, size={}",
+                    mReadPointer,
+                    num,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readBytes overflowed");
+#endif
         }
 
         std::copy_n(reinterpret_cast<const char*>(mBufferView.data() + mReadPointer), num, static_cast<char*>(target));
@@ -165,24 +223,54 @@ public:
         do {
             if (shift >= 35) {
                 mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
                 return error_utils::makeError(
-                    "ReadOnlyBinaryStream::readUnsignedVarInt overflowed" _SCULK_SL_PARAM_PASS
+                    std::format(
+                        "ReadOnlyBinaryStream::readUnsignedVarInt overflowed: mReadPointer={}, shift={}, size={}",
+                        mReadPointer,
+                        shift,
+                        mBufferView.size()
+                    ),
+                    location
                 );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readUnsignedVarInt overflowed");
+#endif
             }
 
             if (mReadPointer >= mBufferView.size()) {
                 mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
                 return error_utils::makeError(
-                    "ReadOnlyBinaryStream::readUnsignedVarInt overflowed" _SCULK_SL_PARAM_PASS
+                    std::format(
+                        "ReadOnlyBinaryStream::readUnsignedVarInt overflowed: mReadPointer={}, shift={}, size={}",
+                        mReadPointer,
+                        shift,
+                        mBufferView.size()
+                    ),
+                    location
                 );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readUnsignedVarInt overflowed");
+#endif
             }
 
             byte = std::to_integer<std::uint8_t>(mBufferView[mReadPointer++]);
             if (shift == 28 && (byte & 0x80) == 0 && (byte & 0x70) != 0) {
                 mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
                 return error_utils::makeError(
-                    "ReadOnlyBinaryStream::readUnsignedVarInt overflowed" _SCULK_SL_PARAM_PASS
+                    std::format(
+                        "ReadOnlyBinaryStream::readUnsignedVarInt overflowed: mReadPointer={}, shift={}, size={}",
+                        mReadPointer,
+                        shift,
+                        mBufferView.size()
+                    ),
+                    location
                 );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readUnsignedVarInt overflowed");
+#endif
             }
             value |= (byte & 0x7F) << shift;
             shift += 7;
@@ -200,24 +288,56 @@ public:
         do {
             if (shift >= 70) {
                 mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+                return error_utils::makeError(
+                    std::format(
+                        "ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed: mReadPointer={}, shift={}, size={}",
+                        mReadPointer,
+                        shift,
+                        mBufferView.size()
+                    ),
+                    location
+                );
+#else
                 return error_utils::makeError(
                     "ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed" _SCULK_SL_PARAM_PASS
                 );
+#endif
             }
 
             if (mReadPointer >= mBufferView.size()) {
                 mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
                 return error_utils::makeError(
-                    "ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed" _SCULK_SL_PARAM_PASS
+                    std::format(
+                        "ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed: mReadPointer={}, shift={}, size={}",
+                        mReadPointer,
+                        shift,
+                        mBufferView.size()
+                    ),
+                    location
                 );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed");
+#endif
             }
 
             byte = std::to_integer<std::uint8_t>(mBufferView[mReadPointer++]);
             if (shift == 63 && (byte & 0x80) == 0 && (byte & 0x7E) != 0) {
                 mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
                 return error_utils::makeError(
-                    "ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed" _SCULK_SL_PARAM_PASS
+                    std::format(
+                        "ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed: mReadPointer={}, shift={}, size={}",
+                        mReadPointer,
+                        shift,
+                        mBufferView.size()
+                    ),
+                    location
                 );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readUnsignedVarInt64 overflowed");
+#endif
             }
             value |= static_cast<std::uint64_t>(byte & 0x7F) << shift;
             shift += 7;
@@ -230,7 +350,18 @@ public:
     [[nodiscard]] constexpr Result<> readVarInt(std::int32_t& value _SCULK_SL_PARAM_DEFAULT) noexcept {
         std::uint32_t temp{};
         if (!readUnsignedVarInt(temp _SCULK_SL_PARAM_PASS)) {
-            return error_utils::makeError("ReadOnlyBinaryStream::readVarInt failed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readVarInt failed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readVarInt failed");
+#endif
         }
         value = (temp & 1) ? ~(temp >> 1) : (temp >> 1);
         return {};
@@ -239,7 +370,18 @@ public:
     [[nodiscard]] constexpr Result<> readVarInt64(std::int64_t& value _SCULK_SL_PARAM_DEFAULT) noexcept {
         std::uint64_t temp{};
         if (!readUnsignedVarInt64(temp _SCULK_SL_PARAM_PASS)) {
-            return error_utils::makeError("ReadOnlyBinaryStream::readVarInt64 failed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readVarInt64 failed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readVarInt64 failed");
+#endif
         }
         value = (temp & 1) ? ~(temp >> 1) : (temp >> 1);
         return {};
@@ -250,14 +392,36 @@ public:
             value = swapEndian(value);
             return {};
         }
-        return error_utils::makeError("ReadOnlyBinaryStream::readSignedBigEndianInt failed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "ReadOnlyBinaryStream::readSignedBigEndianInt failed: mReadPointer={}, size={}",
+                mReadPointer,
+                mBufferView.size()
+            ),
+            location
+        );
+#else
+        return error_utils::makeError("ReadOnlyBinaryStream::readSignedBigEndianInt failed");
+#endif
     }
 
     [[nodiscard]] constexpr Result<> readString(std::string& outString _SCULK_SL_PARAM_DEFAULT) noexcept {
         std::uint32_t length{};
         if (!readUnsignedVarInt(length _SCULK_SL_PARAM_PASS)) {
             outString.clear();
-            return error_utils::makeError("ReadOnlyBinaryStream::readString failed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readString failed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readString failed");
+#endif
         }
         return readRawBytes(outString, static_cast<std::size_t>(length) _SCULK_SL_PARAM_PASS);
     }
@@ -265,12 +429,32 @@ public:
     [[nodiscard]] constexpr Result<> readLongString(std::string& value _SCULK_SL_PARAM_DEFAULT) noexcept {
         std::int32_t length{};
         if (!readSignedInt(length _SCULK_SL_PARAM_PASS)) {
-            return error_utils::makeError("ReadOnlyBinaryStream::readLongString overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readLongString failed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readLongString overflowed");
+#endif
         }
         if (length < 0) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
             return error_utils::makeError(
-                "ReadOnlyBinaryStream::readLongString failed: negative length" _SCULK_SL_PARAM_PASS
+                std::format(
+                    "ReadOnlyBinaryStream::readLongString failed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
             );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readLongString failed: negative length");
+#endif
         }
         return readRawBytes(value, static_cast<std::size_t>(length) _SCULK_SL_PARAM_PASS);
     }
@@ -284,13 +468,38 @@ public:
         if (mReadPointer > mBufferView.size()) {
             mHasOverflowed = true;
             rawBuffer.clear();
-            return error_utils::makeError("ReadOnlyBinaryStream::readRawBytes overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readRawBytes overflowed: mReadPointer={}, length={}, size={}",
+                    mReadPointer,
+                    length,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readRawBytes overflowed");
+#endif
         }
         std::size_t remaining = mBufferView.size() - mReadPointer;
         if (length > remaining) {
             mHasOverflowed = true;
             rawBuffer.clear();
-            return error_utils::makeError("ReadOnlyBinaryStream::readRawBytes overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readRawBytes overflowed: mReadPointer={}, length={}, remaining={}, size={}",
+                    mReadPointer,
+                    length,
+                    remaining,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readRawBytes overflowed");
+#endif
         }
 
         rawBuffer.assign(reinterpret_cast<const char*>(mBufferView.data() + mReadPointer), length);
@@ -302,7 +511,18 @@ public:
     [[nodiscard]] constexpr Result<> readArray(std::vector<T>& outVector, F&& func _SCULK_SL_PARAM_DEFAULT) {
         std::uint32_t length{};
         if (!readUnsignedVarInt(length _SCULK_SL_PARAM_PASS)) {
-            return error_utils::makeError("ReadOnlyBinaryStream::readArray overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readArray overflowed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readArray overflowed");
+#endif
         }
 
         outVector.resize(length);
@@ -363,13 +583,39 @@ public:
         for (std::size_t bitIndex = 0; bitIndex < outBitset.size(); bitIndex += 7) {
             std::uint8_t byte{};
             if (!readByte(byte _SCULK_SL_PARAM_PASS)) {
-                return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed" _SCULK_SL_PARAM_PASS);
+                mHasOverflowed = true;
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+                return error_utils::makeError(
+                    std::format(
+                        "ReadOnlyBinaryStream::readBitset overflowed: mReadPointer={}, bitIndex={}, size={}",
+                        mReadPointer,
+                        bitIndex,
+                        mBufferView.size()
+                    ),
+                    location
+                );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed");
+#endif
             }
             chunkCount++;
 
             if (bitIndex + bitLength8(byte) > outBitset.size()) {
                 mHasOverflowed = true;
-                return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+                return error_utils::makeError(
+                    std::format(
+                        "ReadOnlyBinaryStream::readBitset overflowed: mReadPointer={}, bitIndex={}, byte={}, size={}",
+                        mReadPointer,
+                        bitIndex,
+                        byte,
+                        mBufferView.size()
+                    ),
+                    location
+                );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed");
+#endif
             }
 
             const std::uint8_t payload = byte & 0x7Fu;
@@ -387,18 +633,60 @@ public:
             if ((byte & 0x80u) == 0) {
                 if (!seenSetBit && chunkCount != 1) {
                     mHasOverflowed = true;
-                    return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+                    return error_utils::makeError(
+                        std::format(
+                            "ReadOnlyBinaryStream::readBitset overflowed: mReadPointer={}, bitIndex={}, byte={}, "
+                            "chunkCount={}, size={}",
+                            mReadPointer,
+                            bitIndex,
+                            byte,
+                            chunkCount,
+                            mBufferView.size()
+                        ),
+                        location
+                    );
+#else
+                    return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed");
+#endif
                 }
                 if (seenSetBit && payload == 0) {
                     mHasOverflowed = true;
-                    return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+                    return error_utils::makeError(
+                        std::format(
+                            "ReadOnlyBinaryStream::readBitset overflowed: mReadPointer={}, bitIndex={}, byte={}, "
+                            "chunkCount={}, size={}",
+                            mReadPointer,
+                            bitIndex,
+                            byte,
+                            chunkCount,
+                            mBufferView.size()
+                        ),
+                        location
+                    );
+#else
+                    return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed");
+#endif
                 }
                 return {};
             }
         }
 
         mHasOverflowed = true;
-        return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "ReadOnlyBinaryStream::readBitset overflowed: mReadPointer={}, size={}, chunkCount={}",
+                mReadPointer,
+                mBufferView.size(),
+                chunkCount
+            ),
+            location
+        );
+#else
+        return error_utils::makeError("ReadOnlyBinaryStream::readBitset overflowed");
+#endif
     }
 
     template <typename T, typename F>
@@ -408,7 +696,18 @@ public:
         if constexpr (std::is_invocable_r_v<Result<>, F, ReadOnlyBinaryStream&, UT & _SCULK_SL_PARAMETER>) {
             UT value{};
             if (!std::invoke(std::forward<F>(func), *this, value _SCULK_SL_PARAM_PASS)) {
-                return error_utils::makeError("ReadOnlyBinaryStream::readEnum overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+                return error_utils::makeError(
+                    std::format(
+                        "ReadOnlyBinaryStream::readEnum overflowed: mReadPointer={}, size={}",
+                        mReadPointer,
+                        mBufferView.size()
+                    ),
+                    location
+                );
+#else
+                return error_utils::makeError("ReadOnlyBinaryStream::readEnum overflowed");
+#endif
             }
             outValue = static_cast<T>(value);
             return {};
@@ -421,7 +720,18 @@ public:
     [[nodiscard]] constexpr Result<> readVariantIndex(T& var, F&& func _SCULK_SL_PARAM_DEFAULT) noexcept {
         U index{};
         if (!std::invoke(std::forward<F>(func), *this, index _SCULK_SL_PARAM_PASS)) {
-            return error_utils::makeError("ReadOnlyBinaryStream::readVariantIndex overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "ReadOnlyBinaryStream::readVariantIndex overflowed: mReadPointer={}, size={}",
+                    mReadPointer,
+                    mBufferView.size()
+                ),
+                location
+            );
+#else
+            return error_utils::makeError("ReadOnlyBinaryStream::readVariantIndex overflowed");
+#endif
         }
         return emplace_variant(var, index _SCULK_SL_PARAM_PASS);
     }

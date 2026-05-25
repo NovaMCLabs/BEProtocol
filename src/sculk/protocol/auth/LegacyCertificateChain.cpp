@@ -34,6 +34,28 @@ namespace sculk::protocol::inline abi_v975 {
     }                                                                                                                  \
     const auto& PART##Json = *PART##JsonOpt;
 
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+#define SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(PART, FIELD)                                                            \
+    if (!PART##Json.contains(#FIELD)) {                                                                                \
+        return error_utils::makeError("Certificate JSON does not contain a valid field '" #FIELD "'");                 \
+    }                                                                                                                  \
+    if (auto status = reflection::jsonc::deserialize<false, false>(PART.FIELD, PART##Json[#FIELD], options);           \
+        !status) {                                                                                                     \
+        return error_utils::makeError(                                                                                 \
+            std::format("Failed to deserialize certificate {} field '{}': {}", #PART, #FIELD, status.error())          \
+        );                                                                                                             \
+    }
+
+#define SCULK_CERTIFICATE_DESERIALIZE_OPTIONAL(PART, FIELD)                                                            \
+    if (PART##Json.contains(#FIELD)) {                                                                                 \
+        if (auto status = reflection::jsonc::deserialize<false, false>(PART.FIELD, PART##Json[#FIELD], options);       \
+            !status) {                                                                                                 \
+            return error_utils::makeError(                                                                             \
+                std::format("Failed to deserialize certificate {} field '{}': {}", #PART, #FIELD, status.error())      \
+            );                                                                                                         \
+        }                                                                                                              \
+    }
+#else
 #define SCULK_CERTIFICATE_DESERIALIZE_REQUIRED(PART, FIELD)                                                            \
     if (!PART##Json.contains(#FIELD)) {                                                                                \
         return error_utils::makeError("Certificate JSON does not contain a valid field '" #FIELD "'");                 \
@@ -48,6 +70,7 @@ namespace sculk::protocol::inline abi_v975 {
             return error_utils::makeError("Failed to deserialize certificate " #PART " field '" #FIELD "'");           \
         }                                                                                                              \
     }
+#endif
 
 bool Certificate::verify(std::string_view publicKeyPem) const {
     std::string signingInput = std::format("{}.{}", mRawHeader, mRawPayload);

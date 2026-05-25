@@ -52,6 +52,28 @@ namespace sculk::protocol::inline abi_v975 {
     }                                                                                                                  \
     const auto& PART##Json = *PART##JsonOpt;
 
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+#define SCULK_LOGIN_TOKEN_DESERIALIZE_REQUIRED(PART, FIELD)                                                            \
+    if (!PART##Json.contains(#FIELD)) {                                                                                \
+        return error_utils::makeError("Login token " #PART " JSON does not contain a valid field '" #FIELD "'");       \
+    }                                                                                                                  \
+    if (auto status = reflection::jsonc::deserialize<false, false>(PART.FIELD, PART##Json[#FIELD], options);           \
+        !status) {                                                                                                     \
+        return error_utils::makeError(                                                                                 \
+            std::format("Failed to deserialize login token {} field '{}': {}", #PART, #FIELD, status.error())          \
+        );                                                                                                             \
+    }
+
+#define SCULK_LOGIN_TOKEN_DESERIALIZE_OPTIONAL(PART, FIELD)                                                            \
+    if (PART##Json.contains(#FIELD)) {                                                                                 \
+        if (auto status = reflection::jsonc::deserialize<false, false>(PART.FIELD, PART##Json[#FIELD], options);       \
+            !status) {                                                                                                 \
+            return error_utils::makeError(                                                                             \
+                std::format("Failed to deserialize login token {} field '{}': {}", #PART, #FIELD, status.error())      \
+            );                                                                                                         \
+        }                                                                                                              \
+    }
+#else
 #define SCULK_LOGIN_TOKEN_DESERIALIZE_REQUIRED(PART, FIELD)                                                            \
     if (!PART##Json.contains(#FIELD)) {                                                                                \
         return error_utils::makeError("Login token " #PART " JSON does not contain a valid field '" #FIELD "'");       \
@@ -66,6 +88,7 @@ namespace sculk::protocol::inline abi_v975 {
             return error_utils::makeError("Failed to deserialize login token " #PART " field '" #FIELD "'");           \
         }                                                                                                              \
     }
+#endif
 
 Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     auto        authType     = authenticationKeyManager.getVerifyAuthenticationType();
@@ -121,6 +144,9 @@ Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& au
 
         if (*mPayload.iss != authenticationKeyManager.getLoginTokenExpectedIssuer()) {
             return error_utils::makeError("Login token 'iss' claim is invalid");
+        }
+        if (*mPayload.tid != authenticationKeyManager.getLoginTokenExpectedPlayFabTitle()) {
+            return error_utils::makeError("Login token 'tid' claim does not match expected PlayFab title ID");
         }
 
         auto keyId = authenticationKeyManager.getLoginTokenPublicKeyPemByKeyId(*mHeader.kid);

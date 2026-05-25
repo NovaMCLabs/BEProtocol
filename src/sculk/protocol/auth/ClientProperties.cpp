@@ -42,6 +42,43 @@ constexpr std::string_view removeLeadingCharacter(std::string_view key) {
     }                                                                                                                  \
     const auto& PART##Json = *PART##JsonOpt;
 
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+#define SCULK_CLIENT_PROPERTIES_DESERIALIZE_REQUIRED(PART, FIELD)                                                      \
+    if (!PART##Json.contains(removeLeadingCharacter(#FIELD))) {                                                        \
+        return error_utils::makeError("Client properties " #PART " JSON does not contain a valid field '" #FIELD "'"); \
+    }                                                                                                                  \
+    if (auto status = reflection::jsonc::deserialize<false, false>(                                                    \
+            PART.FIELD,                                                                                                \
+            PART##Json[removeLeadingCharacter(#FIELD)],                                                                \
+            removeLeadingCharacter,                                                                                    \
+            options                                                                                                    \
+        );                                                                                                             \
+        !status) {                                                                                                     \
+        return error_utils::makeError(                                                                                 \
+            std::format("Failed to deserialize client properties {} field '{}': {}", #PART, #FIELD, status.error())    \
+        );                                                                                                             \
+    }
+
+#define SCULK_CLIENT_PROPERTIES_DESERIALIZE_OPTIONAL(PART, FIELD)                                                      \
+    if (PART##Json.contains(removeLeadingCharacter(#FIELD))) {                                                         \
+        if (auto status = reflection::jsonc::deserialize<false, false>(                                                \
+                PART.FIELD,                                                                                            \
+                PART##Json[removeLeadingCharacter(#FIELD)],                                                            \
+                removeLeadingCharacter,                                                                                \
+                options                                                                                                \
+            );                                                                                                         \
+            !status) {                                                                                                 \
+            return error_utils::makeError(                                                                             \
+                std::format(                                                                                           \
+                    "Failed to deserialize client properties {} field '{}': {}",                                       \
+                    #PART,                                                                                             \
+                    #FIELD,                                                                                            \
+                    status.error()                                                                                     \
+                )                                                                                                      \
+            );                                                                                                         \
+        }                                                                                                              \
+    }
+#else
 #define SCULK_CLIENT_PROPERTIES_DESERIALIZE_REQUIRED(PART, FIELD)                                                      \
     if (!PART##Json.contains(removeLeadingCharacter(#FIELD))) {                                                        \
         return error_utils::makeError("Client properties " #PART " JSON does not contain a valid field '" #FIELD "'"); \
@@ -66,6 +103,7 @@ constexpr std::string_view removeLeadingCharacter(std::string_view key) {
             return error_utils::makeError("Failed to deserialize client properties " #PART " field '" #FIELD "'");     \
         }                                                                                                              \
     }
+#endif
 
 
 Result<> ClientProperties::verify(std::string_view publicKeyPem) const {
@@ -81,7 +119,16 @@ Result<> ClientProperties::sign(const AuthenticationKeyManager& authenticationKe
 
     auto keyPair = authenticationKeyManager.getClientPropertiesKeyPair();
     if (!keyPair) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "Failed to get client properties key pair from authentication key manager: {}",
+                keyPair.error().mMessage
+            )
+        );
+#else
         return error_utils::makeError("Failed to get client properties key pair from authentication key manager");
+#endif
     }
     mHeader.x5u = keyPair->mPublicKeyPem;
 

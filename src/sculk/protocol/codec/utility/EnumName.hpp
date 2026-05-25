@@ -19,13 +19,31 @@ template <typename T>
 readEnumName(ReadOnlyBinaryStream& stream, T& outValue _SCULK_SL_PARAM_DEFAULT) noexcept {
     std::string enumName{};
     if (!stream.readString(enumName _SCULK_SL_PARAM_PASS)) {
-        return error_utils::makeError("ReadOnlyBinaryStream::readEnumName overflowed" _SCULK_SL_PARAM_PASS);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "ReadOnlyBinaryStream::readString overflowed: mReadPointer={}, size={}",
+                stream.getPosition(),
+                stream.size()
+            )
+        );
+#else
+        return error_utils::makeError("ReadOnlyBinaryStream::readString overflowed");
+#endif
     }
     auto enumValue = magic_enum::enum_cast<T>(enumName, magic_enum::case_insensitive);
     if (!enumValue.has_value()) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
         return error_utils::makeError(
-            "ReadOnlyBinaryStream::readEnumName received an invalid enum name" _SCULK_SL_PARAM_PASS
+            std::format(
+                "ReadOnlyBinaryStream::readEnumName received an invalid enum name '{}', this enum is bound to '{}'",
+                enumName,
+                magic_enum::enum_names<T>()
+            )
         );
+#else
+        return error_utils::makeError("ReadOnlyBinaryStream::readEnumName received an invalid enum name");
+#endif
     }
     outValue = *enumValue;
     return {};

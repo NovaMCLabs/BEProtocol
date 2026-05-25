@@ -119,9 +119,16 @@ Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeo
         return error_utils::makeError("Failed to parse Mojang service response JSON");
     }
     MojangServiceFetchResult fetchResult{};
-    if (!reflection::jsonc::deserialize(fetchResult, *serviceJson)) {
+    if (auto status = reflection::jsonc::deserialize(fetchResult, *serviceJson); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format("Failed to deserialize Mojang service response JSON: {}", status.error())
+        );
+#else
         return error_utils::makeError("Failed to deserialize Mojang service response JSON");
+#endif
     }
+    mLoginTokenExpectedPlayFabTitle = std::move(fetchResult.result.serviceEnvironments.auth.prod.playfabTitleId);
 
     httplib::Client keyClient(fetchResult.result.serviceEnvironments.auth.prod.serviceUri);
     keyClient.set_connection_timeout(timeoutSeconds);
@@ -137,8 +144,14 @@ Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeo
         return error_utils::makeError("Failed to parse Mojang public key response JSON");
     }
     MojangPublicKeyFetchResult keyFetchResult{};
-    if (!reflection::jsonc::deserialize(keyFetchResult, *keyJson)) {
+    if (auto status = reflection::jsonc::deserialize(keyFetchResult, *keyJson); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format("Failed to deserialize Mojang public key response JSON: {}", status.error())
+        );
+#else
         return error_utils::makeError("Failed to deserialize Mojang public key response JSON");
+#endif
     }
     if (keyFetchResult.keys.empty()) {
         return error_utils::makeError("Mojang public key response JSON does not contain any keys");
@@ -163,8 +176,14 @@ Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeo
         return error_utils::makeError("Failed to parse Mojang configuration response JSON");
     }
     MojangConfigFetchResult configFetchResult{};
-    if (!reflection::jsonc::deserialize(configFetchResult, *issuerJson)) {
+    if (auto status = reflection::jsonc::deserialize(configFetchResult, *issuerJson); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format("Failed to deserialize Mojang configuration response JSON: {}", status.error())
+        );
+#else
         return error_utils::makeError("Failed to deserialize Mojang configuration response JSON");
+#endif
     }
     mLoginTokenExpectedIssuer = std::move(configFetchResult.issuer);
 

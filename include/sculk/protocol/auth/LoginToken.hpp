@@ -54,7 +54,7 @@ public:
 public:
     [[nodiscard]] std::string getClientPublicKey() const { return mPayload.cpk; }
 
-    [[nodiscard]] std::string_view getMinecraftID() const { return mPayload.mid; }
+    [[nodiscard]] std::string_view getPlayFabID() const { return mPayload.mid; }
 
     [[nodiscard]] std::string_view getXboxName() const { return mPayload.xname; }
 

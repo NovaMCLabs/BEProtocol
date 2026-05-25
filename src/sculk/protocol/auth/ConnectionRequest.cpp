@@ -50,15 +50,27 @@ std::string_view ConnectionRequest::getXboxName() const {
 
 Result<AuthenticationType> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     if (mLoginToken) {
-        if (!mClientProperties.verify(mLoginToken->getClientPublicKey())) {
+        if (auto status = mClientProperties.verify(mLoginToken->getClientPublicKey()); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format("Client properties verification failed: {}", status.error().mMessage)
+            );
+#else
             return error_utils::makeError("Client properties verification failed");
+#endif
         }
         return mLoginToken->verify(authenticationKeyManager);
     }
 
     if (mLegacyCertificateChain) {
-        if (!mClientProperties.verify(mLegacyCertificateChain->getClientPublicKey())) {
+        if (auto status = mClientProperties.verify(mLegacyCertificateChain->getClientPublicKey()); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format("Client properties verification failed: {}", status.error().mMessage)
+            );
+#else
             return error_utils::makeError("Client properties verification failed");
+#endif
         }
         return mLegacyCertificateChain->verify(authenticationKeyManager);
     }
@@ -74,15 +86,25 @@ Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationK
     }
 
     if (mLoginToken && authenticationKeyManager.loginTokenSigningInitialized(mAuthenticationType)) {
-        if (!mLoginToken->sign(authenticationKeyManager)) {
+        if (auto status = mLoginToken->sign(authenticationKeyManager); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(std::format("Login token signing failed: {}", status.error().mMessage));
+#else
             return error_utils::makeError("Login token signing failed");
+#endif
         }
     }
 
     if (mLegacyCertificateChain
         && authenticationKeyManager.legacyCertificateChainSigningInitialized(mAuthenticationType)) {
-        if (!mLegacyCertificateChain->sign(authenticationKeyManager)) {
+        if (auto status = mLegacyCertificateChain->sign(authenticationKeyManager); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format("Legacy certificate chain signing failed: {}", status.error().mMessage)
+            );
+#else
             return error_utils::makeError("Legacy certificate chain signing failed");
+#endif
         }
     }
 
@@ -113,6 +135,27 @@ std::string ConnectionRequest::toString() const {
     return result;
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+#define SCULK_CONNECTION_REQUEST_DESERIALIZE_REQUIRED(FIELD_NAME, VALUE)                                               \
+    if (!authJson.contains(FIELD_NAME)) {                                                                              \
+        return error_utils::makeError("Authentication JSON does not contain a valid '" FIELD_NAME "' field");          \
+    }                                                                                                                  \
+    if (auto status = reflection::jsonc::deserialize<false, false>(VALUE, authJson[FIELD_NAME], options); !status) {   \
+        return error_utils::makeError(                                                                                 \
+            std::format("Failed to deserialize '{}' field in authentication JSON: {}", FIELD_NAME, status.error())     \
+        );                                                                                                             \
+    }
+
+#define SCULK_CONNECTION_REQUEST_DESERIALIZE_OPTIONAL(FIELD_NAME, VALUE)                                               \
+    if (authJson.contains(FIELD_NAME)) {                                                                               \
+        if (auto status = reflection::jsonc::deserialize<false, false>(VALUE, authJson[FIELD_NAME], options);          \
+            !status) {                                                                                                 \
+            return error_utils::makeError(                                                                             \
+                std::format("Failed to deserialize '{}' field in authentication JSON: {}", FIELD_NAME, status.error()) \
+            );                                                                                                         \
+        }                                                                                                              \
+    }
+#else
 #define SCULK_CONNECTION_REQUEST_DESERIALIZE_REQUIRED(FIELD_NAME, VALUE)                                               \
     if (!authJson.contains(FIELD_NAME)) {                                                                              \
         return error_utils::makeError("Authentication JSON does not contain a valid '" FIELD_NAME "' field");          \
@@ -127,13 +170,24 @@ std::string ConnectionRequest::toString() const {
             return error_utils::makeError("Failed to deserialize '" FIELD_NAME "' field in authentication JSON");      \
         }                                                                                                              \
     }
+#endif
 
 Result<ConnectionRequest> ConnectionRequest::fromString(std::string_view rawRequest) {
     ReadOnlyBinaryStream stream(rawRequest);
 
     std::string authJsonStr{};
     if (!stream.readLongString(authJsonStr)) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "Read ConnectionRequest authentication JSON overflowed: mReadPointer={}, size={}",
+                stream.getPosition(),
+                stream.size()
+            )
+        );
+#else
         return error_utils::makeError("Read ConnectionRequest authentication JSON overflowed");
+#endif
     }
 
     auto authJsonOpt = jsonc::json::parse(authJsonStr);
@@ -153,7 +207,17 @@ Result<ConnectionRequest> ConnectionRequest::fromString(std::string_view rawRequ
 
     std::string clientProperties{};
     if (!stream.readLongString(clientProperties)) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "Read ConnectionRequest client properties overflowed: mReadPointer={}, size={}",
+                stream.getPosition(),
+                stream.size()
+            )
+        );
+#else
         return error_utils::makeError("Read ConnectionRequest client properties overflowed");
+#endif
     }
 
     return ConnectionRequest::create(
@@ -174,7 +238,13 @@ Result<ConnectionRequest> ConnectionRequest::create(
     if (legacyCertificateChainString && *legacyCertificateChainString != "{\"chain\":[\"..\"]}\n") {
         auto certChain = LegacyCertificateChain::fromString(*legacyCertificateChainString);
         if (!certChain) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format("Failed to parse legacy certificate chain: {}", certChain.error().mMessage)
+            );
+#else
             return error_utils::makeError("Failed to parse legacy certificate chain");
+#endif
         }
         legacyCertificateChain = std::move(*certChain);
     }
@@ -182,9 +252,15 @@ Result<ConnectionRequest> ConnectionRequest::create(
     std::optional<LoginToken> loginToken{};
     if (loginTokenString) {
         auto token = LoginToken::fromString(*loginTokenString);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        if (!token) {
+            return error_utils::makeError(std::format("Failed to parse login token: {}", token.error().mMessage));
+        }
+#else
         if (!token) {
             return error_utils::makeError("Failed to parse login token");
         }
+#endif
         loginToken = std::move(*token);
     }
 
@@ -194,7 +270,13 @@ Result<ConnectionRequest> ConnectionRequest::create(
 
     auto clientProperties = ClientProperties::fromString(std::move(clientPropertiesString));
     if (!clientProperties) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format("Failed to parse client properties: {}", clientProperties.error().mMessage)
+        );
+#else
         return error_utils::makeError("Failed to parse client properties");
+#endif
     }
 
     return ConnectionRequest{
