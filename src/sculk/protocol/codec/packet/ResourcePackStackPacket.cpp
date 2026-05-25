@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ResourcePackStackPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -42,6 +44,7 @@ Result<> ResourcePackStackPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mIncludeEditorPacks);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ResourcePackStackPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mTexturePackRequired),
@@ -52,5 +55,6 @@ std::string ResourcePackStackPacket::toString() const {
         SCULK_FORMAT_FIELD(mIncludeEditorPacks)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

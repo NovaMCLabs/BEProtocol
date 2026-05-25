@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/VoxelShapesPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -36,6 +38,7 @@ Result<> VoxelShapesPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedShort(mCustomShapeCount);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string VoxelShapesPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mShapes),
@@ -43,5 +46,6 @@ std::string VoxelShapesPacket::toString() const {
         SCULK_FORMAT_FIELD(mCustomShapeCount)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

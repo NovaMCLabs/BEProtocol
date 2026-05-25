@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AddBehaviorTreePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,8 +20,10 @@ void AddBehaviorTreePacket::write(BinaryStream& stream) const { stream.writeStri
 
 Result<> AddBehaviorTreePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mBehaviorTreeStructure); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string AddBehaviorTreePacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mBehaviorTreeStructure));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ContainerClosePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -26,6 +28,7 @@ Result<> ContainerClosePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mServerInitiatedClose);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ContainerClosePacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mContainerId),
@@ -33,5 +36,6 @@ std::string ContainerClosePacket::toString() const {
         SCULK_FORMAT_FIELD(mServerInitiatedClose)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

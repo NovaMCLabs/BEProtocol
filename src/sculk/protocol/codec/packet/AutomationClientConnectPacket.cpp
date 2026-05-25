@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AutomationClientConnectPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,8 +22,10 @@ void AutomationClientConnectPacket::write(BinaryStream& stream) const { stream.w
 
 Result<> AutomationClientConnectPacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mWebSocketUrl); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string AutomationClientConnectPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mWebSocketUrl));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

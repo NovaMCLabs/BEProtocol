@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/StartGamePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 #include "sculk/protocol/codec/nbt/TagType.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
@@ -72,6 +74,7 @@ Result<> StartGamePacket::read(ReadOnlyBinaryStream& stream) {
     return mServerTelemetryData.read(stream);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string StartGamePacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mActorUniqueId),
@@ -101,5 +104,6 @@ std::string StartGamePacket::toString() const {
         SCULK_FORMAT_FIELD(mServerTelemetryData)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

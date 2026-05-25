@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PacketViolationWarningPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -30,6 +32,7 @@ Result<> PacketViolationWarningPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readString(mContext);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string PacketViolationWarningPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mType),
@@ -38,5 +41,6 @@ std::string PacketViolationWarningPacket::toString() const {
         SCULK_FORMAT_FIELD(mContext)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

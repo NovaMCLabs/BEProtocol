@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientCacheMissResponsePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -34,8 +36,10 @@ Result<> ClientCacheMissResponsePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mMissingBlobs, &ClientCache::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ClientCacheMissResponsePacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mMissingBlobs));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

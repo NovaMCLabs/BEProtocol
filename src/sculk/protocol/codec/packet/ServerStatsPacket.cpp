@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerStatsPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -24,8 +26,10 @@ Result<> ServerStatsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readFloat(mNetworkTime);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ServerStatsPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mServerTime), SCULK_FORMAT_FIELD(mNetworkTime));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/TrimDataPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -43,8 +45,10 @@ Result<> TrimDataPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mTrimMaterialList, &TrimMaterial::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string TrimDataPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mTrimPatternList), SCULK_FORMAT_FIELD(mTrimMaterialList));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

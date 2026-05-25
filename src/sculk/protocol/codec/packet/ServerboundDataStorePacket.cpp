@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerboundDataStorePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,8 +22,10 @@ void ServerboundDataStorePacket::write(BinaryStream& stream) const { mDataStoreU
 
 Result<> ServerboundDataStorePacket::read(ReadOnlyBinaryStream& stream) { return mDataStoreUpdate.read(stream); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ServerboundDataStorePacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mDataStoreUpdate));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

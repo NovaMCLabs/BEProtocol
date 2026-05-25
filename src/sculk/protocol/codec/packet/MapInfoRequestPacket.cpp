@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MapInfoRequestPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -44,8 +46,10 @@ Result<> MapInfoRequestPacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string MapInfoRequestPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mMapUniqueId), SCULK_FORMAT_FIELD(mClientPixels));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

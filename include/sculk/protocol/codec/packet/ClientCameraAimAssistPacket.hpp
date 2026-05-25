@@ -31,7 +31,9 @@ public:
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
     [[nodiscard]] std::string toString() const override;
+#endif
 };
 
 } // namespace sculk::protocol::inline abi_v975

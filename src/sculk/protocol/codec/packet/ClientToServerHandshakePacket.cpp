@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientToServerHandshakePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,6 +22,8 @@ void ClientToServerHandshakePacket::write(BinaryStream&) const {}
 
 Result<> ClientToServerHandshakePacket::read(ReadOnlyBinaryStream&) { return {}; }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ClientToServerHandshakePacket::toString() const { return SCULK_FORMAT_PACKET(); }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

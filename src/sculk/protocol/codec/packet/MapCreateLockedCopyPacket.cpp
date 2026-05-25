@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MapCreateLockedCopyPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -24,8 +26,10 @@ Result<> MapCreateLockedCopyPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readVarInt64(mNewMapId);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string MapCreateLockedCopyPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mOriginMapId), SCULK_FORMAT_FIELD(mNewMapId));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

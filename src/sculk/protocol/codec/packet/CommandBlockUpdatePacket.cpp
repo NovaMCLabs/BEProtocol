@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CommandBlockUpdatePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -52,6 +54,7 @@ Result<> CommandBlockUpdatePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mExecuteOnFirstTick);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string CommandBlockUpdatePacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mIsBlock),
@@ -69,5 +72,6 @@ std::string CommandBlockUpdatePacket::toString() const {
         SCULK_FORMAT_FIELD(mExecuteOnFirstTick)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

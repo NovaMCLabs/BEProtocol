@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/GraphicsParameterOverridePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -46,6 +48,7 @@ Result<> GraphicsParameterOverridePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mResetParameter);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string GraphicsParameterOverridePacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mParameterKeyFrameValues),
@@ -56,5 +59,6 @@ std::string GraphicsParameterOverridePacket::toString() const {
         SCULK_FORMAT_FIELD(mVec3Value)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

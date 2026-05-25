@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PositionTrackingDBClientRequestPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -28,8 +30,10 @@ Result<> PositionTrackingDBClientRequestPacket::read(ReadOnlyBinaryStream& strea
     return stream.readVarInt(mPositionTrackingId);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string PositionTrackingDBClientRequestPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mAction), SCULK_FORMAT_FIELD(mPositionTrackingId));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

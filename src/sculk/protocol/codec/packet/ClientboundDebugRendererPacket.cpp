@@ -7,7 +7,9 @@
 
 #include "sculk/protocol/codec/packet/ClientboundDebugRendererPacket.hpp"
 #include "../utility/EnumName.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -41,8 +43,10 @@ Result<> ClientboundDebugRendererPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readOptional(mDebugMarkerData, &DebugMarkerData::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ClientboundDebugRendererPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mType), SCULK_FORMAT_FIELD(mDebugMarkerData));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

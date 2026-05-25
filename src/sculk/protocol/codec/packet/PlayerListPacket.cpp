@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerListPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -79,8 +81,10 @@ Result<> PlayerListPacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string PlayerListPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mAction), SCULK_FORMAT_FIELD(mPlayerEntryList));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

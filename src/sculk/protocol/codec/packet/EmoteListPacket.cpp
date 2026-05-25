@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/EmoteListPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -24,8 +26,10 @@ Result<> EmoteListPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mEmotePieceIds, &UUID::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string EmoteListPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mActorRuntimeId), SCULK_FORMAT_FIELD(mEmotePieceIds));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

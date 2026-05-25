@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RemoveActorPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,6 +20,8 @@ void RemoveActorPacket::write(BinaryStream& stream) const { stream.writeVarInt64
 
 Result<> RemoveActorPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt64(mActorUniqueId); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string RemoveActorPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mActorUniqueId)); }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

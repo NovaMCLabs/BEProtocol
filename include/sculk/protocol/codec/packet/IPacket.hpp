@@ -9,7 +9,9 @@
 #include "sculk/protocol/codec/MinecraftPacketIds.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include <format>
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -32,7 +34,9 @@ public:
 
     [[nodiscard]] virtual Result<> read(ReadOnlyBinaryStream& stream) = 0;
 
-    [[nodiscard]] virtual std::string toString() const { return std::string(getName()); }
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
+    [[nodiscard]] virtual std::string toString() const = 0;
+#endif
 
     void writeHeader(BinaryStream& stream) const;
 
@@ -45,6 +49,7 @@ public:
 
 } // namespace sculk::protocol::inline abi_v975
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 template <>
 struct std::formatter<sculk::protocol::abi_v975::IPacket> : std::formatter<std::string> {
     auto format(const sculk::protocol::abi_v975::IPacket& packet, format_context& ctx) const {
@@ -60,4 +65,5 @@ struct fmt::formatter<sculk::protocol::abi_v975::IPacket> : fmt::formatter<std::
         return fmt::formatter<std::string>::format(packet.toString(), ctx);
     }
 };
+#endif
 #endif

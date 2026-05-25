@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MobEffectPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -36,6 +38,7 @@ Result<> MobEffectPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mAmbient);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string MobEffectPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mActorRuntimeId),
@@ -48,5 +51,6 @@ std::string MobEffectPacket::toString() const {
         SCULK_FORMAT_FIELD(mAmbient)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

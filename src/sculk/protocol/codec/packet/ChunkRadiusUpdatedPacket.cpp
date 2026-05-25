@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ChunkRadiusUpdatedPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,6 +20,8 @@ void ChunkRadiusUpdatedPacket::write(BinaryStream& stream) const { stream.writeV
 
 Result<> ChunkRadiusUpdatedPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mChunkRadius); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ChunkRadiusUpdatedPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mChunkRadius)); }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

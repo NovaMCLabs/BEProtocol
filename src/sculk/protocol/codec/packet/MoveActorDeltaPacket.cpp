@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MoveActorDeltaPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -72,6 +74,7 @@ Result<> MoveActorDeltaPacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string MoveActorDeltaPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mActorRuntimeId),
@@ -84,5 +87,6 @@ std::string MoveActorDeltaPacket::toString() const {
         SCULK_FORMAT_FIELD(mRotationYHeaderByteAngle)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

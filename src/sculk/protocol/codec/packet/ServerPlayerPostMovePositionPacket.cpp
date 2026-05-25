@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerPlayerPostMovePositionPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -22,8 +24,10 @@ void ServerPlayerPostMovePositionPacket::write(BinaryStream& stream) const { mPo
 
 Result<> ServerPlayerPostMovePositionPacket::read(ReadOnlyBinaryStream& stream) { return mPos.read(stream); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ServerPlayerPostMovePositionPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPos));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

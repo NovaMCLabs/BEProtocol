@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerboundDiagnosticsPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -83,6 +85,7 @@ Result<> ServerboundDiagnosticsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ServerboundDiagnosticsPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mAvgFps),
@@ -99,5 +102,6 @@ std::string ServerboundDiagnosticsPacket::toString() const {
         SCULK_FORMAT_FIELD(mSystemDiagnostics)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

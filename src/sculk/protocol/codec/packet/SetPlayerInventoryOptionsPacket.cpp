@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetPlayerInventoryOptionsPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -32,6 +34,7 @@ Result<> SetPlayerInventoryOptionsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mLayoutCraft, &ReadOnlyBinaryStream::readVarInt);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string SetPlayerInventoryOptionsPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mLeftInventoryTab),
@@ -41,5 +44,6 @@ std::string SetPlayerInventoryOptionsPacket::toString() const {
         SCULK_FORMAT_FIELD(mLayoutCraft)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

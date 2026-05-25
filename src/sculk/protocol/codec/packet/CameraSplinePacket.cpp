@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CameraSplinePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -22,6 +24,8 @@ Result<> CameraSplinePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mCameraDataSplines, &CameraSplineDefinition::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string CameraSplinePacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mCameraDataSplines)); }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

@@ -152,13 +152,21 @@ constexpr std::string typeToString(const T& value) {
     }
 }
 
+template <typename... Args, std::size_t... Is>
+constexpr std::string format_impl(std::index_sequence<Is...>, Args&&... args) {
+    std::string out{"{"};
+    ((out.append(args), (Is != sizeof...(Args) - 1 ? out.append(", ") : out)), ...);
+    out.push_back('}');
+    return out;
+}
+
 } // namespace detail
 
 template <typename T>
 void append(std::string& out, std::string_view name, const T& value, bool last) {
     out.append(std::format("{}: {}", name, detail::typeToString(value)));
     if (!last) {
-        out.push_back(',');
+        out.append(", ");
     }
 }
 
@@ -175,13 +183,7 @@ constexpr std::string toString(const T& value) {
 
 template <typename... Args>
 constexpr std::string format(Args&&... args) {
-    std::string out{"{"};
-    (out.append(args), ...);
-    if constexpr (sizeof...(Args) > 0) {
-        out.pop_back(); // Remove trailing comma
-    }
-    out.push_back('}');
-    return out;
+    return detail::format_impl(std::index_sequence_for<Args...>{}, std::forward<Args>(args)...);
 }
 
 #define SCULK_FORMAT_FIELD(FIELD) std::format("{}: {}", #FIELD, formatter::detail::typeToString(FIELD))

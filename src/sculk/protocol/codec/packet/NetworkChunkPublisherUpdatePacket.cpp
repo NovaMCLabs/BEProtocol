@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/NetworkChunkPublisherUpdatePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -40,6 +42,7 @@ Result<> NetworkChunkPublisherUpdatePacket::read(ReadOnlyBinaryStream& stream) {
     return {};
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string NetworkChunkPublisherUpdatePacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mNewPositionForView),
@@ -47,5 +50,6 @@ std::string NetworkChunkPublisherUpdatePacket::toString() const {
         SCULK_FORMAT_FIELD(mServerBuiltChunksList)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

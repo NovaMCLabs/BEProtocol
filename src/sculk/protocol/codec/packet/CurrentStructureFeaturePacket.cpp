@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CurrentStructureFeaturePacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,8 +22,10 @@ void CurrentStructureFeaturePacket::write(BinaryStream& stream) const { stream.w
 
 Result<> CurrentStructureFeaturePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mCurrent); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string CurrentStructureFeaturePacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mCurrent));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

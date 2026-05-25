@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/GameTestRequestPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -34,6 +36,7 @@ Result<> GameTestRequestPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readString(mTestName);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string GameTestRequestPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mMaxTestsPerBatch),
@@ -45,5 +48,6 @@ std::string GameTestRequestPacket::toString() const {
         SCULK_FORMAT_FIELD(mTestName)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/StructureTemplateDataRequestPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -32,6 +34,7 @@ Result<> StructureTemplateDataRequestPacket::read(ReadOnlyBinaryStream& stream) 
     return stream.readEnum(mOperationType, &ReadOnlyBinaryStream::readByte);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string StructureTemplateDataRequestPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mStructureName),
@@ -40,5 +43,6 @@ std::string StructureTemplateDataRequestPacket::toString() const {
         SCULK_FORMAT_FIELD(mOperationType)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

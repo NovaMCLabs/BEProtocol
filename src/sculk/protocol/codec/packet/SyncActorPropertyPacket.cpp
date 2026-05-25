@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SyncActorPropertyPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,6 +20,8 @@ void SyncActorPropertyPacket::write(BinaryStream& stream) const { mPropertyData.
 
 Result<> SyncActorPropertyPacket::read(ReadOnlyBinaryStream& stream) { return mPropertyData.read(stream); }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string SyncActorPropertyPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPropertyData)); }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

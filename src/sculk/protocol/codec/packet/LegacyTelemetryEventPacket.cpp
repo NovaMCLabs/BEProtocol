@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/LegacyTelemetryEventPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -230,6 +232,7 @@ Result<> LegacyTelemetryEventPacket::read(ReadOnlyBinaryStream& stream) {
     );
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string LegacyTelemetryEventPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mActorUniqueId),
@@ -237,5 +240,6 @@ std::string LegacyTelemetryEventPacket::toString() const {
         SCULK_FORMAT_FIELD(mUsePlayerId)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

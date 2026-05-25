@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CorrectPlayerMovePredictionPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -38,6 +40,7 @@ Result<> CorrectPlayerMovePredictionPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedVarInt64(mPlayerInputTick);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string CorrectPlayerMovePredictionPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mPredictionType),
@@ -49,5 +52,6 @@ std::string CorrectPlayerMovePredictionPacket::toString() const {
         SCULK_FORMAT_FIELD(mPlayerInputTick)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

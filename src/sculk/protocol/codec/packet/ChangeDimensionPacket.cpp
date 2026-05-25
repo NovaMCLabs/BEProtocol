@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ChangeDimensionPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -28,6 +30,7 @@ Result<> ChangeDimensionPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readOptional(mLoadingScreenId, &ReadOnlyBinaryStream::readUnsignedInt);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ChangeDimensionPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mDimensionType),
@@ -36,5 +39,6 @@ std::string ChangeDimensionPacket::toString() const {
         SCULK_FORMAT_FIELD(mLoadingScreenId)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

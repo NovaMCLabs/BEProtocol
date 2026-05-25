@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ShowCreditsPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -24,8 +26,10 @@ Result<> ShowCreditsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mCreditsState, &ReadOnlyBinaryStream::readVarInt);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ShowCreditsPacket::toString() const {
     return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPlayerRuntimeId), SCULK_FORMAT_FIELD(mCreditsState));
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

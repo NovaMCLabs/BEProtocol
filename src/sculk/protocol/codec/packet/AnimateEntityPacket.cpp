@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AnimateEntityPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -34,6 +36,7 @@ Result<> AnimateEntityPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mRuntimeIds, &ReadOnlyBinaryStream::readUnsignedVarInt64);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string AnimateEntityPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mAnimation),
@@ -45,5 +48,6 @@ std::string AnimateEntityPacket::toString() const {
         SCULK_FORMAT_FIELD(mRuntimeIds)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

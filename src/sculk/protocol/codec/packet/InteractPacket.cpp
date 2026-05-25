@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/InteractPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -26,6 +28,7 @@ Result<> InteractPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readOptional(mPosition, &Vec3::read);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string InteractPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mAction),
@@ -33,5 +36,6 @@ std::string InteractPacket::toString() const {
         SCULK_FORMAT_FIELD(mPosition)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975

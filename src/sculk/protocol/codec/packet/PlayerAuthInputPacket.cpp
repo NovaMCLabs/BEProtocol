@@ -6,7 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerAuthInputPacket.hpp"
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 #include "../utility/Format.hpp"
+#endif
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -74,6 +76,7 @@ Result<> PlayerAuthInputPacket::read(ReadOnlyBinaryStream& stream) {
     return mRawMoveVector.read(stream);
 }
 
+#ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string PlayerAuthInputPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mPlayerRotation),
@@ -97,5 +100,6 @@ std::string PlayerAuthInputPacket::toString() const {
         SCULK_FORMAT_FIELD(mRawMoveVector)
     );
 }
+#endif
 
 } // namespace sculk::protocol::inline abi_v975
