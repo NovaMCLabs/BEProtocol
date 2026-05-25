@@ -27,6 +27,27 @@ struct serializer<sculk::protocol::AuthenticationType> {
 
 namespace sculk::protocol::inline abi_v975 {
 
+std::optional<std::string_view> ConnectionRequest::getXUID() const {
+    if (mLoginToken && mLoginToken->mHeader.alg == "RS256") {
+        return mLoginToken->getXUID();
+    }
+    if (mLegacyCertificateChain && mLegacyCertificateChain->mClientCertificate.has_value()
+        && mLegacyCertificateChain->mMojangCertificate.has_value()) {
+        return mLegacyCertificateChain->getXUID();
+    }
+    return std::nullopt;
+}
+
+std::string_view ConnectionRequest::getXboxName() const {
+    if (mLoginToken) {
+        return mLoginToken->getXboxName();
+    }
+    if (mLegacyCertificateChain) {
+        return mLegacyCertificateChain->getXboxName();
+    }
+    return {};
+}
+
 Result<AuthenticationType> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     if (mLoginToken) {
         if (!mClientProperties.verify(mLoginToken->getClientPublicKey())) {
@@ -92,12 +113,19 @@ std::string ConnectionRequest::toString() const {
     return result;
 }
 
-#define SCULK_CONNECTION_REQUEST_DESERIALIZE(FIELD_NAME, VALUE)                                                        \
+#define SCULK_CONNECTION_REQUEST_DESERIALIZE_REQUIRED(FIELD_NAME, VALUE)                                               \
     if (!authJson.contains(FIELD_NAME)) {                                                                              \
         return error_utils::makeError("Authentication JSON does not contain a valid '" FIELD_NAME "' field");          \
     }                                                                                                                  \
     if (!reflection::jsonc::deserialize<false, false>(VALUE, authJson[FIELD_NAME], options)) {                         \
         return error_utils::makeError("Failed to deserialize '" FIELD_NAME "' field in authentication JSON");          \
+    }
+
+#define SCULK_CONNECTION_REQUEST_DESERIALIZE_OPTIONAL(FIELD_NAME, VALUE)                                               \
+    if (authJson.contains(FIELD_NAME)) {                                                                               \
+        if (!reflection::jsonc::deserialize<false, false>(VALUE, authJson[FIELD_NAME], options)) {                     \
+            return error_utils::makeError("Failed to deserialize '" FIELD_NAME "' field in authentication JSON");      \
+        }                                                                                                              \
     }
 
 Result<ConnectionRequest> ConnectionRequest::fromString(std::string_view rawRequest) {
@@ -117,11 +145,11 @@ Result<ConnectionRequest> ConnectionRequest::fromString(std::string_view rawRequ
     static reflection::jsonc::options options{.indent = -1, .allow_trailing_comma = false};
 
     AuthenticationType authType{};
-    SCULK_CONNECTION_REQUEST_DESERIALIZE("AuthenticationType", authType);
+    SCULK_CONNECTION_REQUEST_DESERIALIZE_REQUIRED("AuthenticationType", authType);
     std::optional<std::string> legacyCertificate{};
-    SCULK_CONNECTION_REQUEST_DESERIALIZE("Certificate", legacyCertificate);
+    SCULK_CONNECTION_REQUEST_DESERIALIZE_OPTIONAL("Certificate", legacyCertificate);
     std::string loginToken{};
-    SCULK_CONNECTION_REQUEST_DESERIALIZE("Token", loginToken);
+    SCULK_CONNECTION_REQUEST_DESERIALIZE_REQUIRED("Token", loginToken);
 
     std::string clientProperties{};
     if (!stream.readLongString(clientProperties)) {
