@@ -9,6 +9,7 @@
 #include "ssl/ES384.hpp"
 #include "ssl/RS256.hpp"
 #include <httplib.h>
+#include <random>
 #include <sculk/reflection/jsonc/reflection.hpp>
 
 namespace sculk::protocol::inline abi_v975 {
@@ -16,6 +17,29 @@ namespace sculk::protocol::inline abi_v975 {
 constexpr std::string_view MOJANG_PUBLIC_KEY_PEM =
     "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/"
     "4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
+
+std::chrono::system_clock::time_point AuthenticationKeyManager::getValidityTime() const {
+    return mValidityTime.value_or(std::chrono::system_clock::now());
+}
+
+const std::vector<std::string>& AuthenticationKeyManager::getLegacyCertificateChainPublicKeyPems() const {
+    return mLegacyCertificateChainPublicKeyPems;
+}
+
+std::optional<std::string_view>
+AuthenticationKeyManager::getLoginTokenPublicKeyPemByKeyId(const std::string& keyId) const {
+    auto it = mLoginTokenPublicKeysPemByKeyId.find(keyId);
+    if (it != mLoginTokenPublicKeysPemByKeyId.end()) {
+        return it->second;
+    }
+    return {};
+}
+
+std::string_view AuthenticationKeyManager::getLoginTokenExpectedIssuer() const { return mLoginTokenExpectedIssuer; }
+
+std::string_view AuthenticationKeyManager::getLoginTokenExpectedPlayFabTitle() const {
+    return mLoginTokenExpectedPlayFabTitle;
+}
 
 Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::generateRandomES384KeyPair() const {
     std::string privateKeyPem{};
@@ -33,6 +57,162 @@ Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::generateRand
         return error_utils::makeError("Failed to generate RS256 key pair");
     }
     return KeyPair{std::move(publicKeyPem), std::move(privateKeyPem)};
+}
+
+std::chrono::system_clock::time_point AuthenticationKeyManager::getSigningTime() const {
+    return mSigningTime.value_or(std::chrono::system_clock::now());
+}
+
+bool AuthenticationKeyManager::legacyCertificateChainSigningInitialized(AuthenticationType authType) const {
+    if (authType == AuthenticationType::Full) {
+        return mLegacyCertificateClientKeyPair.has_value() && mLegacyCertificateMojangKeyPair.has_value()
+            && mLegacyCertificateLoginKeyPair.has_value();
+    } else if (authType == AuthenticationType::SelfSigned) {
+        return mLegacyCertificateLoginKeyPair.has_value();
+    }
+    return false;
+}
+
+void AuthenticationKeyManager::setLegacyCertificateChainClientKeyPair(
+    std::string_view publicKeyPem,
+    std::string_view privateKeyPem
+) {
+    mLegacyCertificateClientKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
+}
+
+void AuthenticationKeyManager::setLegacyCertificateChainMojangKeyPair(
+    std::string_view publicKeyPem,
+    std::string_view privateKeyPem
+) {
+    mLegacyCertificateMojangKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
+}
+
+void AuthenticationKeyManager::setLegacyCertificateChainLoginKeyPair(
+    std::string_view publicKeyPem,
+    std::string_view privateKeyPem
+) {
+    mLegacyCertificateLoginKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
+}
+
+Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getLegacyCertificateChainClientKeyPair() const {
+    if (mLegacyCertificateClientKeyPair) {
+        return *mLegacyCertificateClientKeyPair;
+    }
+    return error_utils::makeError("Client key pair not set");
+}
+
+Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getLegacyCertificateChainMojangKeyPair() const {
+    if (mLegacyCertificateMojangKeyPair) {
+        return *mLegacyCertificateMojangKeyPair;
+    }
+    return error_utils::makeError("Mojang key pair not set");
+}
+
+Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getLegacyCertificateChainLoginKeyPair() const {
+    if (mLegacyCertificateLoginKeyPair) {
+        return *mLegacyCertificateLoginKeyPair;
+    }
+    return error_utils::makeError("Login key pair not set");
+}
+
+bool AuthenticationKeyManager::loginTokenSigningInitialized(AuthenticationType authType) const {
+    if (authType == AuthenticationType::Full) {
+        return mLoginTokenKeyPairsAndKeyId.has_value();
+    } else if (authType == AuthenticationType::SelfSigned) {
+        return mSelfSignedLoginTokenKeyPair.has_value();
+    }
+    return false;
+}
+
+std::string AuthenticationKeyManager::generateRandomKeyId() const {
+    // Example Key ID: 6CD621632CEE45A16374B30445B1FB9B77EC7BF7
+    static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
+
+    thread_local std::mt19937_64       generator(std::random_device{}());
+    std::uniform_int_distribution<int> dist(0, 255);
+
+    std::string keyId{};
+    keyId.reserve(40);
+
+    do {
+        keyId.clear();
+        for (int i = 0; i < 20; ++i) {
+            const int value = dist(generator);
+            keyId.push_back(HEX_TABLE[(value >> 4) & 0x0F]);
+            keyId.push_back(HEX_TABLE[value & 0x0F]);
+        }
+    } while (mLoginTokenPublicKeysPemByKeyId.find(keyId) != mLoginTokenPublicKeysPemByKeyId.end());
+
+    return keyId;
+}
+
+Result<> AuthenticationKeyManager::generateAndSetLoginTokenKeyPairFull() {
+    auto keyPair = generateRandomRS256KeyPair();
+    if (!keyPair) {
+        return error_utils::makeError("Failed to generate login token key pair");
+    }
+    mLoginTokenKeyPairsAndKeyId = std::make_pair(generateRandomKeyId(), *keyPair);
+    return {};
+}
+
+Result<> AuthenticationKeyManager::generateAndSetLoginTokenKeyPairSelfSigned() {
+    auto keyPair = generateRandomES384KeyPair();
+    if (!keyPair) {
+        return error_utils::makeError("Failed to generate login token key pair");
+    }
+    mSelfSignedLoginTokenKeyPair = *keyPair;
+    return {};
+}
+
+void AuthenticationKeyManager::setLoginTokenKeyPairFull(
+    const std::string& keyId,
+    std::string_view   publicKeyPem,
+    std::string_view   privateKeyPem
+) {
+    mLoginTokenKeyPairsAndKeyId = std::make_pair(keyId, KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)});
+}
+
+void AuthenticationKeyManager::setLoginTokenKeyPairSelfSigned(
+    std::string_view publicKeyPem,
+    std::string_view privateKeyPem
+) {
+    mSelfSignedLoginTokenKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
+}
+
+Result<AuthenticationKeyManager::KeyPair>
+AuthenticationKeyManager::getFullLoginTokenKeyPairAndKeyId(std::string& outKeyId) const {
+    if (mLoginTokenKeyPairsAndKeyId) {
+        outKeyId = mLoginTokenKeyPairsAndKeyId->first;
+        return mLoginTokenKeyPairsAndKeyId->second;
+    }
+    return error_utils::makeError("Login token key pair not set");
+}
+
+Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getSelfSignedLoginTokenKeyPair() const {
+    if (mSelfSignedLoginTokenKeyPair) {
+        return *mSelfSignedLoginTokenKeyPair;
+    }
+    return error_utils::makeError("Login token key pair not set");
+}
+
+void AuthenticationKeyManager::addLoginTokenPublicKeyPemByKeyId(
+    const std::string& keyId,
+    const std::string& publicKeyPem
+) {
+    mLoginTokenPublicKeysPemByKeyId[keyId] = publicKeyPem;
+}
+
+void AuthenticationKeyManager::addLegacyCertificateChainPublicKeyPem(std::string_view publicKeyPem) {
+    mLegacyCertificateChainPublicKeyPems.emplace_back(publicKeyPem);
+}
+
+Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getClientPropertiesKeyPair() const {
+    if (mSigningAuthenticationType == AuthenticationType::Full) {
+        return getLegacyCertificateChainClientKeyPair();
+    } else if (mSigningAuthenticationType == AuthenticationType::SelfSigned) {
+        return getLegacyCertificateChainLoginKeyPair();
+    }
+    return error_utils::makeError("Unsupported authentication type for getting client properties key pair");
 }
 
 Result<> AuthenticationKeyManager::generateAndSetLegacyFullCertificateChainKeyPairs() {
@@ -188,6 +368,12 @@ Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeo
     mLoginTokenExpectedIssuer = std::move(configFetchResult.issuer);
 
     return {};
+}
+
+std::future<Result<>> AuthenticationKeyManager::initMojangPublicKeyAsync(std::size_t timeoutSeconds) {
+    return std::async(std::launch::async, [this, timeoutSeconds]() {
+        return initMojangPublicKeyBlocking(timeoutSeconds);
+    });
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -85,13 +85,6 @@ public:
     Certificate                mLoginCertificate{};
 
 public:
-    [[nodiscard]] std::string_view getIdentity() const { return mLoginCertificate.mPayload.extraData->identity; }
-
-    [[nodiscard]] std::string_view getXboxName() const { return mLoginCertificate.mPayload.extraData->displayName; }
-
-    [[nodiscard]] std::string_view getXUID() const { return mLoginCertificate.mPayload.extraData->XUID; }
-
-public:
     [[nodiscard]] std::string getClientPublicKey() const {
         return mClientCertificate ? mClientCertificate->mPayload.identityPublicKey
                                   : mLoginCertificate.mPayload.identityPublicKey;

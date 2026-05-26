@@ -15,7 +15,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(PROTOCOL_ENABLE_DETAIL_ERRORS "Enable detailed error information" OFF)
 option(PROTOCOL_ENABLE_CODEC "Enable codec features" ON)
 option(PROTOCOL_ENABLE_AUTHENTICATION "Enable authentication features" ON)
-option(PROTOCOL_ENABLE_CONNECTION "Enable connection features" OFF)
+option(PROTOCOL_ENABLE_CONNECTION "Enable connection features" ON)
 option(PROTOCOL_ENABLE_EXCEPTIONS "Enable C++ exceptions for Protocol target" OFF)
 option(PROTOCOL_ENABLE_FORMATTING "Enable string formatting support for Protocol target" OFF)
 

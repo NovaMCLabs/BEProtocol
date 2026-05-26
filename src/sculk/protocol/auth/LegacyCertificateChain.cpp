@@ -78,6 +78,7 @@ bool Certificate::verify(std::string_view publicKeyPem) const {
 }
 
 bool Certificate::sign(std::string_view privateKeyPem, std::chrono::system_clock::time_point now) {
+    mHeader.alg = "ES384";
     mPayload.exp =
         std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch() + std::chrono::hours(3)).count();
     mPayload.nbf = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();

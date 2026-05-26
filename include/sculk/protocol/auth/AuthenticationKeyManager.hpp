@@ -46,25 +46,15 @@ public:
 
     [[nodiscard]] constexpr std::chrono::seconds getValidityLeeway() const { return mValidityLeeway; }
 
-    [[nodiscard]] std::chrono::system_clock::time_point getValidityTime() const {
-        return mValidityTime.value_or(std::chrono::system_clock::now());
-    }
+    [[nodiscard]] std::chrono::system_clock::time_point getValidityTime() const;
 
-    [[nodiscard]] const std::vector<std::string>& getLegacyCertificateChainPublicKeyPems() const {
-        return mLegacyCertificateChainPublicKeyPems;
-    }
+    [[nodiscard]] const std::vector<std::string>& getLegacyCertificateChainPublicKeyPems() const;
 
-    [[nodiscard]] std::optional<std::string_view> getLoginTokenPublicKeyPemByKeyId(const std::string& keyId) const {
-        auto it = mLoginTokenPublicKeysPemByKeyId.find(keyId);
-        if (it != mLoginTokenPublicKeysPemByKeyId.end()) {
-            return it->second;
-        }
-        return {};
-    }
+    [[nodiscard]] std::optional<std::string_view> getLoginTokenPublicKeyPemByKeyId(const std::string& keyId) const;
 
-    [[nodiscard]] std::string_view getLoginTokenExpectedIssuer() const { return mLoginTokenExpectedIssuer; }
+    [[nodiscard]] std::string_view getLoginTokenExpectedIssuer() const;
 
-    [[nodiscard]] std::string_view getLoginTokenExpectedPlayFabTitle() const { return mLoginTokenExpectedPlayFabTitle; }
+    [[nodiscard]] std::string_view getLoginTokenExpectedPlayFabTitle() const;
 
 public:
     [[nodiscard]] Result<KeyPair> generateRandomES384KeyPair() const;
@@ -76,130 +66,51 @@ public:
         return mSigningAuthenticationType;
     }
 
-    [[nodiscard]] std::chrono::system_clock::time_point getSigningTime() const {
-        return mSigningTime.value_or(std::chrono::system_clock::now());
-    }
+    [[nodiscard]] std::chrono::system_clock::time_point getSigningTime() const;
 
-    [[nodiscard]] bool legacyCertificateChainSigningInitialized(AuthenticationType authType) const {
-        if (authType == AuthenticationType::Full) {
-            return mLegacyCertificateClientKeyPair.has_value() && mLegacyCertificateMojangKeyPair.has_value()
-                && mLegacyCertificateLoginKeyPair.has_value();
-        } else if (authType == AuthenticationType::SelfSigned) {
-            return mLegacyCertificateLoginKeyPair.has_value();
-        }
-        return false;
-    }
+    [[nodiscard]] bool legacyCertificateChainSigningInitialized(AuthenticationType authType) const;
 
     [[nodiscard]] Result<> generateAndSetLegacyFullCertificateChainKeyPairs();
 
     [[nodiscard]] Result<> generateAndSetLegacySelfSignedCertificateChainKeyPairs();
 
-    constexpr void
-    setLegacyCertificateChainClientKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem) {
-        mLegacyCertificateClientKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
-    }
+    void setLegacyCertificateChainClientKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    constexpr void
-    setLegacyCertificateChainMojangKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem) {
-        mLegacyCertificateMojangKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
-    }
+    void setLegacyCertificateChainMojangKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    constexpr void
-    setLegacyCertificateChainLoginKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem) {
-        mLegacyCertificateLoginKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
-    }
+    void setLegacyCertificateChainLoginKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    [[nodiscard]] Result<KeyPair> getLegacyCertificateChainClientKeyPair() const {
-        if (mLegacyCertificateClientKeyPair) {
-            return *mLegacyCertificateClientKeyPair;
-        }
-        return error_utils::makeError("Client key pair not set");
-    }
+    [[nodiscard]] Result<KeyPair> getLegacyCertificateChainClientKeyPair() const;
 
-    [[nodiscard]] Result<KeyPair> getLegacyCertificateChainMojangKeyPair() const {
-        if (mLegacyCertificateMojangKeyPair) {
-            return *mLegacyCertificateMojangKeyPair;
-        }
-        return error_utils::makeError("Mojang key pair not set");
-    }
+    [[nodiscard]] Result<KeyPair> getLegacyCertificateChainMojangKeyPair() const;
 
-    [[nodiscard]] Result<KeyPair> getLegacyCertificateChainLoginKeyPair() const {
-        if (mLegacyCertificateLoginKeyPair) {
-            return *mLegacyCertificateLoginKeyPair;
-        }
-        return error_utils::makeError("Login key pair not set");
-    }
-
-    [[nodiscard]] bool loginTokenSigningInitialized(AuthenticationType authType) const {
-        if (authType == AuthenticationType::Full) {
-            return mLoginTokenKeyPairsAndKeyId.has_value();
-        } else if (authType == AuthenticationType::SelfSigned) {
-            return mSelfSignedLoginTokenKeyPair.has_value();
-        }
-        return false;
-    }
-
-    [[nodiscard]] Result<> generateAndSetLoginTokenKeyPairFull(std::string_view keyId) {
-        auto keyPair = generateRandomRS256KeyPair();
-        if (!keyPair) {
-            return error_utils::makeError("Failed to generate login token key pair");
-        }
-        mLoginTokenKeyPairsAndKeyId = std::make_pair(std::string(keyId), *keyPair);
-        return {};
-    }
-
-    [[nodiscard]] Result<> generateAndSetLoginTokenKeyPairSelfSigned() {
-        auto keyPair = generateRandomES384KeyPair();
-        if (!keyPair) {
-            return error_utils::makeError("Failed to generate login token key pair");
-        }
-        mSelfSignedLoginTokenKeyPair = *keyPair;
-        return {};
-    }
-
-    constexpr void
-    setLoginTokenKeyPairFull(const std::string& keyId, std::string_view publicKeyPem, std::string_view privateKeyPem) {
-        mLoginTokenKeyPairsAndKeyId =
-            std::make_pair(keyId, KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)});
-    }
-
-    constexpr void setLoginTokenKeyPairSelfSigned(std::string_view publicKeyPem, std::string_view privateKeyPem) {
-        mSelfSignedLoginTokenKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
-    }
-
-    [[nodiscard]] Result<KeyPair> getLoginTokenKeyPairFull(std::string& outKeyId) const {
-        if (mLoginTokenKeyPairsAndKeyId) {
-            outKeyId = mLoginTokenKeyPairsAndKeyId->first;
-            return mLoginTokenKeyPairsAndKeyId->second;
-        }
-        return error_utils::makeError("Login token key pair not set");
-    }
-
-    [[nodiscard]] Result<KeyPair> getLoginTokenKeyPairSelfSigned() const {
-        if (mSelfSignedLoginTokenKeyPair) {
-            return *mSelfSignedLoginTokenKeyPair;
-        }
-        return error_utils::makeError("Login token key pair not set");
-    }
+    [[nodiscard]] Result<KeyPair> getLegacyCertificateChainLoginKeyPair() const;
 
 public:
-    constexpr void addLoginTokenPublicKeyPemByKeyId(const std::string& keyId, const std::string& publicKeyPem) {
-        mLoginTokenPublicKeysPemByKeyId[keyId] = publicKeyPem;
-    }
+    [[nodiscard]] bool loginTokenSigningInitialized(AuthenticationType authType) const;
 
-    constexpr void addLegacyCertificateChainPublicKeyPem(std::string_view publicKeyPem) {
-        mLegacyCertificateChainPublicKeyPems.emplace_back(publicKeyPem);
-    }
+    [[nodiscard]] std::string generateRandomKeyId() const;
+
+    [[nodiscard]] Result<> generateAndSetLoginTokenKeyPairFull();
+
+    [[nodiscard]] Result<> generateAndSetLoginTokenKeyPairSelfSigned();
+
+    void
+    setLoginTokenKeyPairFull(const std::string& keyId, std::string_view publicKeyPem, std::string_view privateKeyPem);
+
+    void setLoginTokenKeyPairSelfSigned(std::string_view publicKeyPem, std::string_view privateKeyPem);
+
+    [[nodiscard]] Result<KeyPair> getFullLoginTokenKeyPairAndKeyId(std::string& outKeyId) const;
+
+    [[nodiscard]] Result<KeyPair> getSelfSignedLoginTokenKeyPair() const;
 
 public:
-    [[nodiscard]] Result<KeyPair> getClientPropertiesKeyPair() const {
-        if (mSigningAuthenticationType == AuthenticationType::Full) {
-            return getLegacyCertificateChainClientKeyPair();
-        } else if (mSigningAuthenticationType == AuthenticationType::SelfSigned) {
-            return getLegacyCertificateChainLoginKeyPair();
-        }
-        return error_utils::makeError("Unsupported authentication type for getting client properties key pair");
-    }
+    void addLoginTokenPublicKeyPemByKeyId(const std::string& keyId, const std::string& publicKeyPem);
+
+    void addLegacyCertificateChainPublicKeyPem(std::string_view publicKeyPem);
+
+public:
+    [[nodiscard]] Result<KeyPair> getClientPropertiesKeyPair() const;
 
 public:
     constexpr void setVerifyAuthenticationType(AuthenticationType authType) { mVerifyAuthenticationType = authType; }
@@ -214,11 +125,7 @@ public:
 
     Result<> initMojangPublicKeyBlocking(std::size_t timeoutSeconds);
 
-    std::future<Result<>> initMojangPublicKeyAsync(std::size_t timeoutSeconds) {
-        return std::async(std::launch::async, [this, timeoutSeconds]() {
-            return initMojangPublicKeyBlocking(timeoutSeconds);
-        });
-    }
+    std::future<Result<>> initMojangPublicKeyAsync(std::size_t timeoutSeconds);
 };
 
 } // namespace sculk::protocol::inline abi_v975

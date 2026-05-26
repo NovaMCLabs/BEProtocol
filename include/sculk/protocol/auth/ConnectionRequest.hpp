@@ -9,6 +9,7 @@
 #include "AuthenticationKeyManager.hpp"
 #include "AuthenticationType.hpp"
 #include "ClientProperties.hpp"
+#include "Identity.hpp"
 #include "LegacyCertificateChain.hpp"
 #include "LoginToken.hpp"
 #include "sculk/protocol/utility/Result.hpp"
@@ -25,9 +26,13 @@ public:
     ClientProperties                      mClientProperties{};
 
 public:
-    [[nodiscard]] std::optional<std::string_view> getXUID() const;
+    [[nodiscard]] std::optional<std::string> getXboxLiveID() const;
 
-    [[nodiscard]] std::string_view getXboxName() const;
+    [[nodiscard]] std::string getXboxLiveName() const;
+
+    [[nodiscard]] Identity getIdentity() const;
+
+    [[nodiscard]] std::string getPlayFabID() const;
 
 public:
     [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& publicKeyManager) const;

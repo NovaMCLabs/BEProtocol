@@ -166,7 +166,7 @@ Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& au
 Result<> LoginToken::signFull(const AuthenticationKeyManager& authenticationKeyManager) {
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTION_INIT();
 
-    auto keyPair = authenticationKeyManager.getLoginTokenKeyPairFull(mHeader.kid.emplace());
+    auto keyPair = authenticationKeyManager.getFullLoginTokenKeyPairAndKeyId(mHeader.kid.emplace());
     if (!keyPair) {
         return error_utils::makeError("No login token key pair available for signing");
     }
@@ -206,13 +206,14 @@ Result<> LoginToken::signFull(const AuthenticationKeyManager& authenticationKeyM
 Result<> LoginToken::signSelfSigned(const AuthenticationKeyManager& authenticationKeyManager) {
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTION_INIT();
 
-    auto keyPair = authenticationKeyManager.getLoginTokenKeyPairSelfSigned();
+    auto keyPair = authenticationKeyManager.getSelfSignedLoginTokenKeyPair();
     if (!keyPair) {
         return error_utils::makeError("No self-signed login token key pair available for signing");
     }
 
     mHeader.alg = "ES384";
     mHeader.x5u = keyPair->mPublicKeyPem;
+
     SCULK_LOGIN_TOKEN_CREATE_JSON(header, mHeader);
     SCULK_LOGIN_TOKEN_SERIALIZE(header, alg);
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTIONAL(header, x5u);

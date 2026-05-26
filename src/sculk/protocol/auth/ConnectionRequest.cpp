@@ -9,6 +9,8 @@
 #include "sculk/protocol/utility/Base64Url.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include <limits>
+#include <random>
 #include <sculk/reflection/jsonc/reflection.hpp>
 
 namespace sculk::reflection::jsonc {
@@ -27,25 +29,48 @@ struct serializer<sculk::protocol::AuthenticationType> {
 
 namespace sculk::protocol::inline abi_v975 {
 
-std::optional<std::string_view> ConnectionRequest::getXUID() const {
+std::optional<std::string> ConnectionRequest::getXboxLiveID() const {
+    std::string xuid{};
     if (mLoginToken && mLoginToken->mHeader.alg == "RS256") {
-        return mLoginToken->getXUID();
+        xuid = mLoginToken->mPayload.xid;
     }
     if (mLegacyCertificateChain && mLegacyCertificateChain->mClientCertificate.has_value()
         && mLegacyCertificateChain->mMojangCertificate.has_value()) {
-        return mLegacyCertificateChain->getXUID();
+        xuid = mLegacyCertificateChain->mLoginCertificate.mPayload.extraData->XUID;
+    }
+    if (!xuid.empty() && Identity::validateXuid(xuid)) {
+        return xuid;
     }
     return std::nullopt;
 }
 
-std::string_view ConnectionRequest::getXboxName() const {
+std::string ConnectionRequest::getXboxLiveName() const {
     if (mLoginToken) {
-        return mLoginToken->getXboxName();
+        return mLoginToken->mPayload.xname;
     }
     if (mLegacyCertificateChain) {
-        return mLegacyCertificateChain->getXboxName();
+        return mLegacyCertificateChain->mLoginCertificate.mPayload.extraData->displayName;
     }
     return {};
+}
+
+Identity ConnectionRequest::getIdentity() const {
+    auto xuid = getXboxLiveID();
+    if (xuid && Identity::validateXuid(*xuid)) {
+        return Identity::fromXuid(*xuid);
+    }
+    auto selfSignedId = mClientProperties.mPayload.mSelfSignedId;
+    if (Identity::validateString(selfSignedId)) {
+        return Identity::fromString(selfSignedId);
+    }
+    return {};
+}
+
+std::string ConnectionRequest::getPlayFabID() const {
+    if (mLoginToken) {
+        return mLoginToken->mPayload.mid;
+    }
+    return mClientProperties.mPayload.mPlayFabId;
 }
 
 Result<AuthenticationType> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
@@ -78,11 +103,143 @@ Result<AuthenticationType> ConnectionRequest::verify(const AuthenticationKeyMana
     return error_utils::makeError("ConnectionRequest must have either a login token or a legacy certificate chain");
 }
 
+namespace {
+
+template <typename T = std::int64_t>
+inline T randomInt() {
+    thread_local std::mt19937_64     generator(std::random_device{}());
+    std::uniform_int_distribution<T> dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+    return dist(generator);
+}
+
+inline Identity randomIdentity() {
+    return Identity{.mHighBits = randomInt<std::uint64_t>(), .mLowBits = randomInt<std::uint64_t>()};
+}
+
+inline Result<>
+ensureAndFillAllFieldsFull(ConnectionRequest& request, const AuthenticationKeyManager& publicKeyManager) {
+    if (!request.mLoginToken) {
+        request.mLoginToken = LoginToken{
+            .mPayload = {
+                         // Full sign payload
+                .sub   = "",                                                                // Unknown
+                .ipt   = "",                                                                // Unknown
+                .mid   = request.getPlayFabID(),                                            // PlayFabID
+                .tid   = std::string(publicKeyManager.getLoginTokenExpectedPlayFabTitle()), // PlayFabIdTitle
+                .pfcd  = 0,                                                                 // Unknown
+                .cpk   = request.mLegacyCertificateChain->getClientPublicKey(), // ES384 public key for ClientProperties
+                .ap    = 15,                                                    // Unknown
+                .xid   = request.getXboxLiveID().value_or(""),                  // XUID
+                .xname = request.getXboxLiveName(),                             // Xbox Live gamertag
+                .iss   = std::string(publicKeyManager.getLoginTokenExpectedIssuer()), // Issuer
+                .aud   = "api://auth-minecraft-services/multiplayer"                  // Audience
+            },
+        };
+    } else if (!request.mLegacyCertificateChain) {
+        request.mLegacyCertificateChain = LegacyCertificateChain{
+            .mLoginCertificate = Certificate{
+                .mPayload = {
+                    .randomNonce = randomInt(),
+                    .iss         = "Mojang",
+                    .iat         = 0,
+                    .extraData   = Certificate::ExtraData{
+                        .identity    = request.getIdentity().toString(),
+                        .displayName = request.getXboxLiveName(),
+                        .XUID        = request.getXboxLiveID().value_or(""),
+                        .sandBoxId   = "RETAIL"
+                    }
+                }
+            }
+        };
+        request.mClientProperties.mPayload.mPlayFabId = request.mLoginToken->mPayload.mid;
+    }
+
+    if (!request.mLegacyCertificateChain->mClientCertificate) {
+        request.mLegacyCertificateChain->mClientCertificate = Certificate{.mPayload = {.certificateAuthority = true}};
+    }
+
+    if (!request.mLegacyCertificateChain->mMojangCertificate) {
+        request.mLegacyCertificateChain->mMojangCertificate = Certificate{
+            .mPayload = {.certificateAuthority = true, .randomNonce = randomInt(), .iss = "Mojang", .iat = 0}
+        };
+    }
+
+    return {};
+}
+
+inline Result<> ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request) {
+    if (!request.mLoginToken) {
+        request.mLoginToken = LoginToken{
+            .mPayload = {
+                         // SelfSigned sign payload
+                .mid   = request.getPlayFabID(),                                // PlayFabID
+                .cpk   = request.mLegacyCertificateChain->getClientPublicKey(), // ES384 public key for ClientProperties
+                .ap    = 0,                                                     // Unknown
+                .xid   = request.getXboxLiveID().value_or(""),                  // XUID
+                .xname = request.getXboxLiveName(),                             // Xbox Live gamertag
+                .aud   = "api://auth-minecraft-services/multiplayer",           // Audience
+                .leguuid = randomIdentity().toString(),                         // Unknown
+                .nid     = "",                                                  // Unknown
+                .nname   = "",                                                  // Unknown
+                .pid     = "",                                                  // Unknown
+                .pname   = ""                                                   // Unknown
+            },
+        };
+    } else if (!request.mLegacyCertificateChain) {
+        request.mLegacyCertificateChain = LegacyCertificateChain{
+            .mLoginCertificate = Certificate{
+                .mPayload = {
+                    .randomNonce = randomInt(),
+                    // .iss         = "Mojang",
+                    // .iat         = 0,
+                    .extraData = Certificate::ExtraData{
+                        .identity    = request.getIdentity().toString(),
+                        .displayName = request.getXboxLiveName(),
+                        .XUID        = "",      // Empty XUID
+                        .sandBoxId   = "RETAIL" // Always "RETAIL"
+                    }
+                }
+            }
+        };
+        request.mClientProperties.mPayload.mPlayFabId = request.mLoginToken->mPayload.mid;
+    }
+
+    return {};
+}
+
+} // namespace
+
 Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationKeyManager) {
     if (!mLoginToken && !mLegacyCertificateChain) {
         return error_utils::makeError(
             "ConnectionRequest must have either a login token or a legacy certificate chain to sign"
         );
+    }
+
+    mAuthenticationType = authenticationKeyManager.getSigningAuthenticationType();
+    if (mAuthenticationType == AuthenticationType::Full) {
+        if (!ensureAndFillAllFieldsFull(*this, authenticationKeyManager)) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format("Failed to ensure and fill all fields for full authentication: {}", status.error().mMessage)
+            );
+#else
+            return error_utils::makeError("Failed to ensure and fill all fields for full authentication");
+#endif
+        }
+    } else if (mAuthenticationType == AuthenticationType::SelfSigned) {
+        if (!ensureAndFillAllFieldsSelfSigned(*this)) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+            return error_utils::makeError(
+                std::format(
+                    "Failed to ensure and fill all fields for self-signed authentication: {}",
+                    status.error().mMessage
+                )
+            );
+#else
+            return error_utils::makeError("Failed to ensure and fill all fields for self-signed authentication");
+#endif
+        }
     }
 
     if (mLoginToken && authenticationKeyManager.loginTokenSigningInitialized(mAuthenticationType)) {

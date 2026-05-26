@@ -54,13 +54,6 @@ public:
 public:
     [[nodiscard]] std::string getClientPublicKey() const { return mPayload.cpk; }
 
-    [[nodiscard]] std::string_view getPlayFabID() const { return mPayload.mid; }
-
-    [[nodiscard]] std::string_view getXboxName() const { return mPayload.xname; }
-
-    [[nodiscard]] std::string_view getXUID() const { return mPayload.xid; }
-
-public:
     [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
 
     [[nodiscard]] Result<> signFull(const AuthenticationKeyManager& authenticationKeyManager);
