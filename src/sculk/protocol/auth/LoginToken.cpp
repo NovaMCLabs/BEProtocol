@@ -114,6 +114,10 @@ Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& au
             SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(pid);
             SCULK_LOGIN_TOKEN_CHECK_PAYLOAD(pname);
 
+            if (*mHeader.x5u != mPayload.cpk) {
+                return error_utils::makeError("Login token 'x5u' header field does not match 'cpk' payload field");
+            }
+
             if (!es384::verifyES384Signature(signingInput, mSignature, *mHeader.x5u)) {
                 return error_utils::makeError("Failed to verify login token signature");
             }

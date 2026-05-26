@@ -68,16 +68,14 @@ if(PROTOCOL_ENABLE_AUTHENTICATION OR PROTOCOL_ENABLE_CONNECTION)
     )
     FetchContent_MakeAvailable(reflection)
     target_link_libraries(Protocol PRIVATE $<BUILD_INTERFACE:reflection::reflection>)
-else()
-    if(PROTOCOL_ENABLE_CODEC)
-        FetchContent_Declare(
-            magic_enum
-            GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-            GIT_TAG v0.9.7
-        )
-        FetchContent_MakeAvailable(magic_enum)
-        target_link_libraries(Protocol PRIVATE $<BUILD_INTERFACE:magic_enum::magic_enum>)
-    endif()
+elseif(PROTOCOL_ENABLE_CODEC)
+    FetchContent_Declare(
+        magic_enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+        GIT_TAG v0.9.7
+    )
+    FetchContent_MakeAvailable(magic_enum)
+    target_link_libraries(Protocol PRIVATE $<BUILD_INTERFACE:magic_enum::magic_enum>)
 endif()
 
 if(PROTOCOL_ENABLE_AUTHENTICATION)
@@ -104,6 +102,68 @@ if(PROTOCOL_ENABLE_AUTHENTICATION)
     target_compile_definitions(Protocol PRIVATE
         CPPHTTPLIB_OPENSSL_SUPPORT
         CPPHTTPLIB_NO_EXCEPTIONS
+    )
+endif()
+
+if(PROTOCOL_ENABLE_CONNECTION)
+    set(ZLIB_BUILD_TESTING OFF CACHE BOOL "Disable zlib tests" FORCE)
+    set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "Disable zlib examples" FORCE)
+    set(SKIP_INSTALL_ALL ON CACHE BOOL "Disable zlib install targets" FORCE)
+
+    FetchContent_Declare(
+        zlib
+        GIT_REPOSITORY https://github.com/madler/zlib.git
+        GIT_TAG v1.3.2
+    )
+    FetchContent_GetProperties(zlib)
+
+    if(NOT zlib_POPULATED)
+        FetchContent_Populate(zlib)
+        add_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
+
+    if(NOT TARGET zlibstatic)
+        message(FATAL_ERROR "Static zlib target 'zlibstatic' was not generated. Static linking is required.")
+    endif()
+
+    foreach(PROTOCOL_ZLIB_OPTIONAL_TARGET zlib example minigzip example64 minigzip64)
+        if(TARGET ${PROTOCOL_ZLIB_OPTIONAL_TARGET})
+            set_target_properties(${PROTOCOL_ZLIB_OPTIONAL_TARGET} PROPERTIES
+                EXCLUDE_FROM_ALL TRUE
+                EXCLUDE_FROM_DEFAULT_BUILD TRUE
+            )
+        endif()
+    endforeach()
+
+    target_link_libraries(Protocol PRIVATE
+        $<BUILD_INTERFACE:zlibstatic>
+        $<INSTALL_INTERFACE:ZLIB::ZLIB>
+    )
+
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries for dependencies" FORCE)
+    set(SNAPPY_BUILD_TESTS OFF CACHE BOOL "Disable snappy tests" FORCE)
+    set(SNAPPY_BUILD_BENCHMARKS OFF CACHE BOOL "Disable snappy benchmarks" FORCE)
+    set(SNAPPY_INSTALL OFF CACHE BOOL "Disable snappy install targets" FORCE)
+
+    FetchContent_Declare(
+        snappy
+        GIT_REPOSITORY https://github.com/google/snappy.git
+        GIT_TAG 1.2.2
+    )
+    FetchContent_GetProperties(snappy)
+
+    if(NOT snappy_POPULATED)
+        FetchContent_Populate(snappy)
+        add_subdirectory(${snappy_SOURCE_DIR} ${snappy_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
+
+    if(NOT TARGET snappy)
+        message(FATAL_ERROR "Static snappy target 'snappy' was not generated.")
+    endif()
+
+    target_link_libraries(Protocol PRIVATE
+        $<BUILD_INTERFACE:snappy>
+        $<INSTALL_INTERFACE:Snappy::snappy>
     )
 endif()
 

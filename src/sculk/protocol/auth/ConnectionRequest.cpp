@@ -165,8 +165,7 @@ ensureAndFillAllFieldsFull(ConnectionRequest& request, const AuthenticationKeyMa
     return {};
 }
 
-inline Result<>
-ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request, const AuthenticationKeyManager& publicKeyManager) {
+inline Result<> ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request) {
     if (!request.mLoginToken) {
         request.mLoginToken.emplace();
     } else if (!request.mLegacyCertificateChain) {
@@ -229,7 +228,7 @@ Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationK
 #endif
         }
     } else if (mAuthenticationType == AuthenticationType::SelfSigned) {
-        if (auto status = ensureAndFillAllFieldsSelfSigned(*this, authenticationKeyManager); !status) {
+        if (auto status = ensureAndFillAllFieldsSelfSigned(*this); !status) {
 #ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
             return error_utils::makeError(
                 std::format(

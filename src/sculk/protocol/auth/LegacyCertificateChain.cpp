@@ -307,8 +307,8 @@ Result<> LegacyCertificateChain::signSelfSigned(
         return error_utils::makeError("Login key pair not set, set the login key pair before signing");
     }
 
-    mLoginCertificate.mHeader.x5u                = keyPair->mPublicKeyPem;
-    mLoginCertificate.mPayload.identityPublicKey = keyPair->mPublicKeyPem;
+    mLoginCertificate.mHeader.x5u                = pem_helper::stripPemMarkersAndCompact(keyPair->mPublicKeyPem);
+    mLoginCertificate.mPayload.identityPublicKey = pem_helper::stripPemMarkersAndCompact(keyPair->mPublicKeyPem);
     if (!mLoginCertificate.sign(keyPair->mPrivateKeyPem, now)) {
         return error_utils::makeError("Failed to sign login certificate");
     }

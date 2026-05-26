@@ -14,7 +14,12 @@ namespace sculk::protocol::inline abi_v975 {
 
 class BatchedPackets {
 public:
-    std::vector<std::unique_ptr<IPacket>> mPackets;
+    std::vector<std::unique_ptr<IPacket>> mPackets{};
+
+public:
+    [[nodiscard]] std::vector<std::byte> serialize() const;
+
+    [[nodiscard]] Result<> deserialize(const std::vector<std::byte>& data);
 };
 
 } // namespace sculk::protocol::inline abi_v975
