@@ -289,7 +289,9 @@ std::string ConnectionRequest::toString() const {
         authJson["Certificate"] = mLegacyCertificateChain->toString();
     }
 
-    stream.writeLongString(authJson.dump(-1));
+    auto authJsonStr = authJson.dump(-1);
+    authJsonStr.push_back('\n');
+    stream.writeLongString(authJsonStr);
     stream.writeLongString(mClientProperties.toString());
 
     std::string result{};

@@ -164,7 +164,9 @@ std::string LegacyCertificateChain::toString() const {
         certChainJson["chain"].push_back(mMojangCertificate->toString());
     }
     certChainJson["chain"].push_back(mLoginCertificate.toString());
-    return certChainJson.dump(-1);
+    auto certChainJsonStr = certChainJson.dump(-1);
+    certChainJsonStr.push_back('\n');
+    return certChainJsonStr;
 }
 
 Result<AuthenticationType>
