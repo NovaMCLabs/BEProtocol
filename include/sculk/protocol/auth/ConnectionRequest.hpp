@@ -11,6 +11,7 @@
 #include "ClientProperties.hpp"
 #include "Identity.hpp"
 #include "LegacyCertificateChain.hpp"
+#include "LoginStatus.hpp"
 #include "LoginToken.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <optional>
@@ -35,7 +36,7 @@ public:
     [[nodiscard]] std::string getPlayFabID() const;
 
 public:
-    [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& publicKeyManager) const;
+    [[nodiscard]] Result<LoginStatus> verify(const AuthenticationKeyManager& publicKeyManager) const;
 
     [[nodiscard]] Result<> sign(const AuthenticationKeyManager& authenticationKeyManager);
 

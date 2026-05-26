@@ -7,6 +7,7 @@
 
 #pragma once
 #include "AUthenticationKeyManager.hpp"
+#include "LoginStatus.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <format>
 #include <optional>
@@ -54,7 +55,7 @@ public:
 public:
     [[nodiscard]] std::string getClientPublicKey() const { return mPayload.cpk; }
 
-    [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
+    [[nodiscard]] Result<LoginStatus> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
 
     [[nodiscard]] Result<> signFull(const AuthenticationKeyManager& authenticationKeyManager);
 

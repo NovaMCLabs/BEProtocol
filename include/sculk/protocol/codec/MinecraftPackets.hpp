@@ -29,7 +29,7 @@ public:
 
     [[nodiscard]] static std::unique_ptr<IPacket> readAndCreatePacketFromStream(ReadOnlyBinaryStream& stream);
 
-    [[nodiscard]] static PacketHeader readPacketHeader(ReadOnlyBinaryStream& stream);
+    [[nodiscard]] static Result<PacketHeader> readPacketHeader(ReadOnlyBinaryStream& stream);
 
     static void writePacketHeader(BinaryStream& stream, const PacketHeader& header);
 };

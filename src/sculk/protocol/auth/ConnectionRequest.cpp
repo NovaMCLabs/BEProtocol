@@ -74,7 +74,7 @@ std::string ConnectionRequest::getPlayFabID() const {
     return mClientProperties.mPayload.mPlayFabId;
 }
 
-Result<AuthenticationType> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+Result<LoginStatus> ConnectionRequest::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     if (mLoginToken) {
         if (auto status = mClientProperties.verify(mLoginToken->getClientPublicKey()); !status) {
 #ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS

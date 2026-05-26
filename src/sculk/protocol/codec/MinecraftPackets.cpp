@@ -250,15 +250,20 @@ namespace sculk::protocol::inline abi_v975 {
 #define DEPRECATED_PACKET(PACKET_ID)
 // clang-format on
 
-MinecraftPackets::PacketHeader MinecraftPackets::readPacketHeader(ReadOnlyBinaryStream& stream) {
-    PacketHeader  result{};
+Result<MinecraftPackets::PacketHeader> MinecraftPackets::readPacketHeader(ReadOnlyBinaryStream& stream) {
     std::uint32_t header{};
-    if (stream.readUnsignedVarInt(header)) {
-        result.mPacketId          = static_cast<MinecraftPacketIds>(header & 0x3FF);
-        result.mSenderSubClientId = (header >> 10) & 3;
-        result.mTargetSubClientId = (header >> 12) & 3;
+    if (auto status = stream.readUnsignedVarInt(header); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(std::format("Failed to read packet header: {}", status.error().mMessage));
+#else
+        return error_utils::makeError("Failed to read packet header");
+#endif
     }
-    return result;
+    return PacketHeader{
+        .mPacketId          = static_cast<MinecraftPacketIds>(header & 0x3FF),
+        .mSenderSubClientId = static_cast<std::uint8_t>((header >> 10) & 3),
+        .mTargetSubClientId = static_cast<std::uint8_t>((header >> 12) & 3)
+    };
 }
 
 void MinecraftPackets::writePacketHeader(BinaryStream& stream, const PacketHeader& header) {
@@ -279,7 +284,10 @@ std::unique_ptr<IPacket> MinecraftPackets::createPacket(const PacketHeader& head
 
 std::unique_ptr<IPacket> MinecraftPackets::readAndCreatePacketFromStream(ReadOnlyBinaryStream& stream) {
     auto header = readPacketHeader(stream);
-    auto packet = createPacket(header);
+    if (!header) {
+        return nullptr;
+    }
+    auto packet = createPacket(*header);
     if (!packet || !packet->read(stream)) {
         return nullptr;
     }

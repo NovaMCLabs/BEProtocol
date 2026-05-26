@@ -7,6 +7,7 @@
 
 #pragma once
 #include "AuthenticationKeyManager.hpp"
+#include "LoginStatus.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <chrono>
 #include <format>
@@ -90,7 +91,7 @@ public:
                                   : mLoginCertificate.mPayload.identityPublicKey;
     }
 
-    [[nodiscard]] Result<AuthenticationType> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
+    [[nodiscard]] Result<LoginStatus> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
 
     [[nodiscard]] Result<>
     signFull(const AuthenticationKeyManager& authenticationKeyManager, std::chrono::system_clock::time_point now);

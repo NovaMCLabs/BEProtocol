@@ -42,6 +42,10 @@ private:
 public:
     [[nodiscard]] constexpr explicit BinaryStream(std::vector<std::byte>& buffer) : mBuffer(buffer) {}
 
+    [[nodiscard]] constexpr const std::byte* data() const { return mBuffer.data(); }
+
+    [[nodiscard]] constexpr std::byte* data() { return mBuffer.data(); }
+
     [[nodiscard]] constexpr std::size_t size() const { return mBuffer.size(); }
 
     constexpr void reserve(std::size_t size) { mBuffer.reserve(size); }

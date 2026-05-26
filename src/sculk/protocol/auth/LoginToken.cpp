@@ -90,7 +90,7 @@ namespace sculk::protocol::inline abi_v975 {
     }
 #endif
 
-Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+Result<LoginStatus> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     auto        authType     = authenticationKeyManager.getVerifyAuthenticationType();
     std::string signingInput = std::format("{}.{}", mRawHeader, mRawPayload);
 
@@ -121,7 +121,7 @@ Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& au
             if (!es384::verifyES384Signature(signingInput, mSignature, *mHeader.x5u)) {
                 return error_utils::makeError("Failed to verify login token signature");
             }
-            return AuthenticationType::SelfSigned;
+            return LoginStatus::SelfSigned;
         }
     }
 
@@ -161,7 +161,7 @@ Result<AuthenticationType> LoginToken::verify(const AuthenticationKeyManager& au
         if (!rs256::verifyRS256Signature(signingInput, mSignature, *keyId)) {
             return error_utils::makeError("Failed to verify login token signature");
         }
-        return AuthenticationType::Full;
+        return LoginStatus::Mojang;
     }
 
     return error_utils::makeError("Guest authentication does not support login token verification");

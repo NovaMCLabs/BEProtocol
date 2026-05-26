@@ -169,8 +169,7 @@ std::string LegacyCertificateChain::toString() const {
     return certChainJsonStr;
 }
 
-Result<AuthenticationType>
-LegacyCertificateChain::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+Result<LoginStatus> LegacyCertificateChain::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
     const bool hasClient = mClientCertificate.has_value();
     const bool hasMojang = mMojangCertificate.has_value();
 
@@ -189,7 +188,7 @@ LegacyCertificateChain::verify(const AuthenticationKeyManager& authenticationKey
             if (!loginCert.verify(loginCert.mHeader.x5u)) {
                 return error_utils::makeError("Login certificate signature verification failed");
             }
-            return AuthenticationType::SelfSigned;
+            return LoginStatus::SelfSignedLegacy;
         }
     }
 
@@ -246,7 +245,7 @@ LegacyCertificateChain::verify(const AuthenticationKeyManager& authenticationKey
             if (!loginCert.verify(loginCert.mHeader.x5u)) {
                 return error_utils::makeError("Login certificate signature verification failed");
             }
-            return AuthenticationType::Full;
+            return LoginStatus::MojangLegacy;
         }
     }
 
