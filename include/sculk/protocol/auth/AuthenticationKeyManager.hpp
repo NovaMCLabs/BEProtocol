@@ -30,7 +30,6 @@ private:
     std::optional<std::pair<std::string, KeyPair>>       mLoginTokenKeyPairsAndKeyId{};
     std::string                                          mLoginTokenExpectedIssuer{};
     std::string                                          mLoginTokenExpectedPlayFabTitle{};
-    std::optional<KeyPair>                               mSelfSignedLoginTokenKeyPair{};
     std::vector<std::string>                             mLegacyCertificateChainPublicKeyPems{};
     std::optional<KeyPair>                               mLegacyCertificateClientKeyPair{};
     std::optional<KeyPair>                               mLegacyCertificateMojangKeyPair{};
@@ -90,13 +89,9 @@ public:
     void
     _setLoginTokenKeyPairFull(const std::string& keyId, std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    void _setLoginTokenKeyPairSelfSigned(std::string_view publicKeyPem, std::string_view privateKeyPem);
-
     [[nodiscard]] std::string _generateRandomKeyId() const;
 
     [[nodiscard]] Result<KeyPair> getFullLoginTokenKeyPairAndKeyId(std::string& outKeyId) const;
-
-    [[nodiscard]] Result<KeyPair> getSelfSignedLoginTokenKeyPair() const;
 
 public:
     void addLoginTokenPublicKeyPemByKeyId(const std::string& keyId, const std::string& publicKeyPem);

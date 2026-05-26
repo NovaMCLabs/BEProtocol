@@ -119,7 +119,7 @@ bool AuthenticationKeyManager::_loginTokenSigningInitialized(AuthenticationType 
     if (authType == AuthenticationType::Full) {
         return mLoginTokenKeyPairsAndKeyId.has_value();
     } else if (authType == AuthenticationType::SelfSigned) {
-        return mSelfSignedLoginTokenKeyPair.has_value();
+        return getClientPropertiesKeyPair().has_value();
     }
     return false;
 }
@@ -167,26 +167,7 @@ Result<> AuthenticationKeyManager::_generateAndSetLoginTokenKeyPairFull() {
 }
 
 Result<> AuthenticationKeyManager::_generateAndSetLoginTokenKeyPairSelfSigned() {
-    auto keyPair = generateRandomES384KeyPair();
-    if (!keyPair) {
-        return error_utils::makeError("Failed to generate login token key pair");
-    }
-    mSelfSignedLoginTokenKeyPair = *keyPair;
-
-    if (auto result = _generateAndSetLegacySelfSignedCertificateChainKeyPairs(); !result) {
-#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
-        return error_utils::makeError(
-            std::format(
-                "Failed to generate legacy self-signed certificate chain key pairs: {}",
-                result.error().message()
-            )
-        );
-#else
-        return error_utils::makeError("Failed to generate legacy self-signed certificate chain key pairs");
-#endif
-    }
-
-    return {};
+    return _generateAndSetLegacySelfSignedCertificateChainKeyPairs();
 }
 
 void AuthenticationKeyManager::_setLoginTokenKeyPairFull(
@@ -197,25 +178,11 @@ void AuthenticationKeyManager::_setLoginTokenKeyPairFull(
     mLoginTokenKeyPairsAndKeyId = std::make_pair(keyId, KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)});
 }
 
-void AuthenticationKeyManager::_setLoginTokenKeyPairSelfSigned(
-    std::string_view publicKeyPem,
-    std::string_view privateKeyPem
-) {
-    mSelfSignedLoginTokenKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
-}
-
 Result<AuthenticationKeyManager::KeyPair>
 AuthenticationKeyManager::getFullLoginTokenKeyPairAndKeyId(std::string& outKeyId) const {
     if (mLoginTokenKeyPairsAndKeyId) {
         outKeyId = mLoginTokenKeyPairsAndKeyId->first;
         return mLoginTokenKeyPairsAndKeyId->second;
-    }
-    return error_utils::makeError("Login token key pair not set");
-}
-
-Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getSelfSignedLoginTokenKeyPair() const {
-    if (mSelfSignedLoginTokenKeyPair) {
-        return *mSelfSignedLoginTokenKeyPair;
     }
     return error_utils::makeError("Login token key pair not set");
 }

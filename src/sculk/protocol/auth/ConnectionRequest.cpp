@@ -145,9 +145,7 @@ ensureAndFillAllFieldsFull(ConnectionRequest& request, const AuthenticationKeyMa
     loginTokenPayload.ipt   = ""; // Unknown
     loginTokenPayload.mid   = request.getPlayFabID();
     loginTokenPayload.tid   = std::string(publicKeyManager.getLoginTokenExpectedPlayFabTitle());
-    loginTokenPayload.pfcd  = 0; // Unknown
-    loginTokenPayload.cpk =
-        pem_helper::stripPemMarkersAndCompact(publicKeyManager.getClientPropertiesKeyPair()->mPublicKeyPem);
+    loginTokenPayload.pfcd  = 0;  // Unknown
     loginTokenPayload.ap    = 15; // Unknown
     loginTokenPayload.xid   = request.getXboxLiveID().value_or("");
     loginTokenPayload.xname = request.getXboxLiveName();
@@ -193,17 +191,19 @@ ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request, const Authenticatio
     auto& loginTokenPayload = request.mLoginToken->mPayload;
 
     loginTokenPayload.mid = request.getPlayFabID();
-    loginTokenPayload.cpk =
-        pem_helper::stripPemMarkersAndCompact(publicKeyManager.getClientPropertiesKeyPair()->mPublicKeyPem);
-    loginTokenPayload.ap      = 0; // Unknown
-    loginTokenPayload.xid     = request.getXboxLiveID().value_or("");
-    loginTokenPayload.xname   = request.getXboxLiveName();
-    loginTokenPayload.aud     = "api://auth-minecraft-services/multiplayer";
-    loginTokenPayload.leguuid = randomIdentity().toString(); // Unknown
-    loginTokenPayload.nid     = "";                          // Unknown
-    loginTokenPayload.nname   = "";                          // Unknown
-    loginTokenPayload.pid     = "";                          // Unknown
-    loginTokenPayload.pname   = "";                          // Unknown
+    loginTokenPayload.ap  = 0; // Unknown, seems to be 0 for self-signed tokens
+    if (loginTokenPayload.xid.empty()) {
+        loginTokenPayload.xid = request.mLegacyCertificateChain->mLoginCertificate.mPayload.extraData->XUID;
+    }
+    loginTokenPayload.xname = request.getXboxLiveName();
+    loginTokenPayload.aud   = "api://auth-minecraft-services/multiplayer";
+    if (!loginTokenPayload.leguuid) {
+        loginTokenPayload.leguuid = randomIdentity().toString(); // Unknown
+    }
+    loginTokenPayload.nid   = ""; // Unknown
+    loginTokenPayload.nname = ""; // Unknown
+    loginTokenPayload.pid   = ""; // Unknown
+    loginTokenPayload.pname = ""; // Unknown
 
     return {};
 }

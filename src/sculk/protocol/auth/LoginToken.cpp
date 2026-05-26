@@ -180,6 +180,11 @@ Result<> LoginToken::signFull(const AuthenticationKeyManager& authenticationKeyM
     SCULK_LOGIN_TOKEN_SERIALIZE(header, typ);
     mRawHeader = base64url::encode(headerJson.dump(-1));
 
+    auto clientKeyPair = authenticationKeyManager.getClientPropertiesKeyPair();
+    if (!clientKeyPair) {
+        return error_utils::makeError("No client properties key pair available for signing");
+    }
+    mPayload.cpk = pem_helper::stripPemMarkersAndCompact(clientKeyPair->mPublicKeyPem);
     SCULK_LOGIN_TOKEN_CREATE_JSON(payload, mPayload);
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTIONAL(payload, sub);
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTIONAL(payload, ipt);
@@ -206,7 +211,7 @@ Result<> LoginToken::signFull(const AuthenticationKeyManager& authenticationKeyM
 Result<> LoginToken::signSelfSigned(const AuthenticationKeyManager& authenticationKeyManager) {
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTION_INIT();
 
-    auto keyPair = authenticationKeyManager.getSelfSignedLoginTokenKeyPair();
+    auto keyPair = authenticationKeyManager.getClientPropertiesKeyPair();
     if (!keyPair) {
         return error_utils::makeError("No self-signed login token key pair available for signing");
     }
@@ -219,6 +224,7 @@ Result<> LoginToken::signSelfSigned(const AuthenticationKeyManager& authenticati
     SCULK_LOGIN_TOKEN_SERIALIZE_OPTIONAL(header, x5u);
     mRawHeader = base64url::encode(headerJson.dump(-1));
 
+    mPayload.cpk = *mHeader.x5u;
     SCULK_LOGIN_TOKEN_CREATE_JSON(payload, mPayload);
     SCULK_LOGIN_TOKEN_SERIALIZE(payload, mid);
     SCULK_LOGIN_TOKEN_SERIALIZE(payload, cpk);
