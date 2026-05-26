@@ -62,23 +62,17 @@ public:
     [[nodiscard]] Result<KeyPair> generateRandomRS256KeyPair() const;
 
 public:
-    [[nodiscard]] constexpr AuthenticationType getSigningAuthenticationType() const {
-        return mSigningAuthenticationType;
-    }
+    [[nodiscard]] bool _legacyCertificateChainSigningInitialized(AuthenticationType authType) const;
 
-    [[nodiscard]] std::chrono::system_clock::time_point getSigningTime() const;
+    [[nodiscard]] Result<> _generateAndSetLegacyFullCertificateChainKeyPairs();
 
-    [[nodiscard]] bool legacyCertificateChainSigningInitialized(AuthenticationType authType) const;
+    [[nodiscard]] Result<> _generateAndSetLegacySelfSignedCertificateChainKeyPairs();
 
-    [[nodiscard]] Result<> generateAndSetLegacyFullCertificateChainKeyPairs();
+    void _setLegacyCertificateChainClientKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    [[nodiscard]] Result<> generateAndSetLegacySelfSignedCertificateChainKeyPairs();
+    void _setLegacyCertificateChainMojangKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    void setLegacyCertificateChainClientKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
-
-    void setLegacyCertificateChainMojangKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
-
-    void setLegacyCertificateChainLoginKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
+    void _setLegacyCertificateChainLoginKeyPair(std::string_view publicKeyPem, std::string_view privateKeyPem);
 
     [[nodiscard]] Result<KeyPair> getLegacyCertificateChainClientKeyPair() const;
 
@@ -87,18 +81,18 @@ public:
     [[nodiscard]] Result<KeyPair> getLegacyCertificateChainLoginKeyPair() const;
 
 public:
-    [[nodiscard]] bool loginTokenSigningInitialized(AuthenticationType authType) const;
+    [[nodiscard]] bool _loginTokenSigningInitialized(AuthenticationType authType) const;
 
-    [[nodiscard]] std::string generateRandomKeyId() const;
+    [[nodiscard]] Result<> _generateAndSetLoginTokenKeyPairFull();
 
-    [[nodiscard]] Result<> generateAndSetLoginTokenKeyPairFull();
-
-    [[nodiscard]] Result<> generateAndSetLoginTokenKeyPairSelfSigned();
+    [[nodiscard]] Result<> _generateAndSetLoginTokenKeyPairSelfSigned();
 
     void
-    setLoginTokenKeyPairFull(const std::string& keyId, std::string_view publicKeyPem, std::string_view privateKeyPem);
+    _setLoginTokenKeyPairFull(const std::string& keyId, std::string_view publicKeyPem, std::string_view privateKeyPem);
 
-    void setLoginTokenKeyPairSelfSigned(std::string_view publicKeyPem, std::string_view privateKeyPem);
+    void _setLoginTokenKeyPairSelfSigned(std::string_view publicKeyPem, std::string_view privateKeyPem);
+
+    [[nodiscard]] std::string _generateRandomKeyId() const;
 
     [[nodiscard]] Result<KeyPair> getFullLoginTokenKeyPairAndKeyId(std::string& outKeyId) const;
 
@@ -115,17 +109,24 @@ public:
 public:
     constexpr void setVerifyAuthenticationType(AuthenticationType authType) { mVerifyAuthenticationType = authType; }
 
-    constexpr void setSigningAuthenticationType(AuthenticationType authType) { mSigningAuthenticationType = authType; }
-
     constexpr void setValidityLeeway(std::chrono::seconds leeway) { mValidityLeeway = leeway; }
 
     constexpr void setValidityTime(std::chrono::system_clock::time_point validityTime) { mValidityTime = validityTime; }
 
-    constexpr void setSigningTime(std::chrono::system_clock::time_point signingTime) { mSigningTime = signingTime; }
-
     Result<> initMojangPublicKeyBlocking(std::size_t timeoutSeconds);
 
     std::future<Result<>> initMojangPublicKeyAsync(std::size_t timeoutSeconds);
+
+public:
+    [[nodiscard]] constexpr AuthenticationType getSigningAuthenticationType() const {
+        return mSigningAuthenticationType;
+    }
+
+    [[nodiscard]] std::chrono::system_clock::time_point getSigningTime() const;
+
+    constexpr void setSigningAuthenticationType(AuthenticationType authType) { mSigningAuthenticationType = authType; }
+
+    constexpr void setSigningTime(std::chrono::system_clock::time_point signingTime) { mSigningTime = signingTime; }
 
     Result<> initForSign(AuthenticationType authType);
 };

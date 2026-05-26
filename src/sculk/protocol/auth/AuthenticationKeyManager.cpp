@@ -63,7 +63,7 @@ std::chrono::system_clock::time_point AuthenticationKeyManager::getSigningTime()
     return mSigningTime.value_or(std::chrono::system_clock::now());
 }
 
-bool AuthenticationKeyManager::legacyCertificateChainSigningInitialized(AuthenticationType authType) const {
+bool AuthenticationKeyManager::_legacyCertificateChainSigningInitialized(AuthenticationType authType) const {
     if (authType == AuthenticationType::Full) {
         return mLegacyCertificateClientKeyPair.has_value() && mLegacyCertificateMojangKeyPair.has_value()
             && mLegacyCertificateLoginKeyPair.has_value();
@@ -73,21 +73,21 @@ bool AuthenticationKeyManager::legacyCertificateChainSigningInitialized(Authenti
     return false;
 }
 
-void AuthenticationKeyManager::setLegacyCertificateChainClientKeyPair(
+void AuthenticationKeyManager::_setLegacyCertificateChainClientKeyPair(
     std::string_view publicKeyPem,
     std::string_view privateKeyPem
 ) {
     mLegacyCertificateClientKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
 }
 
-void AuthenticationKeyManager::setLegacyCertificateChainMojangKeyPair(
+void AuthenticationKeyManager::_setLegacyCertificateChainMojangKeyPair(
     std::string_view publicKeyPem,
     std::string_view privateKeyPem
 ) {
     mLegacyCertificateMojangKeyPair = KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)};
 }
 
-void AuthenticationKeyManager::setLegacyCertificateChainLoginKeyPair(
+void AuthenticationKeyManager::_setLegacyCertificateChainLoginKeyPair(
     std::string_view publicKeyPem,
     std::string_view privateKeyPem
 ) {
@@ -115,7 +115,7 @@ Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getLegacyCer
     return error_utils::makeError("Login key pair not set");
 }
 
-bool AuthenticationKeyManager::loginTokenSigningInitialized(AuthenticationType authType) const {
+bool AuthenticationKeyManager::_loginTokenSigningInitialized(AuthenticationType authType) const {
     if (authType == AuthenticationType::Full) {
         return mLoginTokenKeyPairsAndKeyId.has_value();
     } else if (authType == AuthenticationType::SelfSigned) {
@@ -124,7 +124,7 @@ bool AuthenticationKeyManager::loginTokenSigningInitialized(AuthenticationType a
     return false;
 }
 
-std::string AuthenticationKeyManager::generateRandomKeyId() const {
+std::string AuthenticationKeyManager::_generateRandomKeyId() const {
     // Example Key ID: 6CD621632CEE45A16374B30445B1FB9B77EC7BF7
     static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
 
@@ -146,27 +146,50 @@ std::string AuthenticationKeyManager::generateRandomKeyId() const {
     return keyId;
 }
 
-Result<> AuthenticationKeyManager::generateAndSetLoginTokenKeyPairFull() {
+Result<> AuthenticationKeyManager::_generateAndSetLoginTokenKeyPairFull() {
     auto keyPair = generateRandomRS256KeyPair();
     if (!keyPair) {
         return error_utils::makeError("Failed to generate login token key pair");
     }
-    mLoginTokenKeyPairsAndKeyId = std::make_pair(generateRandomKeyId(), *keyPair);
-    mSigningAuthenticationType  = AuthenticationType::Full;
+    mLoginTokenKeyPairsAndKeyId = std::make_pair(_generateRandomKeyId(), *keyPair);
+
+    if (auto result = _generateAndSetLegacyFullCertificateChainKeyPairs(); !result) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format("Failed to generate legacy full certificate chain key pairs: {}", result.error().message())
+        );
+#else
+        return error_utils::makeError("Failed to generate legacy full certificate chain key pairs");
+#endif
+    }
+
     return {};
 }
 
-Result<> AuthenticationKeyManager::generateAndSetLoginTokenKeyPairSelfSigned() {
+Result<> AuthenticationKeyManager::_generateAndSetLoginTokenKeyPairSelfSigned() {
     auto keyPair = generateRandomES384KeyPair();
     if (!keyPair) {
         return error_utils::makeError("Failed to generate login token key pair");
     }
     mSelfSignedLoginTokenKeyPair = *keyPair;
-    mSigningAuthenticationType   = AuthenticationType::SelfSigned;
+
+    if (auto result = _generateAndSetLegacySelfSignedCertificateChainKeyPairs(); !result) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "Failed to generate legacy self-signed certificate chain key pairs: {}",
+                result.error().message()
+            )
+        );
+#else
+        return error_utils::makeError("Failed to generate legacy self-signed certificate chain key pairs");
+#endif
+    }
+
     return {};
 }
 
-void AuthenticationKeyManager::setLoginTokenKeyPairFull(
+void AuthenticationKeyManager::_setLoginTokenKeyPairFull(
     const std::string& keyId,
     std::string_view   publicKeyPem,
     std::string_view   privateKeyPem
@@ -174,7 +197,7 @@ void AuthenticationKeyManager::setLoginTokenKeyPairFull(
     mLoginTokenKeyPairsAndKeyId = std::make_pair(keyId, KeyPair{std::string(publicKeyPem), std::string(privateKeyPem)});
 }
 
-void AuthenticationKeyManager::setLoginTokenKeyPairSelfSigned(
+void AuthenticationKeyManager::_setLoginTokenKeyPairSelfSigned(
     std::string_view publicKeyPem,
     std::string_view privateKeyPem
 ) {
@@ -217,7 +240,7 @@ Result<AuthenticationKeyManager::KeyPair> AuthenticationKeyManager::getClientPro
     return error_utils::makeError("Unsupported authentication type for getting client properties key pair");
 }
 
-Result<> AuthenticationKeyManager::generateAndSetLegacyFullCertificateChainKeyPairs() {
+Result<> AuthenticationKeyManager::_generateAndSetLegacyFullCertificateChainKeyPairs() {
     auto clientResult = generateRandomES384KeyPair();
     if (!clientResult) {
         return error_utils::makeError("Failed to generate ES384 key pair");
@@ -240,7 +263,7 @@ Result<> AuthenticationKeyManager::generateAndSetLegacyFullCertificateChainKeyPa
     return {};
 }
 
-Result<> AuthenticationKeyManager::generateAndSetLegacySelfSignedCertificateChainKeyPairs() {
+Result<> AuthenticationKeyManager::_generateAndSetLegacySelfSignedCertificateChainKeyPairs() {
     auto loginResult = generateRandomES384KeyPair();
     if (!loginResult) {
         return error_utils::makeError("Failed to generate ES384 key pair");
@@ -380,15 +403,9 @@ std::future<Result<>> AuthenticationKeyManager::initMojangPublicKeyAsync(std::si
 
 Result<> AuthenticationKeyManager::initForSign(AuthenticationType authType) {
     if (authType == AuthenticationType::Full) {
-        if (auto result = generateAndSetLoginTokenKeyPairFull(); !result) {
-            return result;
-        }
-        return generateAndSetLegacyFullCertificateChainKeyPairs();
+        return _generateAndSetLoginTokenKeyPairFull();
     } else if (authType == AuthenticationType::SelfSigned) {
-        if (auto result = generateAndSetLoginTokenKeyPairSelfSigned(); !result) {
-            return result;
-        }
-        return generateAndSetLegacySelfSignedCertificateChainKeyPairs();
+        return _generateAndSetLoginTokenKeyPairSelfSigned();
     }
     return error_utils::makeError("Unsupported authentication type for initialization for signing");
 }

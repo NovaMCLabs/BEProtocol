@@ -119,22 +119,7 @@ inline Identity randomIdentity() {
 inline Result<>
 ensureAndFillAllFieldsFull(ConnectionRequest& request, const AuthenticationKeyManager& publicKeyManager) {
     if (!request.mLoginToken) {
-        request.mLoginToken = LoginToken{
-            .mPayload = {
-                         // Full sign payload
-                .sub   = "",                                                                // Unknown
-                .ipt   = "",                                                                // Unknown
-                .mid   = request.getPlayFabID(),                                            // PlayFabID
-                .tid   = std::string(publicKeyManager.getLoginTokenExpectedPlayFabTitle()), // PlayFabIdTitle
-                .pfcd  = 0,                                                                 // Unknown
-                .cpk   = request.mLegacyCertificateChain->getClientPublicKey(), // ES384 public key for ClientProperties
-                .ap    = 15,                                                    // Unknown
-                .xid   = request.getXboxLiveID().value_or(""),                  // XUID
-                .xname = request.getXboxLiveName(),                             // Xbox Live gamertag
-                .iss   = std::string(publicKeyManager.getLoginTokenExpectedIssuer()), // Issuer
-                .aud   = "api://auth-minecraft-services/multiplayer"                  // Audience
-            },
-        };
+        request.mLoginToken.emplace();
     } else if (!request.mLegacyCertificateChain) {
         request.mLegacyCertificateChain = LegacyCertificateChain{
             .mLoginCertificate = Certificate{
@@ -154,6 +139,19 @@ ensureAndFillAllFieldsFull(ConnectionRequest& request, const AuthenticationKeyMa
         request.mClientProperties.mPayload.mPlayFabId = request.mLoginToken->mPayload.mid;
     }
 
+    auto& loginTokenPayload = request.mLoginToken->mPayload;
+    loginTokenPayload.sub   = ""; // Unknown
+    loginTokenPayload.ipt   = ""; // Unknown
+    loginTokenPayload.mid   = request.getPlayFabID();
+    loginTokenPayload.tid   = std::string(publicKeyManager.getLoginTokenExpectedPlayFabTitle());
+    loginTokenPayload.pfcd  = 0; // Unknown
+    loginTokenPayload.cpk   = publicKeyManager.getClientPropertiesKeyPair()->mPublicKeyPem;
+    loginTokenPayload.ap    = 15; // Unknown
+    loginTokenPayload.xid   = request.getXboxLiveID().value_or("");
+    loginTokenPayload.xname = request.getXboxLiveName();
+    loginTokenPayload.iss   = std::string(publicKeyManager.getLoginTokenExpectedIssuer());
+    loginTokenPayload.aud   = "api://auth-minecraft-services/multiplayer";
+
     if (!request.mLegacyCertificateChain->mClientCertificate) {
         request.mLegacyCertificateChain->mClientCertificate = Certificate{.mPayload = {.certificateAuthority = true}};
     }
@@ -167,24 +165,10 @@ ensureAndFillAllFieldsFull(ConnectionRequest& request, const AuthenticationKeyMa
     return {};
 }
 
-inline Result<> ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request) {
+inline Result<>
+ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request, const AuthenticationKeyManager& publicKeyManager) {
     if (!request.mLoginToken) {
-        request.mLoginToken = LoginToken{
-            .mPayload = {
-                         // SelfSigned sign payload
-                .mid   = request.getPlayFabID(),                                // PlayFabID
-                .cpk   = request.mLegacyCertificateChain->getClientPublicKey(), // ES384 public key for ClientProperties
-                .ap    = 0,                                                     // Unknown
-                .xid   = request.getXboxLiveID().value_or(""),                  // XUID
-                .xname = request.getXboxLiveName(),                             // Xbox Live gamertag
-                .aud   = "api://auth-minecraft-services/multiplayer",           // Audience
-                .leguuid = randomIdentity().toString(),                         // Unknown
-                .nid     = "",                                                  // Unknown
-                .nname   = "",                                                  // Unknown
-                .pid     = "",                                                  // Unknown
-                .pname   = ""                                                   // Unknown
-            },
-        };
+        request.mLoginToken.emplace();
     } else if (!request.mLegacyCertificateChain) {
         request.mLegacyCertificateChain = LegacyCertificateChain{
             .mLoginCertificate = Certificate{
@@ -203,6 +187,20 @@ inline Result<> ensureAndFillAllFieldsSelfSigned(ConnectionRequest& request) {
         };
         request.mClientProperties.mPayload.mPlayFabId = request.mLoginToken->mPayload.mid;
     }
+
+    auto& loginTokenPayload = request.mLoginToken->mPayload;
+
+    loginTokenPayload.mid     = request.getPlayFabID();
+    loginTokenPayload.cpk     = publicKeyManager.getClientPropertiesKeyPair()->mPublicKeyPem;
+    loginTokenPayload.ap      = 0; // Unknown
+    loginTokenPayload.xid     = request.getXboxLiveID().value_or("");
+    loginTokenPayload.xname   = request.getXboxLiveName();
+    loginTokenPayload.aud     = "api://auth-minecraft-services/multiplayer";
+    loginTokenPayload.leguuid = randomIdentity().toString(); // Unknown
+    loginTokenPayload.nid     = "";                          // Unknown
+    loginTokenPayload.nname   = "";                          // Unknown
+    loginTokenPayload.pid     = "";                          // Unknown
+    loginTokenPayload.pname   = "";                          // Unknown
 
     return {};
 }
@@ -228,7 +226,7 @@ Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationK
 #endif
         }
     } else if (mAuthenticationType == AuthenticationType::SelfSigned) {
-        if (auto status = ensureAndFillAllFieldsSelfSigned(*this); !status) {
+        if (auto status = ensureAndFillAllFieldsSelfSigned(*this, authenticationKeyManager); !status) {
 #ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
             return error_utils::makeError(
                 std::format(
@@ -242,7 +240,7 @@ Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationK
         }
     }
 
-    if (mLoginToken && authenticationKeyManager.loginTokenSigningInitialized(mAuthenticationType)) {
+    if (mLoginToken && authenticationKeyManager._loginTokenSigningInitialized(mAuthenticationType)) {
         if (auto status = mLoginToken->sign(authenticationKeyManager); !status) {
 #ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
             return error_utils::makeError(std::format("Login token signing failed: {}", status.error().mMessage));
@@ -253,7 +251,7 @@ Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationK
     }
 
     if (mLegacyCertificateChain
-        && authenticationKeyManager.legacyCertificateChainSigningInitialized(mAuthenticationType)) {
+        && authenticationKeyManager._legacyCertificateChainSigningInitialized(mAuthenticationType)) {
         if (auto status = mLegacyCertificateChain->sign(authenticationKeyManager); !status) {
 #ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
             return error_utils::makeError(
@@ -263,6 +261,14 @@ Result<> ConnectionRequest::sign(const AuthenticationKeyManager& authenticationK
             return error_utils::makeError("Legacy certificate chain signing failed");
 #endif
         }
+    }
+
+    if (auto status = mClientProperties.sign(authenticationKeyManager); !status) {
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(std::format("Client properties signing failed: {}", status.error().mMessage));
+#else
+        return error_utils::makeError("Client properties signing failed");
+#endif
     }
 
     return {};
