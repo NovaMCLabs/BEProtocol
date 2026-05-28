@@ -26,6 +26,14 @@ public:
     ClientProperties                      mClientProperties{};
 
 public:
+    enum class VerificationStatus : std::uint8_t {
+        Online                      = 0,
+        SelfSigned                  = 1,
+        LegacyOnline_Deprecated     = 2,
+        LegacySelfSigned_Deprecated = 3,
+    };
+
+public:
     [[nodiscard]] std::optional<std::string> getXboxLiveID() const;
 
     [[nodiscard]] std::string getXboxLiveName() const;
@@ -35,9 +43,17 @@ public:
     [[nodiscard]] std::string getPlayFabID() const;
 
 public:
-    [[nodiscard]] Result<> verifyFull(const AuthenticationKeyManager& publicKeyManager, bool allowLegacy = false) const;
+    [[nodiscard]] Result<VerificationStatus> verify(
+        const AuthenticationKeyManager& authenticationKeyManager,
+        bool                            onlineMode  = true,
+        bool                            allowLegacy = false
+    ) const;
 
-    [[nodiscard]] Result<> verifySelfSigned(std::chrono::seconds leeway, bool allowLegacy = false) const;
+    [[nodiscard]] Result<VerificationStatus>
+    _verifyOnline(const AuthenticationKeyManager& publicKeyManager, bool allowLegacy = false) const;
+
+    [[nodiscard]] Result<VerificationStatus>
+    _verifySelfSigned(std::chrono::seconds leeway, bool allowLegacy = false) const;
 
     [[nodiscard]] Result<> selfSign(const PemKeyPair& clientKeyPair, bool includeLegacyChain = false);
 

@@ -81,15 +81,40 @@ std::string ConnectionRequest::getPlayFabID() const {
     return mClientProperties.mPayload.mPlayFabId;
 }
 
-Result<>
-ConnectionRequest::verifyFull(const AuthenticationKeyManager& authenticationKeyManager, bool allowLegacy) const {
-    if (mLoginToken.verify(authenticationKeyManager)) {
-        return mClientProperties.verify(mLoginToken.getClientPublicKey());
+Result<ConnectionRequest::VerificationStatus> ConnectionRequest::verify(
+    const AuthenticationKeyManager& authenticationKeyManager,
+    bool                            onlineMode,
+    bool                            allowLegacy
+) const {
+    if (onlineMode) {
+        return _verifyOnline(authenticationKeyManager, allowLegacy);
+    }
+
+    auto onlineStatus = _verifyOnline(authenticationKeyManager, allowLegacy);
+    if (onlineStatus) {
+        return *onlineStatus;
+    }
+
+    return _verifySelfSigned(authenticationKeyManager.getLeeway(), allowLegacy);
+}
+
+Result<ConnectionRequest::VerificationStatus>
+ConnectionRequest::_verifyOnline(const AuthenticationKeyManager& authenticationKeyManager, bool allowLegacy) const {
+    if (mLoginToken.verifyOnline(authenticationKeyManager)) {
+        if (mClientProperties.verify(mLoginToken.getClientPublicKey())) {
+            return VerificationStatus::Online;
+        }
+        return error_utils::makeError("client properties verification failed with login token public key");
     }
 
     if (allowLegacy && mLegacyCertificateChain) {
-        if (mLegacyCertificateChain->verify(authenticationKeyManager.getLeeway())) {
-            return mClientProperties.verify(mLegacyCertificateChain->mLoginCertificate.mHeader.x5u);
+        if (mLegacyCertificateChain->verifyOnline(authenticationKeyManager.getLeeway())) {
+            if (mClientProperties.verify(mLegacyCertificateChain->mLoginCertificate.mHeader.x5u)) {
+                return VerificationStatus::LegacyOnline_Deprecated;
+            }
+            return error_utils::makeError(
+                "client properties verification failed with legacy certificate chain public key"
+            );
         }
         return error_utils::makeError("legacy certificate chain verification failed");
     }
@@ -97,14 +122,23 @@ ConnectionRequest::verifyFull(const AuthenticationKeyManager& authenticationKeyM
     return error_utils::makeError("login token verification failed");
 }
 
-Result<> ConnectionRequest::verifySelfSigned(std::chrono::seconds leeway, bool allowLegacy) const {
+Result<ConnectionRequest::VerificationStatus>
+ConnectionRequest::_verifySelfSigned(std::chrono::seconds leeway, bool allowLegacy) const {
     if (mLoginToken.verifySelfSigned(leeway)) {
-        return mClientProperties.verify(mLoginToken.getClientPublicKey());
+        if (mClientProperties.verify(mLoginToken.getClientPublicKey())) {
+            return VerificationStatus::SelfSigned;
+        }
+        return error_utils::makeError("client properties verification failed with self-signed login token public key");
     }
 
     if (allowLegacy && mLegacyCertificateChain) {
         if (mLegacyCertificateChain->verifySelfSigned(leeway)) {
-            return mClientProperties.verify(mLegacyCertificateChain->mLoginCertificate.mHeader.x5u);
+            if (mClientProperties.verify(mLegacyCertificateChain->mLoginCertificate.mHeader.x5u)) {
+                return VerificationStatus::LegacySelfSigned_Deprecated;
+            }
+            return error_utils::makeError(
+                "client properties verification failed with legacy self-signed certificate chain public key"
+            );
         }
         return error_utils::makeError("legacy certificate chain self-signed verification failed");
     }

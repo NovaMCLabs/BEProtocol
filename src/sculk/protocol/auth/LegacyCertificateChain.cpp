@@ -191,7 +191,7 @@ std::string LegacyCertificateChain::toString() const {
     return certChainJsonStr;
 }
 
-Result<> LegacyCertificateChain::verify(std::chrono::seconds leeway) const {
+Result<> LegacyCertificateChain::verifyOnline(std::chrono::seconds leeway) const {
     if (!mClientCertificate.has_value() || !mMojangCertificate.has_value()) {
         return error_utils::makeError("Legacy certificate chain must contain both client and Mojang certificates");
     }

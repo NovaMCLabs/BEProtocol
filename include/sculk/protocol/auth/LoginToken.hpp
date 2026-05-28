@@ -59,7 +59,7 @@ public:
 
     [[nodiscard]] std::string getClientPublicKey() const { return mPayload.cpk; }
 
-    [[nodiscard]] Result<> verify(const AuthenticationKeyManager& authenticationKeyManager) const;
+    [[nodiscard]] Result<> verifyOnline(const AuthenticationKeyManager& authenticationKeyManager) const;
 
     [[nodiscard]] Result<> verifySelfSigned(std::chrono::seconds leeway) const;
 

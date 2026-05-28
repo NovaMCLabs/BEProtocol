@@ -90,7 +90,7 @@ namespace sculk::protocol::inline abi_v975 {
     }
 #endif
 
-Result<> LoginToken::verify(const AuthenticationKeyManager& authenticationKeyManager) const {
+Result<> LoginToken::verifyOnline(const AuthenticationKeyManager& authenticationKeyManager) const {
     if (isEmpty()) {
         return error_utils::makeError("Login token is empty");
     }

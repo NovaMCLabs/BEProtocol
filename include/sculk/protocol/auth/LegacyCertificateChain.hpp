@@ -77,7 +77,7 @@ public:
                                   : mLoginCertificate.mPayload.identityPublicKey;
     }
 
-    [[nodiscard]] Result<> verify(std::chrono::seconds leeway) const;
+    [[nodiscard]] Result<> verifyOnline(std::chrono::seconds leeway) const;
 
     [[nodiscard]] Result<> verifySelfSigned(std::chrono::seconds leeway) const;
 
