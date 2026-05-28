@@ -174,8 +174,8 @@ if(PROTOCOL_ENABLE_CONNECTION)
     FetchContent_MakeAvailable(RakNet)
     target_include_directories(Protocol PRIVATE $<BUILD_INTERFACE:${RakNet_SOURCE_DIR}/Source>)
     target_link_libraries(Protocol PRIVATE
-        $<BUILD_INTERFACE:RakNet>
-        $<INSTALL_INTERFACE:RakNet::RakNetLibStatic>
+        $<BUILD_INTERFACE:RakNetLibStatic>
+        $<INSTALL_INTERFACE:RakNetLibStatic::RakNetLibStatic>
     )
 endif()
 
