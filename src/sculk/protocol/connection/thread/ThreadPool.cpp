@@ -45,14 +45,14 @@ void ThreadPool::workerLoop(std::stop_token stopToken) {
         mWorkSignal.acquire();
 
         if (mStopping.load(std::memory_order_acquire) || stopToken.stop_requested()) {
-            std::function<void()> task;
+            Task task;
             while (mTasks.try_dequeue(task)) {
                 task();
             }
             return;
         }
 
-        std::function<void()> task;
+        Task task;
         while (mTasks.try_dequeue(task)) {
             task();
         }

@@ -18,8 +18,8 @@ namespace io {
 
 namespace {
 
-constexpr auto IO_RUNTIME_IDLE_WAIT = std::chrono::milliseconds(1);
-constexpr auto IO_RUNTIME_MAX_TICK_BUDGET = std::chrono::microseconds(1500);
+constexpr auto        IO_RUNTIME_IDLE_WAIT            = std::chrono::milliseconds(1);
+constexpr auto        IO_RUNTIME_MAX_TICK_BUDGET      = std::chrono::microseconds(1500);
 constexpr std::size_t IO_RUNTIME_MAX_CLIENTS_PER_PASS = 64;
 
 } // namespace
@@ -62,8 +62,8 @@ struct ClientIoRuntime::Registration {
 
 ClientIoRuntime::ClientIoRuntime(std::size_t workerCount)
 : mWorkerCount(std::max<std::size_t>(std::size_t{1}, workerCount)),
-    mClientsSnapshot(std::shared_ptr<const RegistrationList>{std::make_shared<RegistrationList>()}),
-    mWorkerNextStartSlot(mWorkerCount, 0) {
+  mClientsSnapshot(std::shared_ptr<const RegistrationList>{std::make_shared<RegistrationList>()}),
+  mWorkerNextStartSlot(mWorkerCount, 0) {
     mWorkers.reserve(mWorkerCount);
     for (std::size_t i = 0; i < mWorkerCount; ++i) {
         mWorkers.emplace_back([this, i](std::stop_token stopToken) { workerLoop(stopToken, i); });
@@ -174,8 +174,8 @@ void ClientIoRuntime::workerLoop(std::stop_token stopToken, std::size_t workerIn
                 break;
             }
 
-            const auto slotIndex   = (startSlot + scannedSlots) % assignedSlots;
-            const auto clientIndex = workerIndex + (slotIndex * mWorkerCount);
+            const auto  slotIndex    = (startSlot + scannedSlots) % assignedSlots;
+            const auto  clientIndex  = workerIndex + (slotIndex * mWorkerCount);
             const auto& registration = (*snapshot)[clientIndex];
             if (!registration || !registration->tryEnter()) {
                 continue;

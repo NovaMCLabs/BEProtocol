@@ -53,6 +53,23 @@ cmake --build build
 cmake --install build
 ```
 
+## 📚 Used Libraries
+
+The table below lists the main third-party libraries used by the project.
+Some entries are optional and only enabled by the corresponding CMake features.
+
+| Library | License | URL |
+| --- | --- | --- |
+| RakNet | BSD License | https://github.com/SculkCatalystMC/RakNet |
+| moodycamel::ConcurrentQueue | Simplified BSD / Boost Software License 1.0 | https://github.com/cameron314/concurrentqueue |
+| parallel-hashmap (phmap) | Apache-2.0 | https://github.com/greg7mdp/parallel-hashmap |
+| zlib | zlib | https://github.com/madler/zlib |
+| Snappy | BSD 3-Clause | https://github.com/google/snappy |
+| OpenSSL | Apache-2.0 | https://github.com/openssl/openssl |
+| cpp-httplib | MIT | https://github.com/yhirose/cpp-httplib |
+| Reflection | MPL-2.0 | https://github.com/SculkCatalystMC/Reflection |
+| magic_enum | MIT | https://github.com/Neargye/magic_enum |
+
 ## 🔌 CMake Integration
 
 After installation, consume the library with CMake:

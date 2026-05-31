@@ -14,20 +14,27 @@
 #include <RakPeerInterface.h>
 #include <atomic>
 #include <chrono>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <new>
 #include <semaphore>
 #include <span>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace sculk::protocol::inline abi_v975 {
 
 class ClientNetworkSystem final {
+public:
+    using RawEventCallback         = void (*)(void*, const NetworkEvent&) noexcept;
+    using RawPacketReceiveCallback = void (*)(void*, std::vector<std::byte>&&) noexcept;
+
 public:
     // Usage:
     // 1) connect(host, port)
@@ -72,12 +79,67 @@ public:
     // Returns false when no active session is available.
     [[nodiscard]] bool getNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
-    std::uint64_t subscribeEvents(std::function<void(const NetworkEvent&)> handler);
+    bool setOnConnected(RawEventCallback callback, void* userData = nullptr) noexcept;
 
-    [[nodiscard]] bool unsubscribeEvents(std::uint64_t subscriptionId);
+    template <typename F>
+        requires std::invocable<F&, const NetworkEvent&> && std::is_nothrow_invocable_v<F&, const NetworkEvent&>
+    bool setOnConnected(F&& handler) {
+        return setOnEventWithLambda(mOnConnectedHandler, std::forward<F>(handler));
+    }
+
+    bool setOnDisconnected(RawEventCallback callback, void* userData = nullptr) noexcept;
+
+    template <typename F>
+        requires std::invocable<F&, const NetworkEvent&> && std::is_nothrow_invocable_v<F&, const NetworkEvent&>
+    bool setOnDisconnected(F&& handler) {
+        return setOnEventWithLambda(mOnDisconnectedHandler, std::forward<F>(handler));
+    }
+
+    bool setOnConnectionFailed(RawEventCallback callback, void* userData = nullptr) noexcept;
+
+    template <typename F>
+        requires std::invocable<F&, const NetworkEvent&> && std::is_nothrow_invocable_v<F&, const NetworkEvent&>
+    bool setOnConnectionFailed(F&& handler) {
+        return setOnEventWithLambda(mOnConnectionFailedHandler, std::forward<F>(handler));
+    }
+
+    bool setOnPacketReceive(RawPacketReceiveCallback callback, void* userData = nullptr) noexcept;
+
+    template <typename F>
+        requires std::invocable<F&, std::vector<std::byte>&&>
+              && std::is_nothrow_invocable_v<F&, std::vector<std::byte>&&>
+    bool setOnPacketReceive(F&& handler) {
+        return setOnPacketWithLambda(std::forward<F>(handler));
+    }
+
+    [[nodiscard]] std::uint64_t droppedEventCallbackCount() const noexcept;
 
 private:
     friend class io::ClientIoRuntime;
+
+    struct EventHook {
+        RawEventCallback mCallback{};
+        void*            mUserData{};
+        void (*mDestroyUserData)(void*){};
+
+        ~EventHook() {
+            if (mDestroyUserData && mUserData) {
+                mDestroyUserData(mUserData);
+            }
+        }
+    };
+
+    struct PacketHook {
+        RawPacketReceiveCallback mCallback{};
+        void*                    mUserData{};
+        void (*mDestroyUserData)(void*){};
+
+        ~PacketHook() {
+            if (mDestroyUserData && mUserData) {
+                mDestroyUserData(mUserData);
+            }
+        }
+    };
 
     struct RakPeerDeleter {
         void operator()(RakNet::RakPeerInterface* peer) const noexcept;
@@ -89,8 +151,6 @@ private:
         PacketBuffer  mPayload{};
         std::uint32_t mForceReceiptNumber{};
     };
-    using EventHandler    = std::pair<std::uint64_t, std::function<void(const NetworkEvent&)>>;
-    using EventHandlerVec = std::vector<EventHandler>;
 
     void ioLoop(std::stop_token stopToken);
 
@@ -103,6 +163,63 @@ private:
     void notifyIoWorker() noexcept;
 
     void emitEvent(NetworkEvent event);
+
+    bool setOnEventRaw(
+        std::atomic<std::shared_ptr<EventHook>>& target,
+        RawEventCallback                         callback,
+        void*                                    userData,
+        void (*destroyUserData)(void*)
+    ) noexcept;
+
+    bool setOnPacketRaw(RawPacketReceiveCallback callback, void* userData, void (*destroyUserData)(void*)) noexcept;
+
+    template <typename F>
+        requires std::invocable<F&, const NetworkEvent&> && std::is_nothrow_invocable_v<F&, const NetworkEvent&>
+    bool setOnEventWithLambda(std::atomic<std::shared_ptr<EventHook>>& target, F&& handler) {
+        using Handler = std::decay_t<F>;
+
+        if constexpr (std::is_convertible_v<Handler, RawEventCallback>) {
+            return setOnEventRaw(target, static_cast<RawEventCallback>(handler), nullptr, nullptr);
+        } else {
+            auto* stored = new (std::nothrow) Handler(std::forward<F>(handler));
+            if (!stored) {
+                return false;
+            }
+
+            return setOnEventRaw(
+                target,
+                [](void* userData, const NetworkEvent& event) noexcept { (*static_cast<Handler*>(userData))(event); },
+                stored,
+                [](void* userData) { delete static_cast<Handler*>(userData); }
+            );
+        }
+    }
+
+    template <typename F>
+        requires std::invocable<F&, std::vector<std::byte>&&>
+              && std::is_nothrow_invocable_v<F&, std::vector<std::byte>&&>
+    bool setOnPacketWithLambda(F&& handler) {
+        using Handler = std::decay_t<F>;
+
+        if constexpr (std::is_convertible_v<Handler, RawPacketReceiveCallback>) {
+            return setOnPacketRaw(static_cast<RawPacketReceiveCallback>(handler), nullptr, nullptr);
+        } else {
+            auto* stored = new (std::nothrow) Handler(std::forward<F>(handler));
+            if (!stored) {
+                return false;
+            }
+
+            return setOnPacketRaw(
+                [](void* userData, std::vector<std::byte>&& packet) noexcept {
+                    (*static_cast<Handler*>(userData))(std::move(packet));
+                },
+                stored,
+                [](void* userData) { delete static_cast<Handler*>(userData); }
+            );
+        }
+    }
+
+    void startPacketPumpIfNeeded();
 
 private:
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
@@ -119,11 +236,13 @@ private:
     std::counting_semaphore<>                                 mIoWakeSignal{0};
     std::atomic_bool                                          mSendWakeRequested{false};
     std::atomic_uint32_t                                      mNextImmediateReceipt{1};
-    std::atomic_uint64_t                                      mNextSubscriptionId{1};
     std::atomic_uint64_t                                      mDroppedEventCallbacks{0};
-    std::atomic<std::shared_ptr<const EventHandlerVec>>       mEventHandlersSnapshot{
-        std::shared_ptr<const EventHandlerVec>{std::make_shared<EventHandlerVec>()}
-    };
+    std::atomic<std::shared_ptr<EventHook>>                   mOnConnectedHandler{};
+    std::atomic<std::shared_ptr<EventHook>>                   mOnDisconnectedHandler{};
+    std::atomic<std::shared_ptr<EventHook>>                   mOnConnectionFailedHandler{};
+    std::atomic<std::shared_ptr<PacketHook>>                  mOnPacketReceiveHandler{};
+    std::atomic_bool                                          mPacketPumpActive{false};
+    std::atomic_bool                                          mRegisteredInSharedIoRuntime{false};
 };
 
 } // namespace sculk::protocol::inline abi_v975

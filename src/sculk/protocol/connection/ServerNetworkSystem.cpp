@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/connection/ServerNetworkSystem.hpp"
+#include "sculk/protocol/connection/coro/PumpAdapters.hpp"
 #include <MessageIdentifiers.h>
 #include <RakNetTypes.h>
 #include <algorithm>
@@ -228,6 +229,11 @@ void ServerNetworkSystem::stop() {
 
     std::uint64_t dirtyGuid{};
     while (mDirtySessionGuids.try_dequeue(dirtyGuid)) {}
+
+    {
+        std::scoped_lock lock{mPacketPumpMutex};
+        mActivePacketPumps.clear();
+    }
 }
 
 bool ServerNetworkSystem::isRunning() const noexcept { return mRunning.load(std::memory_order_acquire); }
@@ -327,58 +333,148 @@ bool ServerNetworkSystem::getClientNetworkStatus(RakNet::RakNetGUID guid, Networ
     return true;
 }
 
-std::uint64_t ServerNetworkSystem::subscribeEvents(std::function<void(const NetworkEvent&)> handler) {
-    if (!handler) {
-        return 0;
-    }
-
-    const std::uint64_t id            = mNextSubscriptionId.fetch_add(1, std::memory_order_relaxed);
-    auto                stableHandler = std::move(handler);
-
-    for (;;) {
-        auto current = mEventHandlersSnapshot.load(std::memory_order_acquire);
-        auto next    = std::make_shared<EventHandlerVec>(*current);
-        next->emplace_back(id, stableHandler);
-
-        auto desired = std::const_pointer_cast<const EventHandlerVec>(next);
-        if (mEventHandlersSnapshot
-                .compare_exchange_weak(current, desired, std::memory_order_release, std::memory_order_acquire)) {
-            return id;
-        }
-    }
-
-    return id;
+bool ServerNetworkSystem::setOnConnected(RawEventCallback callback, void* userData) noexcept {
+    return setOnEventRaw(mOnConnectedHandler, callback, userData, nullptr);
 }
 
-bool ServerNetworkSystem::unsubscribeEvents(std::uint64_t subscriptionId) {
-    if (subscriptionId == 0) {
+bool ServerNetworkSystem::setOnDisconnected(RawEventCallback callback, void* userData) noexcept {
+    return setOnEventRaw(mOnDisconnectedHandler, callback, userData, nullptr);
+}
+
+bool ServerNetworkSystem::setOnConnectionFailed(RawEventCallback callback, void* userData) noexcept {
+    return setOnEventRaw(mOnConnectionFailedHandler, callback, userData, nullptr);
+}
+
+bool ServerNetworkSystem::setOnPacketReceive(RawPacketReceiveCallback callback, void* userData) noexcept {
+    return setOnPacketRaw(callback, userData, nullptr);
+}
+
+bool ServerNetworkSystem::setOnEventRaw(
+    std::atomic<std::shared_ptr<EventHook>>& target,
+    RawEventCallback                         callback,
+    void*                                    userData,
+    void (*destroyUserData)(void*)
+) noexcept {
+    if (!callback) {
+        if (destroyUserData && userData) {
+            destroyUserData(userData);
+        }
+        target.store(std::shared_ptr<EventHook>{}, std::memory_order_release);
         return false;
     }
 
-    for (;;) {
-        auto current = mEventHandlersSnapshot.load(std::memory_order_acquire);
-        auto next    = std::make_shared<EventHandlerVec>();
-        next->reserve(current->size());
-
-        bool removed = false;
-        for (const auto& entry : *current) {
-            if (entry.first == subscriptionId) {
-                removed = true;
-                continue;
-            }
-            next->push_back(entry);
+    std::shared_ptr<EventHook> hook{new (std::nothrow) EventHook{}};
+    if (!hook) {
+        if (destroyUserData && userData) {
+            destroyUserData(userData);
         }
+        return false;
+    }
+    hook->mCallback        = callback;
+    hook->mUserData        = userData;
+    hook->mDestroyUserData = destroyUserData;
+    target.store(std::move(hook), std::memory_order_release);
+    return true;
+}
 
-        if (!removed) {
-            return false;
+bool ServerNetworkSystem::setOnPacketRaw(
+    RawPacketReceiveCallback callback,
+    void*                    userData,
+    void (*destroyUserData)(void*)
+) noexcept {
+    if (!callback) {
+        if (destroyUserData && userData) {
+            destroyUserData(userData);
         }
+        mOnPacketReceiveHandler.store(std::shared_ptr<PacketHook>{}, std::memory_order_release);
+        return false;
+    }
 
-        auto desired = std::const_pointer_cast<const EventHandlerVec>(next);
-        if (mEventHandlersSnapshot
-                .compare_exchange_weak(current, desired, std::memory_order_release, std::memory_order_acquire)) {
-            return true;
+    std::shared_ptr<PacketHook> hook{new (std::nothrow) PacketHook{}};
+    if (!hook) {
+        if (destroyUserData && userData) {
+            destroyUserData(userData);
+        }
+        return false;
+    }
+
+    hook->mCallback        = callback;
+    hook->mUserData        = userData;
+    hook->mDestroyUserData = destroyUserData;
+    mOnPacketReceiveHandler.store(std::move(hook), std::memory_order_release);
+
+    startPacketPumpsForExistingSessions();
+    return true;
+}
+
+void ServerNetworkSystem::startPacketPumpIfNeeded(RakNet::RakNetGUID guid) {
+    auto packetHook = mOnPacketReceiveHandler.load(std::memory_order_acquire);
+    if (!packetHook || !packetHook->mCallback) {
+        return;
+    }
+
+    {
+        std::scoped_lock lock{mPacketPumpMutex};
+        auto [it, inserted] = mActivePacketPumps.insert(guid.g);
+        (void)it;
+        if (!inserted) {
+            return;
         }
     }
+
+    coro::startServerReceivePump(
+        mScheduler,
+        *this,
+        guid,
+        [this, guid](std::vector<std::byte>&& packet) -> bool {
+            auto currentHook = mOnPacketReceiveHandler.load(std::memory_order_acquire);
+            if (!currentHook || !currentHook->mCallback) {
+                auto session = getSession(guid);
+                if (session) {
+                    (void)session->enqueueInboundPacket(std::move(packet));
+                }
+                return false;
+            }
+
+            currentHook->mCallback(currentHook->mUserData, guid, std::move(packet));
+            return true;
+        },
+        [this, guid]() {
+            {
+                std::scoped_lock lock{mPacketPumpMutex};
+                mActivePacketPumps.erase(guid.g);
+            }
+
+            auto currentHook = mOnPacketReceiveHandler.load(std::memory_order_acquire);
+            if (!currentHook || !currentHook->mCallback) {
+                return;
+            }
+
+            NetworkStatus status{};
+            if (!getClientNetworkStatus(guid, status) || !status.getConnected()) {
+                return;
+            }
+
+            startPacketPumpIfNeeded(guid);
+        }
+    );
+}
+
+void ServerNetworkSystem::startPacketPumpsForExistingSessions() {
+    auto sessions = mSessionsSnapshot.load(std::memory_order_acquire);
+    for (const auto& [guidValue, session] : *sessions) {
+        if (!session || !session->isConnected()) {
+            continue;
+        }
+
+        RakNet::RakNetGUID guid{};
+        guid.g = guidValue;
+        startPacketPumpIfNeeded(guid);
+    }
+}
+
+std::uint64_t ServerNetworkSystem::droppedEventCallbackCount() const noexcept {
+    return mDroppedEventCallbacks.load(std::memory_order_relaxed);
 }
 
 std::size_t ServerNetworkSystem::sessionCount() const {
@@ -477,6 +573,7 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         }
 
         emitEvent(NetworkEvent{NetworkEventType::Connected, packet->guid, packet->systemAddress});
+        startPacketPumpIfNeeded(packet->guid);
         return;
     }
 
@@ -512,6 +609,11 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         if (removed) {
             emitEvent(NetworkEvent{NetworkEventType::Disconnected, packet->guid, packet->systemAddress});
         }
+
+        {
+            std::scoped_lock lock{mPacketPumpMutex};
+            mActivePacketPumps.erase(packet->guid.g);
+        }
         return;
     }
 
@@ -540,15 +642,32 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
 }
 
 void ServerNetworkSystem::emitEvent(NetworkEvent event) {
-    auto handlers = mEventHandlersSnapshot.load(std::memory_order_acquire);
-    if (handlers->empty()) {
+    std::shared_ptr<EventHook> handler;
+    switch (event.mType) {
+    case NetworkEventType::Connected:
+        handler = mOnConnectedHandler.load(std::memory_order_acquire);
+        break;
+    case NetworkEventType::Disconnected:
+        handler = mOnDisconnectedHandler.load(std::memory_order_acquire);
+        break;
+    case NetworkEventType::ConnectionFailed:
+        handler = mOnConnectionFailedHandler.load(std::memory_order_acquire);
+        break;
+    default:
         return;
     }
 
-    for (const auto& [_, handler] : *handlers) {
-        if (!mThreadPool->submit([event, handler]() mutable { handler(event); })) {
-            mDroppedEventCallbacks.fetch_add(1, std::memory_order_relaxed);
-        }
+    if (!handler || !handler->mCallback) {
+        return;
+    }
+
+    auto sharedHandler = std::move(handler);
+    if (!mThreadPool->submit([event, sharedHandler = std::move(sharedHandler)]() mutable {
+            if (sharedHandler && sharedHandler->mCallback) {
+                sharedHandler->mCallback(sharedHandler->mUserData, event);
+            }
+        })) {
+        mDroppedEventCallbacks.fetch_add(1, std::memory_order_relaxed);
     }
 }
 

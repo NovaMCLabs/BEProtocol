@@ -39,7 +39,7 @@ public:
             return false;
         }
 
-        auto wrapped = std::function<void()>(std::forward<F>(task));
+        auto wrapped = Task(std::forward<F>(task));
         if (!mTasks.enqueue(std::move(wrapped))) {
             return false;
         }
@@ -54,13 +54,16 @@ public:
     void stop() noexcept;
 
 private:
+    using Task = std::move_only_function<void()>;
+
+private:
     void workerLoop(std::stop_token stopToken);
 
 private:
-    moodycamel::ConcurrentQueue<std::function<void()>> mTasks{};
-    std::counting_semaphore<1024 * 1024>               mWorkSignal{0};
-    std::atomic_bool                                   mStopping{false};
-    std::vector<std::jthread>                          mWorkers{};
+    moodycamel::ConcurrentQueue<Task>    mTasks{};
+    std::counting_semaphore<1024 * 1024> mWorkSignal{0};
+    std::atomic_bool                     mStopping{false};
+    std::vector<std::jthread>            mWorkers{};
 };
 
 } // namespace thread
