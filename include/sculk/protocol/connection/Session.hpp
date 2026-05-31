@@ -51,6 +51,8 @@ protected:
     moodycamel::ConcurrentQueue<std::coroutine_handle<>> mReceiveWaiters{};
     std::atomic_bool                                     mConnected{true};
     std::atomic_bool                                     mOutboundDirty{false};
+    std::atomic_uint64_t                                 mInboundQueuedBytes{0};
+    std::atomic_uint64_t                                 mOutboundQueuedBytes{0};
     std::optional<CompressionType>                       mCompressionType{};
     std::size_t                                          mCompressionThreshold{};
 

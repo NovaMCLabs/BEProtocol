@@ -24,6 +24,18 @@ constexpr std::uint8_t  MINECRAFT_BATCH_PACKET_ID      = 0xFE;
 constexpr std::uint64_t MANUAL_RECEIVE_PUMP_GENERATION = std::numeric_limits<std::uint64_t>::max();
 constexpr std::size_t   MAX_BATCH_DECOMPRESSED_BYTES   = 8U * 1024U * 1024U;
 constexpr std::size_t   MAX_BATCH_PACKET_BYTES         = 2U * 1024U * 1024U;
+constexpr std::uint64_t MAX_INBOUND_QUEUED_BYTES       = 64ULL * 1024ULL * 1024ULL;
+constexpr std::uint64_t MAX_OUTBOUND_QUEUED_BYTES      = 64ULL * 1024ULL * 1024ULL;
+
+void subtractQueuedBytesSaturating(std::atomic_uint64_t& counter, std::uint64_t bytes) noexcept {
+    auto current = counter.load(std::memory_order_relaxed);
+    while (true) {
+        const auto next = (bytes >= current) ? 0ULL : (current - bytes);
+        if (counter.compare_exchange_weak(current, next, std::memory_order_acq_rel, std::memory_order_relaxed)) {
+            return;
+        }
+    }
+}
 
 [[nodiscard]] NetworkStatus::ConnectionState mapConnectionState(RakNet::ConnectionState state) noexcept {
     switch (state) {
@@ -123,9 +135,20 @@ bool Session::sendPacket(std::span<const std::byte> buffer) {
         return false;
     }
 
+    const auto packetBytes = static_cast<std::uint64_t>(buffer.size());
+    const auto previous    = mOutboundQueuedBytes.fetch_add(packetBytes, std::memory_order_acq_rel);
+    if (previous + packetBytes > MAX_OUTBOUND_QUEUED_BYTES) {
+        mOutboundQueuedBytes.fetch_sub(packetBytes, std::memory_order_relaxed);
+        return false;
+    }
+
     OutboundPacket packet{};
     packet.mPayload.assign(buffer.begin(), buffer.end());
-    return mOutboundPackets.enqueue(std::move(packet));
+    const bool enqueued = mOutboundPackets.enqueue(std::move(packet));
+    if (!enqueued) {
+        mOutboundQueuedBytes.fetch_sub(packetBytes, std::memory_order_relaxed);
+    }
+    return enqueued;
 }
 
 bool Session::sendPacket(std::vector<std::byte>&& buffer) {
@@ -133,9 +156,20 @@ bool Session::sendPacket(std::vector<std::byte>&& buffer) {
         return false;
     }
 
+    const auto packetBytes = static_cast<std::uint64_t>(buffer.size());
+    const auto previous    = mOutboundQueuedBytes.fetch_add(packetBytes, std::memory_order_acq_rel);
+    if (previous + packetBytes > MAX_OUTBOUND_QUEUED_BYTES) {
+        mOutboundQueuedBytes.fetch_sub(packetBytes, std::memory_order_relaxed);
+        return false;
+    }
+
     OutboundPacket packet{};
-    packet.mPayload = std::move(buffer);
-    return mOutboundPackets.enqueue(std::move(packet));
+    packet.mPayload     = std::move(buffer);
+    const bool enqueued = mOutboundPackets.enqueue(std::move(packet));
+    if (!enqueued) {
+        mOutboundQueuedBytes.fetch_sub(packetBytes, std::memory_order_relaxed);
+    }
+    return enqueued;
 }
 
 std::uint32_t Session::sendPacketImmediately(std::span<const std::byte> buffer, std::uint32_t forceReceiptNumber) {
@@ -205,7 +239,14 @@ Session::sendRawPacketImmediately(std::span<const std::byte> buffer, std::uint32
 }
 
 bool Session::receivePacket(std::vector<std::byte>& outBuffer) noexcept {
-    return mInboundPackets.try_dequeue(outBuffer);
+    std::vector<std::byte> packet;
+    if (!mInboundPackets.try_dequeue(packet)) {
+        return false;
+    }
+
+    subtractQueuedBytesSaturating(mInboundQueuedBytes, static_cast<std::uint64_t>(packet.size()));
+    outBuffer = std::move(packet);
+    return true;
 }
 
 bool Session::hasPendingInboundPackets() const noexcept { return mInboundPackets.size_approx() > 0; }
@@ -301,6 +342,22 @@ NetworkStatus Session::getNetworkStatus() const noexcept {
 void Session::markDisconnected() noexcept {
     mConnected.store(false, std::memory_order_relaxed);
 
+    std::vector<std::byte> inboundPacket;
+    std::uint64_t          drainedInboundBytes = 0;
+    while (mInboundPackets.try_dequeue(inboundPacket)) {
+        drainedInboundBytes += static_cast<std::uint64_t>(inboundPacket.size());
+        inboundPacket.clear();
+    }
+    subtractQueuedBytesSaturating(mInboundQueuedBytes, drainedInboundBytes);
+
+    OutboundPacket outboundPacket;
+    std::uint64_t  drainedOutboundBytes = 0;
+    while (mOutboundPackets.try_dequeue(outboundPacket)) {
+        drainedOutboundBytes += static_cast<std::uint64_t>(outboundPacket.mPayload.size());
+        outboundPacket.mPayload.clear();
+    }
+    subtractQueuedBytesSaturating(mOutboundQueuedBytes, drainedOutboundBytes);
+
     std::coroutine_handle<> handle;
     while (mReceiveWaiters.try_dequeue(handle)) {
         if (mScheduler) {
@@ -341,7 +398,17 @@ bool Session::enqueueInboundPacket(std::vector<std::byte>&& buffer) noexcept {
         return false;
     }
 
+    const auto packetBytes = static_cast<std::uint64_t>(buffer.size());
+    const auto previous    = mInboundQueuedBytes.fetch_add(packetBytes, std::memory_order_acq_rel);
+    if (previous + packetBytes > MAX_INBOUND_QUEUED_BYTES) {
+        mInboundQueuedBytes.fetch_sub(packetBytes, std::memory_order_relaxed);
+        return false;
+    }
+
     const bool ok = mInboundPackets.enqueue(std::move(buffer));
+    if (!ok) {
+        mInboundQueuedBytes.fetch_sub(packetBytes, std::memory_order_relaxed);
+    }
     if (ok) {
         notifyOneReceiver();
     }
@@ -349,16 +416,25 @@ bool Session::enqueueInboundPacket(std::vector<std::byte>&& buffer) noexcept {
 }
 
 bool Session::tryDequeueOutboundPacket(OutboundPacket& outPacket) noexcept {
-    return mOutboundPackets.try_dequeue(outPacket);
+    if (!mOutboundPackets.try_dequeue(outPacket)) {
+        return false;
+    }
+
+    subtractQueuedBytesSaturating(mOutboundQueuedBytes, static_cast<std::uint64_t>(outPacket.mPayload.size()));
+    return true;
 }
 
 std::size_t Session::tryDequeueAllOutboundPackets(OutboundBatch& outPackets) noexcept {
     outPackets.clear();
 
     OutboundPacket packet;
+    std::uint64_t  drainedBytes = 0;
     while (mOutboundPackets.try_dequeue(packet)) {
+        drainedBytes += static_cast<std::uint64_t>(packet.mPayload.size());
         outPackets.push_back(std::move(packet));
     }
+
+    subtractQueuedBytesSaturating(mOutboundQueuedBytes, drainedBytes);
 
     return outPackets.size();
 }

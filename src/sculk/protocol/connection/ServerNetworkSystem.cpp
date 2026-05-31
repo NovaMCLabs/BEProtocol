@@ -9,6 +9,7 @@
 #include "sculk/protocol/connection/coro/PumpAdapters.hpp"
 #include <MessageIdentifiers.h>
 #include <RakNetTypes.h>
+#include <atomic>
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -24,6 +25,7 @@ constexpr auto         RECEIVE_IDLE_SLEEP               = std::chrono::milliseco
 constexpr auto         SEND_FLUSH_INTERVAL              = std::chrono::milliseconds(20);
 constexpr std::uint8_t MINECRAFT_BATCH_PACKET_ID        = 0xFE;
 constexpr std::size_t  MAX_POOLED_PACKET_CAPACITY       = 1U << 20;
+constexpr std::size_t  MAX_POOLED_PACKET_COUNT          = 2048;
 constexpr std::size_t  HARD_MAX_SESSIONS_PER_FLUSH_PASS = 2048;
 constexpr auto         HARD_MAX_FLUSH_TIME_BUDGET       = std::chrono::milliseconds(8);
 constexpr std::size_t  ADAPTIVE_BUDGET_LEVELS           = 4;
@@ -78,6 +80,7 @@ public:
             return buffer;
         }
 
+        mPooledCount.fetch_sub(1, std::memory_order_relaxed);
         buffer.clear();
         if (buffer.capacity() < minCapacity) {
             buffer.reserve(minCapacity);
@@ -90,12 +93,30 @@ public:
             return;
         }
 
+        auto currentCount = mPooledCount.load(std::memory_order_relaxed);
+        while (currentCount < MAX_POOLED_PACKET_COUNT) {
+            if (mPooledCount.compare_exchange_weak(
+                    currentCount,
+                    currentCount + 1,
+                    std::memory_order_acq_rel,
+                    std::memory_order_relaxed
+                )) {
+                buffer.clear();
+                if (mPool.enqueue(std::move(buffer))) {
+                    return;
+                }
+
+                mPooledCount.fetch_sub(1, std::memory_order_relaxed);
+                return;
+            }
+        }
+
         buffer.clear();
-        (void)mPool.enqueue(std::move(buffer));
     }
 
 private:
     moodycamel::ConcurrentQueue<PacketBuffer> mPool{};
+    std::atomic<std::size_t>                  mPooledCount{0};
 };
 
 PacketBufferPool gPacketBufferPool{};
@@ -590,6 +611,8 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
     }
 
     if (messageId == ToMessageID(ID_DISCONNECTION_NOTIFICATION) || messageId == ToMessageID(ID_CONNECTION_LOST)) {
+        mScheduledDueTimeByGuid.erase(key);
+
         SessionPtr removedSession;
         bool       removed = false;
         for (;;) {
@@ -707,7 +730,6 @@ void ServerNetworkSystem::flushOutboundPackets() {
         if (it != sessionsSnapshot->end() && it->second && it->second->isConnected()) {
             (void)it->second->sendPacketImmediately(immediate.mPayload, immediate.mForceReceiptNumber);
         }
-        gPacketBufferPool.release(std::move(immediate.mPayload));
     }
 
     std::uint64_t dirtyGuid{};
@@ -807,7 +829,6 @@ void ServerNetworkSystem::flushOutboundPackets() {
             if (!prepared.mPayload.empty()) {
                 auto framed = prependMinecraftBatchHeader(prepared.mPayload);
                 (void)session->sendRawPacketImmediately(framed, prepared.mForceReceiptNumber);
-                gPacketBufferPool.release(std::move(prepared.mPayload));
                 gPacketBufferPool.release(std::move(framed));
             }
 

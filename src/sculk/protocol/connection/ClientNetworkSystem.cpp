@@ -9,6 +9,7 @@
 #include "sculk/protocol/connection/coro/PumpAdapters.hpp"
 #include <MessageIdentifiers.h>
 #include <RakNetTypes.h>
+#include <atomic>
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -22,6 +23,7 @@ constexpr auto         RECEIVE_IDLE_SLEEP         = std::chrono::milliseconds(1)
 constexpr auto         SEND_FLUSH_INTERVAL        = std::chrono::milliseconds(20);
 constexpr std::uint8_t MINECRAFT_BATCH_PACKET_ID  = 0xFE;
 constexpr std::size_t  MAX_POOLED_PACKET_CAPACITY = 1U << 20;
+constexpr std::size_t  MAX_POOLED_PACKET_COUNT    = 1024;
 
 class PacketBufferPool final {
 public:
@@ -34,6 +36,7 @@ public:
             return buffer;
         }
 
+        mPooledCount.fetch_sub(1, std::memory_order_relaxed);
         buffer.clear();
         if (buffer.capacity() < minCapacity) {
             buffer.reserve(minCapacity);
@@ -46,12 +49,30 @@ public:
             return;
         }
 
+        auto currentCount = mPooledCount.load(std::memory_order_relaxed);
+        while (currentCount < MAX_POOLED_PACKET_COUNT) {
+            if (mPooledCount.compare_exchange_weak(
+                    currentCount,
+                    currentCount + 1,
+                    std::memory_order_acq_rel,
+                    std::memory_order_relaxed
+                )) {
+                buffer.clear();
+                if (mPool.enqueue(std::move(buffer))) {
+                    return;
+                }
+
+                mPooledCount.fetch_sub(1, std::memory_order_relaxed);
+                return;
+            }
+        }
+
         buffer.clear();
-        (void)mPool.enqueue(std::move(buffer));
     }
 
 private:
     moodycamel::ConcurrentQueue<PacketBuffer> mPool{};
+    std::atomic<std::size_t>                  mPooledCount{0};
 };
 
 PacketBufferPool gPacketBufferPool{};
@@ -559,7 +580,6 @@ void ClientNetworkSystem::flushOutboundPackets() {
         if (immediate.mSession && immediate.mSession->isConnected()) {
             (void)immediate.mSession->sendPacketImmediately(immediate.mPayload, immediate.mForceReceiptNumber);
         }
-        gPacketBufferPool.release(std::move(immediate.mPayload));
     }
 
     thread_local OutboundBatch outboundBatch;
@@ -581,7 +601,6 @@ void ClientNetworkSystem::flushOutboundPackets() {
         if (!batched.empty()) {
             auto framed = prependMinecraftBatchHeader(batched);
             (void)session->sendRawPacketImmediately(framed);
-            gPacketBufferPool.release(std::move(batched));
             gPacketBufferPool.release(std::move(framed));
         }
     }
