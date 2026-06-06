@@ -169,7 +169,7 @@ inline void ensureAndFillLoginToken(ConnectionRequest& request) {
     if (payload.xid.empty() && request.mLegacyCertificateChain) {
         payload.xid = request.mLegacyCertificateChain->mLoginCertificate.mPayload.extraData->XUID;
     }
-    if (!payload.xname.empty()) {
+    if (payload.xname.empty()) {
         payload.xname = request.getXboxLiveName();
     }
     payload.aud = "api://auth-minecraft-services/multiplayer";
@@ -193,10 +193,10 @@ inline void ensureAndFillLegacyChain(ConnectionRequest& request) {
                     .iss         = "Mojang",
                     .iat         = 0,
                     .extraData   = Certificate::ExtraData{
-                        .identity    = "", // Empty identity
-                        .displayName = request.getXboxLiveName(),
-                        .XUID        = "",      // Empty XUID
-                        .sandBoxId   = "RETAIL" // Always "RETAIL"
+                          .identity    = "", // Empty identity
+                          .displayName = request.getXboxLiveName(),
+                          .XUID        = "",      // Empty XUID
+                          .sandBoxId   = "RETAIL" // Always "RETAIL"
                     }
                 }
             }

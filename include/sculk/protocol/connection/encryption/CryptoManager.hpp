@@ -43,10 +43,16 @@ public:
 
 public:
     static Result<std::vector<std::byte>>
-    deriveSessionKey(std::span<const std::byte> token, std::span<const std::byte> sharedSecret);
+    deriveSessionKey(std::span<const std::byte> salt, std::span<const std::byte> sharedSecret);
 
     static Result<std::vector<std::byte>>
     computeEcdhSharedSecret(std::string_view localPrivateKeyPem, std::string_view remotePublicKeyPem);
+
+    static Result<std::vector<std::byte>> computeSessionKey(
+        std::string_view           localPrivateKeyPem,
+        std::string_view           remotePublicKeyPem,
+        std::span<const std::byte> salt
+    );
 
 private:
     static constexpr std::size_t CHECKSUM_SIZE  = 8;

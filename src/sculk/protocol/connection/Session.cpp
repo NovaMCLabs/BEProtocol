@@ -53,13 +53,9 @@ Session::~Session() { disconnect(); }
 
 bool Session::isCompressed() const noexcept { return mCompressionType.has_value(); }
 
-void Session::setCompressionType(CompressionType type) noexcept {
+void Session::setCompression(CompressionType type, std::int32_t threshold) noexcept {
     std::scoped_lock lock{mMutex};
-    mCompressionType = type;
-}
-
-void Session::setCompressionThreshold(std::size_t threshold) noexcept {
-    std::scoped_lock lock{mMutex};
+    mCompressionType      = type;
     mCompressionThreshold = threshold;
 }
 

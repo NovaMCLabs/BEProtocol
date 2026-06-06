@@ -45,7 +45,7 @@ protected:
     moodycamel::ConcurrentQueue<Buffer>   mOutboundPackets{};
     std::atomic_bool                      mConnected{};
     std::optional<CompressionType>        mCompressionType{};
-    std::size_t                           mCompressionThreshold{};
+    std::int32_t                          mCompressionThreshold{};
     std::optional<CryptoManager>          mEncryption{};
     std::chrono::steady_clock::time_point mNextFlushAt{};
     mutable std::mutex                    mMutex{};
@@ -63,9 +63,7 @@ public:
 public:
     [[nodiscard]] bool isCompressed() const noexcept;
 
-    void setCompressionType(CompressionType type) noexcept;
-
-    void setCompressionThreshold(std::size_t threshold) noexcept;
+    void setCompression(CompressionType type, std::int32_t threshold) noexcept;
 
     [[nodiscard]] bool isEncrypted() const noexcept;
 

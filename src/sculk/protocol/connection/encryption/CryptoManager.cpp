@@ -74,7 +74,7 @@ CryptoManager::computeEcdhSharedSecret(std::string_view localPrivateKeyPem, std:
 }
 
 Result<std::vector<std::byte>>
-CryptoManager::deriveSessionKey(std::span<const std::byte> token, std::span<const std::byte> sharedSecret) {
+CryptoManager::deriveSessionKey(std::span<const std::byte> salt, std::span<const std::byte> sharedSecret) {
     std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> mdctx(EVP_MD_CTX_new(), &EVP_MD_CTX_free);
     if (!mdctx) {
         return error_utils::makeError("Failed to create digest context");
@@ -84,8 +84,8 @@ CryptoManager::deriveSessionKey(std::span<const std::byte> token, std::span<cons
         return error_utils::makeError("Failed to initialize SHA-256");
     }
 
-    if (EVP_DigestUpdate(mdctx.get(), token.data(), token.size()) != 1) {
-        return error_utils::makeError("Failed to update digest with token");
+    if (EVP_DigestUpdate(mdctx.get(), salt.data(), salt.size()) != 1) {
+        return error_utils::makeError("Failed to update digest with salt");
     }
     if (EVP_DigestUpdate(mdctx.get(), sharedSecret.data(), sharedSecret.size()) != 1) {
         return error_utils::makeError("Failed to update digest with shared secret");
@@ -98,6 +98,19 @@ CryptoManager::deriveSessionKey(std::span<const std::byte> token, std::span<cons
     }
 
     return sessionKey;
+}
+
+Result<std::vector<std::byte>> CryptoManager::computeSessionKey(
+    std::string_view           localPrivateKeyPem,
+    std::string_view           remotePublicKeyPem,
+    std::span<const std::byte> salt
+) {
+    auto sharedSecret = computeEcdhSharedSecret(localPrivateKeyPem, remotePublicKeyPem);
+    if (!sharedSecret) {
+        return error_utils::makeError("Failed to compute ECDH shared secret");
+    }
+
+    return deriveSessionKey(salt, *sharedSecret);
 }
 
 namespace {
@@ -191,13 +204,13 @@ std::vector<std::byte> CryptoManager::ctrCrypt(EvpCipherCtxPtr& ctx, std::span<c
 
     int        outLen = 0;
     const bool ok     = EVP_CipherUpdate(
-                            ctx.get(),
-                            reinterpret_cast<std::uint8_t*>(output.data()),
-                            &outLen,
-                            reinterpret_cast<const std::uint8_t*>(bytes.data()),
-                            static_cast<int>(bytes.size())
-                        )
-                     == 1;
+                        ctx.get(),
+                        reinterpret_cast<std::uint8_t*>(output.data()),
+                        &outLen,
+                        reinterpret_cast<const std::uint8_t*>(bytes.data()),
+                        static_cast<int>(bytes.size())
+                    )
+                 == 1;
 
     if (!ok || static_cast<std::size_t>(outLen) != output.size()) {
         return {bytes.begin(), bytes.end()};

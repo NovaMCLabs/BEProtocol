@@ -15,6 +15,9 @@ public:
     std::int32_t mClientNetworkVersion{};
 
 public:
+    [[nodiscard]] RequestNetworkSettingsPacket() noexcept = default;
+    [[nodiscard]] RequestNetworkSettingsPacket(std::int32_t clientNetworkVersion) noexcept;
+
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
 
     [[nodiscard]] std::string_view getName() const noexcept override;

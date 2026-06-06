@@ -6,7 +6,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "AuthenticationType.hpp"
 #include "PemKeyPair.hpp"
 #include <chrono>
 #include <future>
@@ -19,10 +18,10 @@ class AuthenticationKeyManager {
     std::unordered_map<std::string, std::string> mPublicKeysPemByKeyId{};
     std::string                                  mExpectedIssuer{};
     std::string                                  mExpectedPlayFabTitle{};
-    std::chrono::seconds                         mLeeway{60};
+    std::chrono::seconds                         mLeeway{};
 
 public:
-    AuthenticationKeyManager() = default;
+    AuthenticationKeyManager(bool useCachedMojangKeys = false, std::chrono::seconds leeway = std::chrono::seconds(60));
 
     [[nodiscard]] std::optional<std::string_view> getPublicKeyPemByKeyId(const std::string& keyId) const;
 

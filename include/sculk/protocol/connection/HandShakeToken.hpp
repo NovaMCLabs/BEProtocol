@@ -45,14 +45,16 @@ public:
 
     [[nodiscard]] std::string toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
 
+    void setSaltBytes(std::span<const std::byte> salt);
+
     [[nodiscard]] std::vector<std::byte> getSaltBytes() const;
 
 public:
     [[nodiscard]] static Result<HandShakeToken> fromString(std::string_view rawLoginToken);
 
-    [[nodiscard]] static HandShakeToken fromSalt(std::span<const std::byte> salt);
-
     [[nodiscard]] static std::vector<std::byte> randomSalt();
+
+    [[nodiscard]] static Result<HandShakeToken> random(const PemKeyPair& localKeyPair);
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

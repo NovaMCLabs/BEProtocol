@@ -26,6 +26,15 @@ public:
     float                mClientThrottleScalar{};
 
 public:
+    [[nodiscard]] NetworkSettingsPacket() noexcept = default;
+    [[nodiscard]] NetworkSettingsPacket(
+        std::uint16_t        compressionThreshold,
+        CompressionAlgorithm compressionAlgorithm,
+        bool                 clientThrottleEnabled,
+        std::uint8_t         clientThrottleThreshold,
+        float                clientThrottleScalar
+    ) noexcept;
+
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
 
     [[nodiscard]] std::string_view getName() const noexcept override;

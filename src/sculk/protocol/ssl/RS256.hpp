@@ -140,6 +140,14 @@ jwkRsaPublicKeyToPem(std::string_view modulusEncoded, std::string_view exponentE
     return true;
 }
 
+inline std::string jwkRsaPublicKeyToPem(std::string_view modulusEncoded, std::string_view exponentEncoded) {
+    std::string publicKeyPem{};
+    if (!jwkRsaPublicKeyToPem(modulusEncoded, exponentEncoded, publicKeyPem)) {
+        return {};
+    }
+    return publicKeyPem;
+}
+
 [[nodiscard]] inline bool generateRS256KeyPair(std::string& outPublicKeyPem, std::string& outPrivateKeyPem) {
     outPublicKeyPem.clear();
     outPrivateKeyPem.clear();

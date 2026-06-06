@@ -12,6 +12,19 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
+NetworkSettingsPacket::NetworkSettingsPacket(
+    std::uint16_t        compressionThreshold,
+    CompressionAlgorithm compressionAlgorithm,
+    bool                 clientThrottleEnabled,
+    std::uint8_t         clientThrottleThreshold,
+    float                clientThrottleScalar
+) noexcept
+: mCompressionThreshold(compressionThreshold),
+  mCompressionAlgorithm(compressionAlgorithm),
+  mClientThrottleEnabled(clientThrottleEnabled),
+  mClientThrottleThreshold(clientThrottleThreshold),
+  mClientThrottleScalar(clientThrottleScalar) {}
+
 MinecraftPacketIds NetworkSettingsPacket::getId() const noexcept { return MinecraftPacketIds::NetworkSettings; }
 
 std::string_view NetworkSettingsPacket::getName() const noexcept { return "NetworkSettingsPacket"; }

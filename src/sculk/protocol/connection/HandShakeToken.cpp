@@ -192,11 +192,7 @@ std::vector<std::byte> base64Decode(std::string_view data) {
 
 } // namespace
 
-HandShakeToken HandShakeToken::fromSalt(std::span<const std::byte> salt) {
-    HandShakeToken token{};
-    token.mPayload.salt = base64Encode(salt);
-    return token;
-}
+void HandShakeToken::setSaltBytes(std::span<const std::byte> salt) { mPayload.salt = base64Encode(salt); }
 
 std::vector<std::byte> HandShakeToken::getSaltBytes() const { return base64Decode(mPayload.salt); }
 
@@ -210,6 +206,15 @@ std::vector<std::byte> HandShakeToken::randomSalt() {
     }
 
     return salt;
+}
+
+Result<HandShakeToken> HandShakeToken::random(const PemKeyPair& localKeyPair) {
+    HandShakeToken token{};
+    token.setSaltBytes(randomSalt());
+    if (!token.sign(localKeyPair)) {
+        return error_utils::makeError("Failed to sign handshake token");
+    }
+    return token;
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

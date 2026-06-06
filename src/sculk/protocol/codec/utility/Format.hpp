@@ -252,7 +252,7 @@ constexpr std::string typeToString(const T& value) {
 
 template <typename... Args, std::size_t... Is>
 constexpr std::string formatPacketImpl(const IPacket& packet, std::index_sequence<Is...>, Args&&... args) {
-    std::string out = std::format("{} {{ ", packet.getName());
+    std::string out = std::format("{}({}) {{ ", packet.getName(), static_cast<int>(packet.getId()));
     ((out.append(args), (Is != sizeof...(Args) - 1 ? out.append(", ") : out)), ...);
     out.append(" }");
     return out;

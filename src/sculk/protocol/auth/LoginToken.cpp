@@ -147,6 +147,7 @@ Result<> LoginToken::verifyOnline(const AuthenticationKeyManager& authentication
     if (!rs256::verifyRS256Signature(signingInput, mSignature, *keyId)) {
         return error_utils::makeError("Failed to verify login token signature");
     }
+
     return {};
 }
 
@@ -186,6 +187,7 @@ Result<> LoginToken::verifySelfSigned(std::chrono::seconds leeway) const {
     if (!es384::verifyES384Signature(signingInput, mSignature, *mHeader.x5u)) {
         return error_utils::makeError("Failed to verify login token signature");
     }
+
     return {};
 }
 
