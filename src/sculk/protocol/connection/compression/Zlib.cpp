@@ -7,6 +7,7 @@
 
 #include "sculk/protocol/connection/compression/Zlib.hpp"
 #include "sculk/protocol/utility/Result.hpp"
+#include <cstdint>
 #include <zlib.h>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE::compression::zlib {

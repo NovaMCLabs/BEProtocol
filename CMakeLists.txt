@@ -248,9 +248,12 @@ if(MSVC)
         /utf-8
         /GR-
         /Zc:preprocessor
+        /permissive-
         $<$<NOT:$<BOOL:${PROTOCOL_ENABLE_EXCEPTIONS}>>:/EHs-c->
-        $<$<CONFIG:Release>:/O2 /Ob3>
-        $<$<CONFIG:MinSizeRel>:/O2 /Ob3>
+        $<$<CONFIG:Release>:/O2>
+        $<$<CONFIG:Release>:/Ob3>
+        $<$<CONFIG:MinSizeRel>:/O2>
+        $<$<CONFIG:MinSizeRel>:/Ob3>
     )
     target_compile_definitions(Protocol PRIVATE
         UNICODE
