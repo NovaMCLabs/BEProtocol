@@ -9,6 +9,7 @@
 #include "Session.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
+#include "sculk/protocol/utility/AtomicSharedPtr.hpp"
 #include <RakPeerInterface.h>
 #include <atomic>
 #include <cstddef>
@@ -88,7 +89,7 @@ private:
     std::atomic_bool                                          mRunning{false};
     std::jthread                                              mReceiveThread{};
     std::jthread                                              mFlushThread{};
-    std::atomic<std::shared_ptr<Session>>                     mSession{};
+    AtomicSharedPtr<Session>                                  mSession{};
     ConnectionEventCallback                                   mOnConnected{};
     ConnectionEventCallback                                   mOnDisconnected{};
     ConnectionEventCallback                                   mOnConnectionFailed{};

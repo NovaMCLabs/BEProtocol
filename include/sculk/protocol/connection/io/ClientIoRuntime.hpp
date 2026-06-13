@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/Version.hpp"
+#include "sculk/protocol/utility/AtomicSharedPtr.hpp"
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -46,12 +47,12 @@ private:
     void workerLoop(std::stop_token stopToken, std::size_t workerIndex);
 
 private:
-    std::size_t                                          mWorkerCount{};
-    std::atomic<std::shared_ptr<const RegistrationList>> mClientsSnapshot{};
-    std::counting_semaphore<>                            mWakeSignal{0};
-    std::atomic_bool                                     mWakePending{false};
-    std::vector<std::size_t>                             mWorkerNextStartSlot{};
-    std::vector<std::jthread>                            mWorkers{};
+    std::size_t                       mWorkerCount{};
+    AtomicSharedPtr<RegistrationList> mClientsSnapshot{};
+    std::counting_semaphore<>         mWakeSignal{0};
+    std::atomic_bool                  mWakePending{false};
+    std::vector<std::size_t>          mWorkerNextStartSlot{};
+    std::vector<std::jthread>         mWorkers{};
 };
 
 } // namespace io

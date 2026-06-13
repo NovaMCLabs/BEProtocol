@@ -110,6 +110,11 @@ struct MojangPublicKeyFetchResult {
     std::vector<KeyInfo> keys{};
 };
 
+AuthenticationKeyManager& AuthenticationKeyManager::setLeeway(std::chrono::seconds leeway) {
+    mLeeway = leeway;
+    return *this;
+}
+
 Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeoutSeconds) {
     // https://client.discovery.minecraft-services.net/api/v1.0/discovery/MinecraftPE/builds/1.0.0.0
     httplib::Client serviceClient("https://client.discovery.minecraft-services.net");

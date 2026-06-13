@@ -32,10 +32,7 @@ public:
     [[nodiscard]] std::chrono::seconds getLeeway() const { return mLeeway; }
 
 public:
-    constexpr AuthenticationKeyManager& setLeeway(std::chrono::seconds leeway) {
-        mLeeway = leeway;
-        return *this;
-    }
+    AuthenticationKeyManager& setLeeway(std::chrono::seconds leeway);
 
     Result<> initMojangPublicKeyBlocking(std::size_t timeoutSeconds = 5);
 

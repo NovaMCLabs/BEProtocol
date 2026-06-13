@@ -58,7 +58,7 @@ struct ClientIoRuntime::Registration {
 
 ClientIoRuntime::ClientIoRuntime(std::size_t workerCount)
 : mWorkerCount(std::max<std::size_t>(std::size_t{1}, workerCount)),
-  mClientsSnapshot(std::shared_ptr<const RegistrationList>{std::make_shared<RegistrationList>()}),
+  mClientsSnapshot(std::make_shared<RegistrationList>()),
   mWorkerNextStartSlot(mWorkerCount, 0) {
     mWorkers.reserve(mWorkerCount);
     for (std::size_t i = 0; i < mWorkerCount; ++i) {
@@ -91,7 +91,7 @@ void ClientIoRuntime::registerClient(ClientNetworkSystem& client) {
         }
 
         next->push_back(registration);
-        std::shared_ptr<const RegistrationList> desired = next;
+        std::shared_ptr<RegistrationList> desired = next;
         if (mClientsSnapshot
                 .compare_exchange_weak(current, desired, std::memory_order_release, std::memory_order_acquire)) {
             break;
@@ -121,7 +121,7 @@ void ClientIoRuntime::unregisterClient(ClientNetworkSystem& client) noexcept {
             return;
         }
 
-        std::shared_ptr<const RegistrationList> desired = next;
+        std::shared_ptr<RegistrationList> desired = next;
         if (mClientsSnapshot
                 .compare_exchange_weak(current, desired, std::memory_order_release, std::memory_order_acquire)) {
             break;

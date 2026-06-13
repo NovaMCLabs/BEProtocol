@@ -38,7 +38,7 @@ public:
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 
-    SCULK_PROTOCOL_PACKET_TO_STRING();
+    SCULK_PROTOCOL_PACKET_TO_STRING()
 };
 
 constexpr MoveActorAbsolutePacket::Flags

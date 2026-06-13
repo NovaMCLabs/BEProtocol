@@ -127,7 +127,7 @@ void ServerNetworkSystem::stop() {
         mFlushThread.join();
     }
 
-    std::shared_ptr<const SessionsState> previousState{};
+    std::shared_ptr<SessionsState> previousState{};
     previousState = mSessionsState.exchange(std::make_shared<SessionsState>(), std::memory_order_acq_rel);
 
     for (const auto& session : previousState->mOrdered) {

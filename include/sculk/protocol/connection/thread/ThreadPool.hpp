@@ -16,6 +16,7 @@
 #include <semaphore>
 #include <thread>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -83,7 +84,45 @@ public:
     void stop() noexcept;
 
 private:
-    using Task = std::move_only_function<void() noexcept>;
+    class Task final {
+    private:
+        struct Concept {
+            virtual ~Concept()           = default;
+            virtual void call() noexcept = 0;
+        };
+
+        template <typename F>
+        struct Model final : Concept {
+            F mFunction;
+
+            explicit Model(F&& function) noexcept(std::is_nothrow_move_constructible_v<F>)
+            : mFunction(std::move(function)) {}
+
+            void call() noexcept override { std::invoke(mFunction); }
+        };
+
+    public:
+        Task() = default;
+
+        template <typename F>
+            requires std::invocable<F&>
+        explicit Task(F&& function) : mFunction(std::make_unique<Model<std::decay_t<F>>>(std::forward<F>(function))) {}
+
+        Task(const Task&)            = delete;
+        Task& operator=(const Task&) = delete;
+
+        Task(Task&&) noexcept            = default;
+        Task& operator=(Task&&) noexcept = default;
+
+        void operator()() noexcept {
+            if (mFunction) {
+                mFunction->call();
+            }
+        }
+
+    private:
+        std::unique_ptr<Concept> mFunction{};
+    };
 
     struct WorkerState final {
         moodycamel::ConcurrentQueue<Task>    mTasks{};

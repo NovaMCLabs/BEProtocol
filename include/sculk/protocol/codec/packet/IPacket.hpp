@@ -56,7 +56,7 @@ public:
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
-#define SCULK_PROTOCOL_PACKET_TO_STRING() [[nodiscard]] std::string toString() const override
+#define SCULK_PROTOCOL_PACKET_TO_STRING() [[nodiscard]] std::string toString() const override;
 #define SCULK_PROTOCOL_PACKET_FORMATTER_IMPL(PACKET_CLASS)                                                             \
     template <>                                                                                                        \
     struct std::formatter<sculk::protocol::PACKET_CLASS> : std::formatter<std::string> {                               \

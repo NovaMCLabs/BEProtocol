@@ -172,7 +172,7 @@ public:
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
 
-    SCULK_PROTOCOL_PACKET_TO_STRING();
+    SCULK_PROTOCOL_PACKET_TO_STRING()
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
