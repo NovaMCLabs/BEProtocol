@@ -10,8 +10,9 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void RecipeIngredient::write(BinaryStream& stream) const {
-    stream.writeVariantIndex<std::uint8_t>(mDescriptor, &BinaryStream::writeByte);
-    std::visit(
+    stream.writeVariant(
+        mDescriptor,
+        &BinaryStream::writeByte,
         Overload{
             [&](const InternalItemDescriptor& descriptor) {
                 stream.writeSignedShort(descriptor.mId);
@@ -30,39 +31,36 @@ void RecipeIngredient::write(BinaryStream& stream) const {
             },
             [&](const ComplexAliasDescriptor& descriptor) { stream.writeString(descriptor.mName); },
             [&](const std::monostate&) {}
-        },
-        mDescriptor
+        }
     );
     stream.writeVarInt(mStackSize);
 }
 
 Result<> RecipeIngredient::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVariantIndex<std::uint8_t>(mDescriptor, &ReadOnlyBinaryStream::readByte));
-    _SCULK_READ(
-        std::visit(
-            Overload{
-                [&](InternalItemDescriptor& descriptor) {
-                    _SCULK_READ(stream.readSignedShort(descriptor.mId));
-                    if (descriptor.mId != 0) {
-                        _SCULK_READ(stream.readSignedShort(descriptor.mAux));
-                    }
-                    return Result<>{};
-                },
-                [&](MolangDescriptor& descriptor) {
-                    _SCULK_READ(stream.readString(descriptor.mMolangFullName));
-                    return stream.readByte(descriptor.mMolangVersion);
-                },
-                [&](ItemTagDescriptor& descriptor) { return stream.readString(descriptor.mItemTag); },
-                [&](DeferredDescriptor& descriptor) {
-                    _SCULK_READ(stream.readString(descriptor.mDeferredFullName));
-                    return stream.readUnsignedShort(descriptor.mAux);
-                },
-                [&](ComplexAliasDescriptor& descriptor) { return stream.readString(descriptor.mName); },
-                [&](std::monostate&) { return Result<>{}; }
+    _SCULK_READ(stream.readVariant(
+        mDescriptor,
+        &ReadOnlyBinaryStream::readByte,
+        Overload{
+            [&](InternalItemDescriptor& descriptor) {
+                _SCULK_READ(stream.readSignedShort(descriptor.mId));
+                if (descriptor.mId != 0) {
+                    _SCULK_READ(stream.readSignedShort(descriptor.mAux));
+                }
+                return Result<>{};
             },
-            mDescriptor
-        )
-    );
+            [&](MolangDescriptor& descriptor) {
+                _SCULK_READ(stream.readString(descriptor.mMolangFullName));
+                return stream.readByte(descriptor.mMolangVersion);
+            },
+            [&](ItemTagDescriptor& descriptor) { return stream.readString(descriptor.mItemTag); },
+            [&](DeferredDescriptor& descriptor) {
+                _SCULK_READ(stream.readString(descriptor.mDeferredFullName));
+                return stream.readUnsignedShort(descriptor.mAux);
+            },
+            [&](ComplexAliasDescriptor& descriptor) { return stream.readString(descriptor.mName); },
+            [&](std::monostate&) { return Result<>{}; }
+        }
+    ));
     return stream.readVarInt(mStackSize);
 }
 

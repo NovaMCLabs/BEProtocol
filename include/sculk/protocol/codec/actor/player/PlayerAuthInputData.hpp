@@ -8,10 +8,11 @@
 #pragma once
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class PlayerAuthInputData : int {
+enum class PlayerAuthInputData : std::uint8_t {
     Ascend                          = 0,
     Descend                         = 1,
     NorthJumpDeprecated             = 2,
@@ -82,4 +83,4 @@ enum class PlayerAuthInputData : int {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(PlayerAuthInputData, 0, 65);
+SCULK_PROTOCOL_ENUM_RANGE(PlayerAuthInputData, 0, 65)

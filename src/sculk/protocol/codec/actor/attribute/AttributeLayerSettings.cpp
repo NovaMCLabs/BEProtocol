@@ -10,24 +10,24 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void AttributeLayerWeight::write(BinaryStream& stream) const {
-    stream.writeVariantIndex<std::uint32_t>(mWeight, &BinaryStream::writeUnsignedVarInt);
-    std::visit(
+    stream.writeVariant(
+        mWeight,
+        &BinaryStream::writeUnsignedVarInt,
         Overload{
             [&](float value) { stream.writeFloat(value); },
             [&](const std::string& value) { stream.writeString(value); },
-        },
-        mWeight
+        }
     );
 }
 
 Result<> AttributeLayerWeight::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mWeight, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    return std::visit(
+    return stream.readVariant(
+        mWeight,
+        &ReadOnlyBinaryStream::readUnsignedVarInt,
         Overload{
             [&](float& value) { return stream.readFloat(value); },
             [&](std::string& value) { return stream.readString(value); },
-        },
-        mWeight
+        }
     );
 }
 

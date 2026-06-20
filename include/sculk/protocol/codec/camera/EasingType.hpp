@@ -49,4 +49,4 @@ enum class EasingType : std::uint8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(EasingType, 0, 31);
+SCULK_PROTOCOL_ENUM_RANGE(EasingType, 0, 31)

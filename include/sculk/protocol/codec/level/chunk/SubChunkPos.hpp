@@ -19,6 +19,10 @@ struct SubChunkPos {
     void write(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+
+    void writeCereal(BinaryStream& stream) const;
+
+    [[nodiscard]] Result<> readCereal(ReadOnlyBinaryStream& stream);
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

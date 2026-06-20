@@ -5,17 +5,18 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-#pragma once
-#include "sculk/protocol/utility/BinaryStream.hpp"
-#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/codec/math/FloatRange.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-class InventoryNormalTransaction {
-public:
-    constexpr void write(BinaryStream&) const {}
+void FloatRange::write(BinaryStream& stream) const {
+    stream.writeFloat(mMin);
+    stream.writeFloat(mMax);
+}
 
-    [[nodiscard]] constexpr Result<> read(ReadOnlyBinaryStream&) { return {}; }
-};
+Result<> FloatRange::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readFloat(mMin));
+    return stream.readFloat(mMax);
+}
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

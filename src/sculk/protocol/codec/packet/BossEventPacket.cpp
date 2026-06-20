@@ -17,85 +17,36 @@ MinecraftPacketIds BossEventPacket::getId() const noexcept { return MinecraftPac
 std::string_view BossEventPacket::getName() const noexcept { return "BossEventPacket"; }
 
 void BossEventPacket::write(BinaryStream& stream) const {
-    stream.writeVarInt64(mTargetActor);
+    stream.writeVarInt64(mTargetActorID);
+    stream.writeVarInt64(mPlayerID);
     stream.writeEnum(mType, &BinaryStream::writeUnsignedVarInt);
-    switch (mType) {
-    case EventType::Add:
-        stream.writeString(mName);
-        stream.writeString(mFilteredName);
-        stream.writeFloat(mPercentage);
-        stream.writeUnsignedShort(mDarkenScreen);
-        stream.writeUnsignedVarInt(mColor);
-        stream.writeUnsignedVarInt(mOverlay);
-        break;
-    case EventType::PlayerAdded:
-    case EventType::PlayerRemoved:
-    case EventType::Query:
-        stream.writeVarInt64(mPlayer);
-        break;
-    case EventType::UpdatePercent:
-        stream.writeFloat(mPercentage);
-        break;
-    case EventType::UpdateName:
-        stream.writeString(mName);
-        stream.writeString(mFilteredName);
-        break;
-    case EventType::UpdateProperties:
-        stream.writeUnsignedShort(mDarkenScreen);
-        stream.writeUnsignedVarInt(mColor);
-        stream.writeUnsignedVarInt(mOverlay);
-        break;
-    case EventType::UpdateStyle:
-        stream.writeUnsignedVarInt(mColor);
-        stream.writeUnsignedVarInt(mOverlay);
-        break;
-    default:
-        break;
-    }
+    stream.writeString(mName);
+    stream.writeString(mFilteredName);
+    stream.writeFloat(mPercentage);
+    stream.writeUnsignedVarInt(mColor);
+    stream.writeUnsignedVarInt(mOverlay);
 }
 
 Result<> BossEventPacket::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVarInt64(mTargetActor));
+    _SCULK_READ(stream.readVarInt64(mTargetActorID));
+    _SCULK_READ(stream.readVarInt64(mPlayerID));
     _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    switch (mType) {
-    case EventType::Add:
-        _SCULK_READ(stream.readString(mName));
-        _SCULK_READ(stream.readString(mFilteredName));
-        _SCULK_READ(stream.readFloat(mPercentage));
-        _SCULK_READ(stream.readUnsignedShort(mDarkenScreen));
-        _SCULK_READ(stream.readUnsignedVarInt(mColor));
-        return stream.readUnsignedVarInt(mOverlay);
-    case EventType::PlayerAdded:
-    case EventType::PlayerRemoved:
-    case EventType::Query:
-        return stream.readVarInt64(mPlayer);
-    case EventType::UpdatePercent:
-        return stream.readFloat(mPercentage);
-    case EventType::UpdateName:
-        _SCULK_READ(stream.readString(mName));
-        return stream.readString(mFilteredName);
-    case EventType::UpdateProperties:
-        _SCULK_READ(stream.readUnsignedShort(mDarkenScreen));
-        _SCULK_READ(stream.readUnsignedVarInt(mColor));
-        return stream.readUnsignedVarInt(mOverlay);
-    case EventType::UpdateStyle:
-        _SCULK_READ(stream.readUnsignedVarInt(mColor));
-        return stream.readUnsignedVarInt(mOverlay);
-    default:
-        return {};
-    }
+    _SCULK_READ(stream.readString(mName));
+    _SCULK_READ(stream.readString(mFilteredName));
+    _SCULK_READ(stream.readFloat(mPercentage));
+    _SCULK_READ(stream.readUnsignedVarInt(mColor));
+    return stream.readUnsignedVarInt(mOverlay);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string BossEventPacket::toString() const {
     return SCULK_FORMAT_PACKET(
-        SCULK_FORMAT_FIELD(mTargetActor),
-        SCULK_FORMAT_FIELD(mPlayer),
+        SCULK_FORMAT_FIELD(mTargetActorID),
+        SCULK_FORMAT_FIELD(mPlayerID),
         SCULK_FORMAT_FIELD(mType),
         SCULK_FORMAT_FIELD(mName),
         SCULK_FORMAT_FIELD(mFilteredName),
         SCULK_FORMAT_FIELD(mPercentage),
-        SCULK_FORMAT_FIELD(mDarkenScreen),
         SCULK_FORMAT_FIELD(mColor),
         SCULK_FORMAT_FIELD(mOverlay)
     );

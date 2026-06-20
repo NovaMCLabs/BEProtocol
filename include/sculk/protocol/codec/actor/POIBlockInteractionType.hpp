@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class POIBlockInteractionType : std::uint32_t {
+enum class POIBlockInteractionType : std::uint8_t {
     None                = 0,
     Extend              = 1,
     Clone               = 2,
@@ -38,9 +38,9 @@ enum class POIBlockInteractionType : std::uint32_t {
     BookOpened          = 22,
     Disenchant          = 23,
     Repair              = 24,
-    DisenchantAndRepair = 25
+    DisenchantAndRepair = 25,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(POIBlockInteractionType, 0, 25);
+SCULK_PROTOCOL_ENUM_RANGE(POIBlockInteractionType, 0, 25)

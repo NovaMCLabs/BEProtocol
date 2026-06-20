@@ -14,7 +14,7 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct MapTrackedActorUniqueId {
-    enum class Type : std::int32_t {
+    enum class Type : std::uint8_t {
         Entity      = 0,
         BlockEntity = 1,
         Other       = 2,
@@ -31,4 +31,4 @@ struct MapTrackedActorUniqueId {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MapTrackedActorUniqueId::Type, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(MapTrackedActorUniqueId::Type, 0, 2)

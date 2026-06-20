@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class SetTitlePacket : public IPacket {
 public:
-    enum class TitleType : std::int32_t {
+    enum class TitleType : std::int8_t {
         Clear               = 0,
         Reset               = 1,
         Title               = 2,
@@ -49,6 +49,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SetTitlePacket::TitleType, 0, 8);
+SCULK_PROTOCOL_ENUM_RANGE(SetTitlePacket::TitleType, 0, 8)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(SetTitlePacket)

@@ -23,10 +23,7 @@ void ResourcePacksInfoPacket::write(BinaryStream& stream) const {
     stream.writeBool(mIsVibrantVisualsForceDisabled);
     mWorldTemplateId.write(stream);
     stream.writeString(mWorldTemplateVersion);
-    stream.writeUnsignedShort(static_cast<std::uint16_t>(mResourcePacks.size()));
-    for (const auto& pack : mResourcePacks) {
-        pack.write(stream);
-    }
+    stream.writeArray(mResourcePacks, &BinaryStream::writeUnsignedShort, &PackInfoData::write);
 }
 
 Result<> ResourcePacksInfoPacket::read(ReadOnlyBinaryStream& stream) {
@@ -36,13 +33,7 @@ Result<> ResourcePacksInfoPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mIsVibrantVisualsForceDisabled));
     _SCULK_READ(mWorldTemplateId.read(stream));
     _SCULK_READ(stream.readString(mWorldTemplateVersion));
-    std::uint16_t size{};
-    _SCULK_READ(stream.readUnsignedShort(size));
-    mResourcePacks.resize(size);
-    for (auto& pack : mResourcePacks) {
-        _SCULK_READ(pack.read(stream));
-    }
-    return {};
+    return stream.readArray(mResourcePacks, &ReadOnlyBinaryStream::readUnsignedShort, &PackInfoData::read);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

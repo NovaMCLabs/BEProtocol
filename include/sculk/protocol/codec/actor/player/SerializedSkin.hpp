@@ -12,20 +12,20 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class AnimatedTextureType : std::uint32_t {
+enum class AnimatedTextureType : std::uint8_t {
     Face        = 1,
     Body32x32   = 2,
     Body128x128 = 3,
 };
 
-enum class AnimationExpression : std::uint32_t {
+enum class AnimationExpression : std::uint8_t {
     Linear   = 0,
     Blinking = 1,
 };
 
 class SerializedSkin {
 public:
-    enum class PieceType : std::uint32_t {
+    enum class PieceType : std::uint8_t {
         Skeleton      = 1,
         Body          = 2,
         Skin          = 3,
@@ -52,7 +52,7 @@ public:
         RightArm      = 24,
         Capes         = 25,
         ClassicSkin   = 26,
-        Emote         = 27
+        Emote         = 27,
     };
 
     enum class ArmSizeType : std::uint8_t {
@@ -128,7 +128,7 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(AnimatedTextureType, 1, 3);
-SCULK_PROTOCOL_ENUM_RANGE(AnimationExpression, 0, 1);
-SCULK_PROTOCOL_ENUM_RANGE(SerializedSkin::ArmSizeType, 0, 1);
-SCULK_PROTOCOL_ENUM_RANGE(SerializedSkin::PieceType, 1, 27);
+SCULK_PROTOCOL_ENUM_RANGE(AnimatedTextureType, 1, 3)
+SCULK_PROTOCOL_ENUM_RANGE(AnimationExpression, 0, 1)
+SCULK_PROTOCOL_ENUM_RANGE(SerializedSkin::ArmSizeType, 0, 1)
+SCULK_PROTOCOL_ENUM_RANGE(SerializedSkin::PieceType, 1, 27)

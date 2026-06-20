@@ -16,19 +16,13 @@ MinecraftPacketIds ServerPresenceInfoPacket::getId() const noexcept { return Min
 
 std::string_view ServerPresenceInfoPacket::getName() const noexcept { return "ServerPresenceInfoPacket"; }
 
-void ServerPresenceInfoPacket::write(BinaryStream& stream) const {
-    stream.writeOptional(mExperienceId, &BinaryStream::writeString);
-    stream.writeOptional(mWorldName, &BinaryStream::writeString);
-}
+void ServerPresenceInfoPacket::write(BinaryStream& stream) const { mPresenceConfiguration.write(stream); }
 
-Result<> ServerPresenceInfoPacket::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readOptional(mExperienceId, &ReadOnlyBinaryStream::readString));
-    return stream.readOptional(mWorldName, &ReadOnlyBinaryStream::readString);
-}
+Result<> ServerPresenceInfoPacket::read(ReadOnlyBinaryStream& stream) { return mPresenceConfiguration.read(stream); }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string ServerPresenceInfoPacket::toString() const {
-    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mExperienceId), SCULK_FORMAT_FIELD(mWorldName));
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPresenceConfiguration));
 }
 #endif
 

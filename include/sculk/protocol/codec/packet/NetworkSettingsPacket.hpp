@@ -6,19 +6,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "sculk/protocol/codec/level/CompressionAlgorithm.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class NetworkSettingsPacket : public IPacket {
-public:
-    enum class CompressionAlgorithm : std::int16_t {
-        None   = -1,
-        Zlib   = 0,
-        Snappy = 1,
-    };
-
 public:
     std::uint16_t        mCompressionThreshold{1};
     CompressionAlgorithm mCompressionAlgorithm{};
@@ -48,7 +42,5 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
-
-SCULK_PROTOCOL_ENUM_RANGE(NetworkSettingsPacket::CompressionAlgorithm, -1, 1);
 
 SCULK_PROTOCOL_PACKET_FORMATTER(NetworkSettingsPacket)

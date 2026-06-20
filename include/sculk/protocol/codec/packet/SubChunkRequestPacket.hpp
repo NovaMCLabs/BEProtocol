@@ -25,8 +25,8 @@ public:
 
 public:
     std::int32_t                   mDimensionType{};
-    SubChunkPos                    mCenterPos{};
     std::vector<SubChunkPosOffset> mSubChunkPosOffsetList{};
+    SubChunkPos                    mCenterPos{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

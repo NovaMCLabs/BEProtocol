@@ -13,11 +13,12 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class MovementEffectPacket : public IPacket {
 public:
-    enum class MovementEffectType : std::int32_t {
+    enum class MovementEffectType : std::int8_t {
         Invalid      = -1,
         GlideBoost   = 0,
         DolphinBoost = 1,
-        Count        = 2,
+        GeyserBoost  = 2,
+        Count        = 3,
     };
 
 public:
@@ -40,6 +41,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MovementEffectPacket::MovementEffectType, -1, 2);
+SCULK_PROTOCOL_ENUM_RANGE(MovementEffectPacket::MovementEffectType, -1, 3)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(MovementEffectPacket)

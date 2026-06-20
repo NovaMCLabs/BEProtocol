@@ -44,6 +44,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(NpcRequestPacket::RequestType, 0, 6);
+SCULK_PROTOCOL_ENUM_RANGE(NpcRequestPacket::RequestType, 0, 6)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(NpcRequestPacket)

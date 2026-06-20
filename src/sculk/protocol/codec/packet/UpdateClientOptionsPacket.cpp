@@ -17,14 +17,14 @@ MinecraftPacketIds UpdateClientOptionsPacket::getId() const noexcept { return Mi
 std::string_view UpdateClientOptionsPacket::getName() const noexcept { return "UpdateClientOptionsPacket"; }
 
 void UpdateClientOptionsPacket::write(BinaryStream& stream) const {
-    stream.writeOptional(mGraphicsModeChange, [&](GraphicsMode mode) {
+    stream.writeOptional(mGraphicsModeChange, [](GraphicsMode mode, BinaryStream& stream) {
         stream.writeEnum(mode, &BinaryStream::writeByte);
     });
     stream.writeOptional(mFilterProfanity, &BinaryStream::writeBool);
 }
 
 Result<> UpdateClientOptionsPacket::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readOptional(mGraphicsModeChange, [&](GraphicsMode& mode) {
+    _SCULK_READ(stream.readOptional(mGraphicsModeChange, [](GraphicsMode& mode, ReadOnlyBinaryStream& stream) {
         return stream.readEnum(mode, &ReadOnlyBinaryStream::readByte);
     }));
     return stream.readOptional(mFilterProfanity, &ReadOnlyBinaryStream::readBool);

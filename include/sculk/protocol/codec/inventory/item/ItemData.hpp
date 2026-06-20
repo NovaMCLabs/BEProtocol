@@ -8,11 +8,12 @@
 #pragma once
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct ItemData {
-    enum class ItemVersion : std::int32_t {
+    enum class ItemVersion : std::uint8_t {
         Legacy     = 0,
         DataDriven = 1,
         None       = 2,
@@ -31,4 +32,4 @@ struct ItemData {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ItemData::ItemVersion, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(ItemData::ItemVersion, 0, 2)

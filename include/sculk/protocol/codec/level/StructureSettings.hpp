@@ -60,6 +60,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::AnimationMode, 0, 2);
-SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::Mirror, 0, 3);
-SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::Rotation, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::AnimationMode, 0, 2)
+SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::Mirror, 0, 3)
+SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::Rotation, 0, 3)

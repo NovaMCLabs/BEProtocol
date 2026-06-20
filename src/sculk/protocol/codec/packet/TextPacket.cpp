@@ -18,21 +18,25 @@ std::string_view TextPacket::getName() const noexcept { return "TextPacket"; }
 
 void TextPacket::write(BinaryStream& stream) const {
     stream.writeBool(mLocalize);
-    stream.writeVariantIndex<std::uint8_t>(mBody, &BinaryStream::writeByte);
-    stream.writeEnum(mType, &BinaryStream::writeByte);
-    std::visit(
+    stream.writeVariant(
+        mBody,
+        &BinaryStream::writeByte,
         Overload{
-            [&](const TextPacket::MessageOnly& body) { stream.writeString(body.mMessage); },
+            [&](const TextPacket::MessageOnly& body) {
+                stream.writeEnum(mType, &BinaryStream::writeByte);
+                stream.writeString(body.mMessage);
+            },
             [&](const TextPacket::AuthorAndMessage& body) {
+                stream.writeEnum(mType, &BinaryStream::writeByte);
                 stream.writeString(body.mPlayerName);
                 stream.writeString(body.mMessage);
             },
             [&](const TextPacket::MessageAndParams& body) {
+                stream.writeEnum(mType, &BinaryStream::writeByte);
                 stream.writeString(body.mMessage);
                 stream.writeArray(body.mParameters, &BinaryStream::writeString);
             },
-        },
-        mBody
+        }
     );
     stream.writeString(mXuid);
     stream.writeString(mPlatformId);
@@ -41,24 +45,26 @@ void TextPacket::write(BinaryStream& stream) const {
 
 Result<> TextPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mLocalize));
-    _SCULK_READ(stream.readVariantIndex<std::uint8_t>(mBody, &ReadOnlyBinaryStream::readByte));
-    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
-    _SCULK_READ(
-        std::visit(
-            Overload{
-                [&](TextPacket::MessageOnly& body) { return stream.readString(body.mMessage); },
-                [&](TextPacket::AuthorAndMessage& body) {
-                    _SCULK_READ(stream.readString(body.mPlayerName));
-                    return stream.readString(body.mMessage);
-                },
-                [&](TextPacket::MessageAndParams& body) {
-                    _SCULK_READ(stream.readString(body.mMessage));
-                    return stream.readArray(body.mParameters, &ReadOnlyBinaryStream::readString);
-                },
+    _SCULK_READ(stream.readVariant(
+        mBody,
+        &ReadOnlyBinaryStream::readByte,
+        Overload{
+            [&](TextPacket::MessageOnly& body) {
+                _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+                return stream.readString(body.mMessage);
             },
-            mBody
-        )
-    );
+            [&](TextPacket::AuthorAndMessage& body) {
+                _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+                _SCULK_READ(stream.readString(body.mPlayerName));
+                return stream.readString(body.mMessage);
+            },
+            [&](TextPacket::MessageAndParams& body) {
+                _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
+                _SCULK_READ(stream.readString(body.mMessage));
+                return stream.readArray(body.mParameters, &ReadOnlyBinaryStream::readString);
+            },
+        }
+    ));
     _SCULK_READ(stream.readString(mXuid));
     _SCULK_READ(stream.readString(mPlatformId));
     return stream.readString(mFilteredMessage);

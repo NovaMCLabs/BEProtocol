@@ -10,16 +10,18 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void ItemReleaseInventoryTransaction::write(BinaryStream& stream) const {
-    stream.writeEnum(mActionType, &BinaryStream::writeUnsignedVarInt);
+    mTransaction.write(stream);
+    stream.writeEnum(mActionType, &BinaryStream::writeVarInt);
     stream.writeVarInt(mSlot);
-    mItem.write(stream);
+    mItem.writeCereal(stream);
     mFromPos.write(stream);
 }
 
 Result<> ItemReleaseInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(mTransaction.read(stream));
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readVarInt(mSlot));
-    _SCULK_READ(mItem.read(stream));
+    _SCULK_READ(mItem.readCereal(stream));
     return mFromPos.read(stream);
 }
 

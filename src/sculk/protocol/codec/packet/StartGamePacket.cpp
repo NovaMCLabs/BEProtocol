@@ -42,6 +42,7 @@ void StartGamePacket::write(BinaryStream& stream) const {
     stream.writeBool(mClientGen);
     stream.writeBool(mEnableHashId);
     stream.writeBool(mServerAuthSound);
+    stream.writeBool(mIsLoggingChat);
     stream.writeOptional(mServerConfigurationJoinInfo, &ServerConfigurationJoinInfo::write);
     mServerTelemetryData.write(stream);
 }
@@ -70,6 +71,7 @@ Result<> StartGamePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mClientGen));
     _SCULK_READ(stream.readBool(mEnableHashId));
     _SCULK_READ(stream.readBool(mServerAuthSound));
+    _SCULK_READ(stream.readBool(mIsLoggingChat));
     _SCULK_READ(stream.readOptional(mServerConfigurationJoinInfo, &ServerConfigurationJoinInfo::read));
     return mServerTelemetryData.read(stream);
 }

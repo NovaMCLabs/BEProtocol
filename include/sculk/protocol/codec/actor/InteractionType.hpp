@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class InteractionType : std::uint32_t {
+enum class InteractionType : std::uint8_t {
     Breeding   = 1,
     Taming     = 2,
     Curing     = 3,
@@ -28,9 +28,10 @@ enum class InteractionType : std::uint32_t {
     Unleashing = 13,
     PetSleep   = 14,
     Trusting   = 15,
-    Commanding = 16
+    Commanding = 16,
+    Equipping  = 17,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(InteractionType, 1, 16);
+SCULK_PROTOCOL_ENUM_RANGE(InteractionType, 1, 16)

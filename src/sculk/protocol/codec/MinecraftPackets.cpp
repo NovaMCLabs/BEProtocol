@@ -56,6 +56,7 @@
 #include "sculk/protocol/codec/packet/ClientboundDebugRendererPacket.hpp"
 #include "sculk/protocol/codec/packet/ClientboundMapItemDataPacket.hpp"
 #include "sculk/protocol/codec/packet/ClientboundTextureShiftPacket.hpp"
+#include "sculk/protocol/codec/packet/ClientboundUpdateSoundDataPacket.hpp"
 #include "sculk/protocol/codec/packet/CodeBuilderPacket.hpp"
 #include "sculk/protocol/codec/packet/CodeBuilderSourcePacket.hpp"
 #include "sculk/protocol/codec/packet/CommandBlockUpdatePacket.hpp"
@@ -84,7 +85,7 @@
 #include "sculk/protocol/codec/packet/GameRulesChangedPacket.hpp"
 #include "sculk/protocol/codec/packet/GameTestRequestPacket.hpp"
 #include "sculk/protocol/codec/packet/GameTestResultsPacket.hpp"
-#include "sculk/protocol/codec/packet/GraphicsParameterOverridePacket.hpp"
+#include "sculk/protocol/codec/packet/GraphicsOverrideParameterPacket.hpp"
 #include "sculk/protocol/codec/packet/GuiDataPickItemPacket.hpp"
 #include "sculk/protocol/codec/packet/HurtArmorPacket.hpp"
 #include "sculk/protocol/codec/packet/InteractPacket.hpp"
@@ -127,6 +128,7 @@
 #include "sculk/protocol/codec/packet/OpenSignPacket.hpp"
 #include "sculk/protocol/codec/packet/PacketViolationWarningPacket.hpp"
 #include "sculk/protocol/codec/packet/PartyChangedPacket.hpp"
+#include "sculk/protocol/codec/packet/PartyDestinationCookieResponsePacket.hpp"
 #include "sculk/protocol/codec/packet/PhotoTransferPacket.hpp"
 #include "sculk/protocol/codec/packet/PlaySoundPacket.hpp"
 #include "sculk/protocol/codec/packet/PlayStatusPacket.hpp"
@@ -165,6 +167,7 @@
 #include "sculk/protocol/codec/packet/ResourcePacksReadyForValidationPacket.hpp"
 #include "sculk/protocol/codec/packet/RespawnPacket.hpp"
 #include "sculk/protocol/codec/packet/ScriptMessagePacket.hpp"
+#include "sculk/protocol/codec/packet/SendPartyDestinationCookiePacket.hpp"
 #include "sculk/protocol/codec/packet/ServerPlayerPostMovePositionPacket.hpp"
 #include "sculk/protocol/codec/packet/ServerPresenceInfoPacket.hpp"
 #include "sculk/protocol/codec/packet/ServerSettingsRequestPacket.hpp"
@@ -538,7 +541,7 @@ std::unique_ptr<IPacket> MinecraftPackets::createPacket(MinecraftPacketIds packe
     CREATE_PACKET(PrimitiveShapes)                        // 328
     CREATE_PACKET(ServerboundPackSettingChange)           // 329
     CREATE_PACKET(ClientboundDataStore)                   // 330
-    CREATE_PACKET(GraphicsParameterOverride)              // 331
+    CREATE_PACKET(GraphicsOverrideParameter)              // 331
     CREATE_PACKET(ServerboundDataStore)                   // 332
     CREATE_PACKET(ClientboundDataDrivenUIShowScreen)      // 333
     CREATE_PACKET(ClientboundDataDrivenUICloseAllScreens) // 334
@@ -555,6 +558,9 @@ std::unique_ptr<IPacket> MinecraftPackets::createPacket(MinecraftPacketIds packe
     CREATE_PACKET(ClientboundAttributeLayerSync)          // 345
     CREATE_PACKET(ServerStoreInfo)                        // 346
     CREATE_PACKET(ServerPresenceInfo)                     // 347
+    CREATE_PACKET(ClientboundUpdateSoundData)             // 348
+    CREATE_PACKET(SendPartyDestinationCookie)             // 349
+    CREATE_PACKET(PartyDestinationCookieResponse)         // 350
     CREATE_PACKET_DEFAULT(packetId)
 }
 

@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class BlockEventType : std::int32_t {
+enum class BlockEventType : std::uint8_t {
     EntityFallOn     = 0,
     Place            = 1,
     StateChange      = 2,
@@ -34,4 +34,4 @@ enum class BlockEventType : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(BlockEventType, 0, 16);
+SCULK_PROTOCOL_ENUM_RANGE(BlockEventType, 0, 16)

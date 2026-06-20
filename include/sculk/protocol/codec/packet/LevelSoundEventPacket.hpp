@@ -10,19 +10,20 @@
 #include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include <optional>
+#include <variant>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class LevelSoundEventPacket : public IPacket {
 public:
-    LevelSoundEvent     mEventId{};
-    Vec3                mPosition{};
-    std::int32_t        mData{};
-    std::string         mActorIdentifier{};
-    bool                mIsBabyMob{};
-    bool                mIsGlobal{};
-    std::int64_t        mActorUniqueId{-1};
-    std::optional<Vec3> mFireAtPosition{};
+    std::variant<LevelSoundEvent, std::string> mSoundEvent{};
+    Vec3                                       mPosition{};
+    std::int32_t                               mData{};
+    std::string                                mActorIdentifier{};
+    bool                                       mIsBabyMob{};
+    bool                                       mIsGlobal{};
+    std::int64_t                               mActorUniqueId{-1};
+    std::optional<Vec3>                        mFireAtPosition{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

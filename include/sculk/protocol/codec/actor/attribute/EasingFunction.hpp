@@ -9,10 +9,11 @@
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class EasingFunction : std::int32_t {
+enum class EasingFunction : std::uint8_t {
     Linear       = 0,
     Spring       = 1,
     InQuad       = 2,
@@ -49,4 +50,4 @@ enum class EasingFunction : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(EasingFunction, 0, 31);
+SCULK_PROTOCOL_ENUM_RANGE(EasingFunction, 0, 31)

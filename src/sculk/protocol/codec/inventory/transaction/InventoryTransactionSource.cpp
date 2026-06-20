@@ -11,27 +11,72 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void InventoryTransactionSource::write(BinaryStream& stream) const {
     stream.writeEnum(mType, &BinaryStream::writeUnsignedVarInt);
+    stream.writeOptional(mContainerId, [&](BinaryStream& stream, const std::uint8_t& value) {
+        if (mType == InventoryTransactionSourceType::ContainerInventory
+            || mType == InventoryTransactionSourceType::NonImplementedFeatureTODO) {
+            stream.writeBool(true);
+            stream.writeByte(value);
+        } else {
+            stream.writeBool(false);
+        }
+    });
+    stream.writeOptional(mBitFlags, [&](BinaryStream& stream, std::uint32_t const& value) {
+        if (mType == InventoryTransactionSourceType::WorldInteraction) {
+            stream.writeBool(true);
+            stream.writeUnsignedVarInt(value);
+        } else {
+            stream.writeBool(false);
+        }
+    });
+}
+
+Result<> InventoryTransactionSource::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    bool hasContainerId{};
+    bool shouldWriteContainerId{};
+    _SCULK_READ(stream.readBool(hasContainerId));
+    _SCULK_READ(stream.readBool(shouldWriteContainerId));
+    if (hasContainerId && shouldWriteContainerId) {
+        _SCULK_READ(stream.readByte(mContainerId.emplace()));
+    }
+    bool hasBitFlags{};
+    bool shouldWriteBitFlags{};
+    _SCULK_READ(stream.readBool(hasBitFlags));
+    _SCULK_READ(stream.readBool(shouldWriteBitFlags));
+    if (hasBitFlags && shouldWriteBitFlags) {
+        _SCULK_READ(stream.readUnsignedVarInt(mBitFlags.emplace()));
+    }
+    return {};
+}
+
+void InventoryTransactionSource::writeLegacy(BinaryStream& stream) const {
+    stream.writeEnum(mType, &BinaryStream::writeUnsignedVarInt);
     switch (mType) {
     case InventoryTransactionSourceType::ContainerInventory:
     case InventoryTransactionSourceType::NonImplementedFeatureTODO:
-        stream.writeVarInt(mContainerId);
+        stream.writeVarInt(mContainerId.value_or(0));
         break;
     case InventoryTransactionSourceType::WorldInteraction:
-        stream.writeUnsignedVarInt(mBitFlags);
+        stream.writeUnsignedVarInt(mBitFlags.value_or(0));
         break;
     default:
         break;
     }
 }
 
-Result<> InventoryTransactionSource::read(ReadOnlyBinaryStream& stream) {
+Result<> InventoryTransactionSource::readLegacy(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedVarInt));
     switch (mType) {
     case InventoryTransactionSourceType::ContainerInventory:
-    case InventoryTransactionSourceType::NonImplementedFeatureTODO:
-        return stream.readVarInt(mContainerId);
-    case InventoryTransactionSourceType::WorldInteraction:
-        return stream.readUnsignedVarInt(mBitFlags);
+    case InventoryTransactionSourceType::NonImplementedFeatureTODO: {
+        int containerId{};
+        _SCULK_READ(stream.readVarInt(containerId));
+        mContainerId.emplace() = static_cast<std::uint8_t>(containerId);
+        return {};
+    }
+    case InventoryTransactionSourceType::WorldInteraction: {
+        return stream.readUnsignedVarInt(mBitFlags.emplace());
+    }
     default:
         return {};
     }

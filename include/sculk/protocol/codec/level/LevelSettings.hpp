@@ -66,6 +66,8 @@ struct LevelSettings {
     bool                      mForceExperimentalGameplay{};
     std::uint8_t              mChatRestrictionLevel{};
     bool                      mDisablePlayerInteractions{};
+    int                       mServerEditorConnectionPolicy{};
+    bool                      mAllowAnonymousBlockDropsInEditorWorlds{};
 
     void write(BinaryStream& stream) const;
 

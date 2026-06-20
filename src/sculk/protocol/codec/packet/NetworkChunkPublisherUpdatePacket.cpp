@@ -23,23 +23,13 @@ std::string_view NetworkChunkPublisherUpdatePacket::getName() const noexcept {
 void NetworkChunkPublisherUpdatePacket::write(BinaryStream& stream) const {
     mNewPositionForView.write(stream);
     stream.writeUnsignedVarInt(mNewRadiusForView);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mServerBuiltChunksList.size()));
-    for (const auto& chunkPos : mServerBuiltChunksList) {
-        chunkPos.write(stream);
-    }
+    stream.writeArray(mServerBuiltChunksList, &BinaryStream::writeUnsignedInt, &ChunkPos::write);
 }
 
 Result<> NetworkChunkPublisherUpdatePacket::read(ReadOnlyBinaryStream& stream) {
-    std::uint32_t count{};
     _SCULK_READ(mNewPositionForView.read(stream));
     _SCULK_READ(stream.readUnsignedVarInt(mNewRadiusForView));
-    _SCULK_READ(stream.readUnsignedInt(count));
-    mServerBuiltChunksList.clear();
-    mServerBuiltChunksList.resize(count);
-    for (auto& chunkPos : mServerBuiltChunksList) {
-        _SCULK_READ(chunkPos.read(stream));
-    }
-    return {};
+    return stream.readArray(mServerBuiltChunksList, &ReadOnlyBinaryStream::readUnsignedInt, &ChunkPos::read);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class AchievementIds : std::int32_t {
+enum class AchievementIds : std::uint8_t {
     ChestFullOfCobblestone          = 7,
     DiamondForYou                   = 10,
     IronBelly                       = 20,
@@ -89,4 +89,4 @@ enum class AchievementIds : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(AchievementIds, 7, 116);
+SCULK_PROTOCOL_ENUM_RANGE(AchievementIds, 7, 116)

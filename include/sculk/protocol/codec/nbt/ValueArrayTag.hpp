@@ -25,7 +25,7 @@ struct ValueArrayTag {
             } else if constexpr (std::is_same_v<T, std::int32_t>) {
                 stream.writeVarInt(val);
             } else {
-                static_assert(false, "Invalid ValueTag<T> template");
+                static_assert(traits::always_false_v<T>, "Invalid ValueTag<T> template");
             }
         }
     }
@@ -40,7 +40,7 @@ struct ValueArrayTag {
             } else if constexpr (std::is_same_v<T, std::int32_t>) {
                 _SCULK_READ(stream.readVarInt(mValue[i]));
             } else {
-                static_assert(false, "Invalid ValueTag<T> template");
+                static_assert(traits::always_false_v<T>, "Invalid ValueTag<T> template");
             }
         }
         return Result<>{};

@@ -17,6 +17,8 @@ void EnvironmentAttributeData::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mCurrentTransitionTicks);
     stream.writeUnsignedInt(mTotalTransitionTicks);
     stream.writeEnum(mEasing, &BinaryStream::writeSignedInt);
+    stream.writeUnsignedInt(mLocalTransitionTicks);
+    stream.writeBool(mNoiseTransition);
 }
 
 Result<> EnvironmentAttributeData::read(ReadOnlyBinaryStream& stream) {
@@ -26,7 +28,9 @@ Result<> EnvironmentAttributeData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mToAttribute, &AttributeData::read));
     _SCULK_READ(stream.readUnsignedInt(mCurrentTransitionTicks));
     _SCULK_READ(stream.readUnsignedInt(mTotalTransitionTicks));
-    return stream.readEnum(mEasing, &ReadOnlyBinaryStream::readSignedInt);
+    _SCULK_READ(stream.readEnum(mEasing, &ReadOnlyBinaryStream::readSignedInt));
+    _SCULK_READ(stream.readUnsignedInt(mLocalTransitionTicks));
+    return stream.readBool(mNoiseTransition);
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

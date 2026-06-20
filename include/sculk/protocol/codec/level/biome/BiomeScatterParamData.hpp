@@ -14,7 +14,7 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct BiomeScatterParamData {
-    enum class CoordinateEvaluationOrder : std::int32_t {
+    enum class CoordinateEvaluationOrder : std::uint8_t {
         XYZ = 0,
         XZY = 1,
         YXZ = 2,
@@ -27,7 +27,7 @@ struct BiomeScatterParamData {
     CoordinateEvaluationOrder        mEvalOrder{};
     std::int32_t                     mChancePercentType{};
     std::uint16_t                    mChancePercent{};
-    std::int32_t                     mChanceNumeartor{};
+    std::int32_t                     mChanceNumerator{};
     std::int32_t                     mChanceDenominator{};
     std::int32_t                     mIterationsType{};
     std::uint16_t                    mIterations{};
@@ -39,4 +39,4 @@ struct BiomeScatterParamData {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(BiomeScatterParamData::CoordinateEvaluationOrder, 0, 5);
+SCULK_PROTOCOL_ENUM_RANGE(BiomeScatterParamData::CoordinateEvaluationOrder, 0, 5)

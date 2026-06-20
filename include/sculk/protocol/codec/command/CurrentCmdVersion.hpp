@@ -8,10 +8,11 @@
 #pragma once
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class CurrentCmdVersion : int {
+enum class CurrentCmdVersion : std::int8_t {
     Invalid                                      = -1,
     Initial                                      = 1,
     TpRotationClamping                           = 2,
@@ -67,4 +68,4 @@ enum class CurrentCmdVersion : int {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(CurrentCmdVersion, -1, 48);
+SCULK_PROTOCOL_ENUM_RANGE(CurrentCmdVersion, -1, 48)

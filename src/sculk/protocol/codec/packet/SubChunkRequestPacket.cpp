@@ -30,31 +30,24 @@ std::string_view SubChunkRequestPacket::getName() const noexcept { return "SubCh
 
 void SubChunkRequestPacket::write(BinaryStream& stream) const {
     stream.writeVarInt(mDimensionType);
-    mCenterPos.write(stream);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mSubChunkPosOffsetList.size()));
-    for (const SubChunkPosOffset& offset : mSubChunkPosOffsetList) {
-        offset.write(stream);
-    }
+    stream.writeArray(mSubChunkPosOffsetList, &BinaryStream::writeUnsignedInt, &SubChunkPosOffset::write);
+    mCenterPos.writeCereal(stream);
 }
 
 Result<> SubChunkRequestPacket::read(ReadOnlyBinaryStream& stream) {
-    std::uint32_t size{};
     _SCULK_READ(stream.readVarInt(mDimensionType));
-    _SCULK_READ(mCenterPos.read(stream));
-    _SCULK_READ(stream.readUnsignedInt(size));
-    mSubChunkPosOffsetList.resize(size);
-    for (SubChunkPosOffset& offset : mSubChunkPosOffsetList) {
-        _SCULK_READ(offset.read(stream));
-    }
-    return {};
+    _SCULK_READ(
+        stream.readArray(mSubChunkPosOffsetList, &ReadOnlyBinaryStream::readUnsignedInt, &SubChunkPosOffset::read)
+    );
+    return mCenterPos.readCereal(stream);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
 std::string SubChunkRequestPacket::toString() const {
     return SCULK_FORMAT_PACKET(
         SCULK_FORMAT_FIELD(mDimensionType),
-        SCULK_FORMAT_FIELD(mCenterPos),
-        SCULK_FORMAT_FIELD(mSubChunkPosOffsetList)
+        SCULK_FORMAT_FIELD(mSubChunkPosOffsetList),
+        SCULK_FORMAT_FIELD(mCenterPos)
     );
 }
 #endif

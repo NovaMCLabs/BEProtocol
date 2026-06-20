@@ -20,4 +20,4 @@ enum class SoftEnumUpdateType : std::uint8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SoftEnumUpdateType, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(SoftEnumUpdateType, 0, 2)

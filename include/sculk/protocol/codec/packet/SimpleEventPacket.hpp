@@ -13,11 +13,11 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class SimpleEventPacket : public IPacket {
 public:
-    enum class Subtype : std::uint16_t {
+    enum class Subtype : std::uint8_t {
         UninitializedSubtype        = 0,
         EnableCommands              = 1,
         DisableCommands             = 2,
-        UnlockWorldTemplateSettings = 3
+        UnlockWorldTemplateSettings = 3,
     };
 
 public:
@@ -37,6 +37,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SimpleEventPacket::Subtype, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(SimpleEventPacket::Subtype, 0, 3)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(SimpleEventPacket)

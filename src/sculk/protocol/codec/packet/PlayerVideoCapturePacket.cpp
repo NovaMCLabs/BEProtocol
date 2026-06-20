@@ -17,30 +17,30 @@ MinecraftPacketIds PlayerVideoCapturePacket::getId() const noexcept { return Min
 std::string_view PlayerVideoCapturePacket::getName() const noexcept { return "PlayerVideoCapturePacket"; }
 
 void PlayerVideoCapturePacket::write(BinaryStream& stream) const {
-    stream.writeVariantIndex<std::uint8_t>(mParams, &BinaryStream::writeByte);
-    std::visit(
+    stream.writeVariant(
+        mParams,
+        &BinaryStream::writeByte,
         Overload{
             [&](const StartVideoCapture& data) {
                 stream.writeUnsignedInt(data.mFrameRate);
                 stream.writeString(data.mFilePrefix);
             },
             [&](const StopVideoCapture&) {},
-        },
-        mParams
+        }
     );
 }
 
 Result<> PlayerVideoCapturePacket::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVariantIndex<std::uint8_t>(mParams, &ReadOnlyBinaryStream::readByte));
-    return std::visit(
+    return stream.readVariant(
+        mParams,
+        &ReadOnlyBinaryStream::readByte,
         Overload{
             [&](StartVideoCapture& data) {
                 _SCULK_READ(stream.readUnsignedInt(data.mFrameRate));
                 return stream.readString(data.mFilePrefix);
             },
             [&](StopVideoCapture&) { return Result<>{}; },
-        },
-        mParams
+        }
     );
 }
 

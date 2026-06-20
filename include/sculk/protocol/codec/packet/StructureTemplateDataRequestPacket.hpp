@@ -42,6 +42,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(StructureTemplateDataRequestPacket::StructureTemplateRequestOperation, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(StructureTemplateDataRequestPacket::StructureTemplateRequestOperation, 0, 3)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(StructureTemplateDataRequestPacket)

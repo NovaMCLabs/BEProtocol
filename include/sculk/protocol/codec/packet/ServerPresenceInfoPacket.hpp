@@ -6,15 +6,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "sculk/protocol/codec/level/PresenceConfiguration.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include <optional>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class ServerPresenceInfoPacket : public IPacket {
 public:
-    std::optional<std::string> mExperienceId{};
-    std::optional<std::string> mWorldName{};
+    PresenceConfiguration mPresenceConfiguration{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

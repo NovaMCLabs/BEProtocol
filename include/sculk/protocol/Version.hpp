@@ -8,10 +8,10 @@
 #pragma once
 #include <string_view>
 
-#define SCULK_NETWORK_PROTOCOL_VERSION 975
-#define SCULK_MINECRAFT_VERSION        "26.20"
+#define SCULK_NETWORK_PROTOCOL_VERSION 1001
+#define SCULK_MINECRAFT_VERSION        "26.30"
 
-#define SCULK_ABI_INLINE_NAMESPACE inline abi_v975
+#define SCULK_ABI_INLINE_NAMESPACE inline abi_v1001
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 

@@ -13,14 +13,14 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class PacketViolationWarningPacket : public IPacket {
 public:
-    enum class Severity : int {
+    enum class Severity : std::int8_t {
         Unknown               = -1,
         Warning               = 0,
         FinalWarning          = 1,
         TerminatingConnection = 2,
     };
 
-    enum class Type : int {
+    enum class Type : std::int8_t {
         Unknown         = -1,
         PacketMalformed = 0,
     };
@@ -45,7 +45,7 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(PacketViolationWarningPacket::Severity, -1, 2);
-SCULK_PROTOCOL_ENUM_RANGE(PacketViolationWarningPacket::Type, -1, 0);
+SCULK_PROTOCOL_ENUM_RANGE(PacketViolationWarningPacket::Severity, -1, 2)
+SCULK_PROTOCOL_ENUM_RANGE(PacketViolationWarningPacket::Type, -1, 0)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(PacketViolationWarningPacket)

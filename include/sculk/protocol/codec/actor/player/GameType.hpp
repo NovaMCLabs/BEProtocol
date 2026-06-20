@@ -12,16 +12,15 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class GameType : std::int32_t {
-    Undefined    = -1,
-    Survival     = 0,
-    Creative     = 1,
-    Adventure    = 2,
-    Default      = 5,
-    Spectator    = 6,
-    WorldDefault = 0
+enum class GameType : std::int8_t {
+    Undefined = -1,
+    Survival  = 0,
+    Creative  = 1,
+    Adventure = 2,
+    Default   = 5,
+    Spectator = 6,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(GameType, -1, 6);
+SCULK_PROTOCOL_ENUM_RANGE(GameType, -1, 6)

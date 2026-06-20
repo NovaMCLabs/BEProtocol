@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class LessonProgressPacket : public IPacket {
 public:
-    enum class LessonAction : std::int32_t {
+    enum class LessonAction : std::uint8_t {
         Start    = 0,
         Complete = 1,
         Restart  = 2,
@@ -38,6 +38,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(LessonProgressPacket::LessonAction, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(LessonProgressPacket::LessonAction, 0, 2)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(LessonProgressPacket)

@@ -182,13 +182,13 @@ Result<> SmithingTrimRecipe::read(ReadOnlyBinaryStream& stream) {
 }
 
 void CraftingDataEntry::write(BinaryStream& stream) const {
-    stream.writeVariantIndex<std::int32_t>(mRecipe, &BinaryStream::writeVarInt);
-    std::visit([&](auto&& recipe) { recipe.write(stream); }, mRecipe);
+    stream.writeVariant(mRecipe, &BinaryStream::writeVarInt, [&stream](auto&& recipe) { recipe.write(stream); });
 }
 
 Result<> CraftingDataEntry::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVariantIndex<std::int32_t>(mRecipe, &ReadOnlyBinaryStream::readVarInt));
-    return std::visit([&](auto&& recipe) { return recipe.read(stream); }, mRecipe);
+    return stream.readVariant(mRecipe, &ReadOnlyBinaryStream::readVarInt, [&stream](auto&& recipe) {
+        return recipe.read(stream);
+    });
 }
 
 void PotionMixDataEntry::write(BinaryStream& stream) const {

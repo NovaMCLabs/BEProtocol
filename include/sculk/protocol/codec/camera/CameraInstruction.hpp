@@ -152,4 +152,4 @@ struct CameraInstruction {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(CameraInstruction::SplineInstruction::Type, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(CameraInstruction::SplineInstruction::Type, 0, 1)

@@ -50,6 +50,22 @@ Result<> ServerboundDiagnosticsPacket::SystemDiagnosticTimingInfo::read(ReadOnly
     return stream.readByte(mPercentOfTotal);
 }
 
+void ServerboundDiagnosticsPacket::ScopeDataSummary::write(BinaryStream& stream) const {
+    stream.writeString(mLabel);
+    stream.writeString(mIndentation);
+    stream.writeUnsignedInt64(mTotalHighCostNS);
+    stream.writeUnsignedInt64(mTotalMidCostNS);
+    stream.writeUnsignedInt64(mTotalLowCostNS);
+}
+
+Result<> ServerboundDiagnosticsPacket::ScopeDataSummary::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readString(mLabel));
+    _SCULK_READ(stream.readString(mIndentation));
+    _SCULK_READ(stream.readUnsignedInt64(mTotalHighCostNS));
+    _SCULK_READ(stream.readUnsignedInt64(mTotalMidCostNS));
+    return stream.readUnsignedInt64(mTotalLowCostNS);
+}
+
 MinecraftPacketIds ServerboundDiagnosticsPacket::getId() const noexcept {
     return MinecraftPacketIds::ServerboundDiagnostics;
 }
@@ -68,6 +84,7 @@ void ServerboundDiagnosticsPacket::write(BinaryStream& stream) const {
     stream.writeArray(mMemoryCategoryValues, &MemoryCategoryCounter::write);
     stream.writeArray(mEntityDiagnostics, &EntityDiagnosticTimingInfo::write);
     stream.writeArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::write);
+    stream.writeArray(mScopeDataSummaries, &ScopeDataSummary::write);
 }
 
 Result<> ServerboundDiagnosticsPacket::read(ReadOnlyBinaryStream& stream) {
@@ -82,7 +99,8 @@ Result<> ServerboundDiagnosticsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readFloat(mAvgUnaccountedTimePercent));
     _SCULK_READ(stream.readArray(mMemoryCategoryValues, &MemoryCategoryCounter::read));
     _SCULK_READ(stream.readArray(mEntityDiagnostics, &EntityDiagnosticTimingInfo::read));
-    return stream.readArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::read);
+    _SCULK_READ(stream.readArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::read));
+    return stream.readArray(mScopeDataSummaries, &ScopeDataSummary::read);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING
@@ -99,7 +117,8 @@ std::string ServerboundDiagnosticsPacket::toString() const {
         SCULK_FORMAT_FIELD(mAvgUnaccountedTimePercent),
         SCULK_FORMAT_FIELD(mMemoryCategoryValues),
         SCULK_FORMAT_FIELD(mEntityDiagnostics),
-        SCULK_FORMAT_FIELD(mSystemDiagnostics)
+        SCULK_FORMAT_FIELD(mSystemDiagnostics),
+        SCULK_FORMAT_FIELD(mScopeDataSummaries)
     );
 }
 #endif

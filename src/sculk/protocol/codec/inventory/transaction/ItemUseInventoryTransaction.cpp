@@ -10,6 +10,37 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void ItemUseInventoryTransaction::write(BinaryStream& stream) const {
+    mTransaction.write(stream);
+    stream.writeEnum(mActionType, &BinaryStream::writeVarInt);
+    stream.writeEnum(mTriggerType, &BinaryStream::writeUnsignedVarInt);
+    mPos.write(stream);
+    stream.writeUnsignedVarInt(mFace);
+    stream.writeVarInt(mSlot);
+    mItem.writeCereal(stream);
+    mFromPos.write(stream);
+    mClickPos.write(stream);
+    stream.writeUnsignedVarInt(mTargetBlockId);
+    stream.writeEnum(mClientPredictedResult, &BinaryStream::writeByte);
+    stream.writeEnum(mClientCooldownState, &BinaryStream::writeByte);
+}
+
+Result<> ItemUseInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(mTransaction.read(stream));
+    _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readEnum(mTriggerType, &ReadOnlyBinaryStream::readUnsignedVarInt));
+    _SCULK_READ(mPos.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mFace));
+    _SCULK_READ(stream.readVarInt(mSlot));
+    _SCULK_READ(mItem.readCereal(stream));
+    _SCULK_READ(mFromPos.read(stream));
+    _SCULK_READ(mClickPos.read(stream));
+    _SCULK_READ(stream.readUnsignedVarInt(mTargetBlockId));
+    _SCULK_READ(stream.readEnum(mClientPredictedResult, &ReadOnlyBinaryStream::readByte));
+    return stream.readEnum(mClientCooldownState, &ReadOnlyBinaryStream::readByte);
+}
+
+void ItemUseInventoryTransaction::writeLegacy(BinaryStream& stream) const {
+    mTransaction.writeLegacy(stream);
     stream.writeEnum(mActionType, &BinaryStream::writeUnsignedVarInt);
     stream.writeEnum(mTriggerType, &BinaryStream::writeUnsignedVarInt);
     mPos.write(stream);
@@ -23,11 +54,14 @@ void ItemUseInventoryTransaction::write(BinaryStream& stream) const {
     stream.writeEnum(mClientCooldownState, &BinaryStream::writeByte);
 }
 
-Result<> ItemUseInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
+Result<> ItemUseInventoryTransaction::readLegacy(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(mTransaction.readLegacy(stream));
     _SCULK_READ(stream.readEnum(mActionType, &ReadOnlyBinaryStream::readUnsignedVarInt));
     _SCULK_READ(stream.readEnum(mTriggerType, &ReadOnlyBinaryStream::readUnsignedVarInt));
     _SCULK_READ(mPos.read(stream));
-    _SCULK_READ(stream.readVarInt(mFace));
+    std::int32_t face{};
+    _SCULK_READ(stream.readVarInt(face));
+    mFace = static_cast<std::uint32_t>(face);
     _SCULK_READ(stream.readVarInt(mSlot));
     _SCULK_READ(mItem.read(stream));
     _SCULK_READ(mFromPos.read(stream));

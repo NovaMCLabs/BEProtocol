@@ -18,16 +18,16 @@ std::string_view InventoryContentPacket::getName() const noexcept { return "Inve
 
 void InventoryContentPacket::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt(mInventoryId);
-    stream.writeArray(mSlots, &NetworkItemStackDescriptor::write);
+    stream.writeArray(mSlots, &NetworkItemStackDescriptor::writeCereal);
     mFullContainerName.write(stream);
-    mStorageItem.write(stream);
+    mStorageItem.writeCereal(stream);
 }
 
 Result<> InventoryContentPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt(mInventoryId));
-    _SCULK_READ(stream.readArray(mSlots, &NetworkItemStackDescriptor::read));
+    _SCULK_READ(stream.readArray(mSlots, &NetworkItemStackDescriptor::readCereal));
     _SCULK_READ(mFullContainerName.read(stream));
-    return mStorageItem.read(stream);
+    return mStorageItem.readCereal(stream);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

@@ -14,7 +14,7 @@ void BiomeScatterParamData::write(BinaryStream& stream) const {
     stream.writeEnum(mEvalOrder, &BinaryStream::writeVarInt);
     stream.writeVarInt(mChancePercentType);
     stream.writeUnsignedShort(mChancePercent);
-    stream.writeSignedInt(mChanceNumeartor);
+    stream.writeSignedInt(mChanceNumerator);
     stream.writeSignedInt(mChanceDenominator);
     stream.writeVarInt(mIterationsType);
     stream.writeUnsignedShort(mIterations);
@@ -25,7 +25,7 @@ Result<> BiomeScatterParamData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mEvalOrder, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readVarInt(mChancePercentType));
     _SCULK_READ(stream.readUnsignedShort(mChancePercent));
-    _SCULK_READ(stream.readSignedInt(mChanceNumeartor));
+    _SCULK_READ(stream.readSignedInt(mChanceNumerator));
     _SCULK_READ(stream.readSignedInt(mChanceDenominator));
     _SCULK_READ(stream.readVarInt(mIterationsType));
     return stream.readUnsignedShort(mIterations);

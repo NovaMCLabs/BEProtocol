@@ -67,6 +67,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(TextPacket::Type, 0, 11);
+SCULK_PROTOCOL_ENUM_RANGE(TextPacket::Type, 0, 11)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(TextPacket)

@@ -9,10 +9,11 @@
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class ColorAttributeOperation : std::int32_t {
+enum class ColorAttributeOperation : std::uint8_t {
     OVERRIDE    = 0,
     ALPHA_BLEND = 1,
     ADD         = 2,
@@ -31,4 +32,4 @@ struct ColorAttributeData {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ColorAttributeOperation, 0, 4);
+SCULK_PROTOCOL_ENUM_RANGE(ColorAttributeOperation, 0, 4)

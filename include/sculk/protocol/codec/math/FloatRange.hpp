@@ -6,29 +6,18 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "InventoryTransactionSource.hpp"
-#include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
+#include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-struct InventoryTransactionAction {
-    InventoryTransactionSource mSource{};
-    std::uint32_t              mSlot{};
-    NetworkItemStackDescriptor mFromItem{};
-    NetworkItemStackDescriptor mToItem{};
+struct FloatRange {
+    float mMin{};
+    float mMax{};
 
     void write(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
-
-struct InventoryTransactionActions {
-    std::vector<InventoryTransactionAction> mActions{};
-
-    void write(BinaryStream& stream) const;
-
-    [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
-};
-
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

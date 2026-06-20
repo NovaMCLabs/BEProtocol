@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "sculk/protocol/codec/level/CompressionAlgorithm.hpp"
 #include "sculk/protocol/connection/NetworkStatus.hpp"
 #include "sculk/protocol/connection/coro/Task.hpp"
 #include "sculk/protocol/connection/encryption/CryptoManager.hpp"
@@ -32,20 +33,13 @@ public:
     using BatchedBuffer   = std::vector<Buffer>;
     using OutboundBuffers = std::vector<Buffer>;
 
-public:
-    enum class CompressionType : std::int8_t {
-        None   = -1,
-        Zlib   = 0,
-        Snappy = 1,
-    };
-
 protected:
     RakNet::RakPeerInterface*             mPeer{};
     RakNet::AddressOrGUID                 mRemote{};
     moodycamel::ConcurrentQueue<Buffer>   mInboundPackets{};
     moodycamel::ConcurrentQueue<Buffer>   mOutboundPackets{};
     std::atomic_bool                      mConnected{};
-    std::optional<CompressionType>        mCompressionType{};
+    std::optional<CompressionAlgorithm>   mCompressionType{};
     std::int32_t                          mCompressionThreshold{};
     std::optional<CryptoManager>          mEncryption{};
     std::chrono::steady_clock::time_point mNextFlushAt{};
@@ -64,7 +58,7 @@ public:
 public:
     [[nodiscard]] bool isCompressed() const noexcept;
 
-    void setCompressed(CompressionType type, std::int32_t threshold) noexcept;
+    void setCompressed(CompressionAlgorithm type, std::int32_t threshold) noexcept;
 
     [[nodiscard]] bool isEncrypted() const noexcept;
 
@@ -116,5 +110,3 @@ private:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
-
-SCULK_PROTOCOL_ENUM_RANGE(Session::CompressionType, -1, 1);

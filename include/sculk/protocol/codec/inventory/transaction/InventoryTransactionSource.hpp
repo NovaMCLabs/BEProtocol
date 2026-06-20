@@ -23,14 +23,18 @@ enum class InventoryTransactionSourceType : std::uint32_t {
 
 struct InventoryTransactionSource {
     InventoryTransactionSourceType mType{};
-    std::int32_t                   mContainerId{};
-    std::uint32_t                  mBitFlags{};
+    std::optional<std::uint8_t>    mContainerId{};
+    std::optional<std::uint32_t>   mBitFlags{};
 
     void write(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+
+    void writeLegacy(BinaryStream& stream) const;
+
+    [[nodiscard]] Result<> readLegacy(ReadOnlyBinaryStream& stream);
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(InventoryTransactionSourceType, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(InventoryTransactionSourceType, 0, 3)

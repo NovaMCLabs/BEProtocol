@@ -61,4 +61,4 @@ struct ItemStackResponse {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ItemStackNetResult, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(ItemStackNetResult, 0, 1)

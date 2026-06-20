@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class AuthenticationType : std::int8_t {
+enum class AuthenticationType : std::uint8_t {
     Full       = 0,
     Guest      = 1,
     SelfSigned = 2,
@@ -20,4 +20,4 @@ enum class AuthenticationType : std::int8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(AuthenticationType, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(AuthenticationType, 0, 2)

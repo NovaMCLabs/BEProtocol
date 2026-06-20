@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class InventoryLeftTabIndex : std::int32_t {
+enum class InventoryLeftTabIndex : std::uint8_t {
     None               = 0,
     RecipeConstruction = 1,
     RecipeEquipment    = 2,
@@ -24,4 +24,4 @@ enum class InventoryLeftTabIndex : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(InventoryLeftTabIndex, 0, 6);
+SCULK_PROTOCOL_ENUM_RANGE(InventoryLeftTabIndex, 0, 6)

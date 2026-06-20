@@ -14,7 +14,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class SetSpawnPositionPacket : public IPacket {
 public:
-    enum class SpawnPositionType : std::int32_t {
+    enum class SpawnPositionType : std::int8_t {
         PlayerRespawn = 0,
         WorldSpawn    = 1,
     };
@@ -39,6 +39,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SetSpawnPositionPacket::SpawnPositionType, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(SetSpawnPositionPacket::SpawnPositionType, 0, 1)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(SetSpawnPositionPacket)

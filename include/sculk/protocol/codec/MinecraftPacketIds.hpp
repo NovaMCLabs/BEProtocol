@@ -8,10 +8,11 @@
 #pragma once
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class MinecraftPacketIds : int {
+enum class MinecraftPacketIds : std::uint16_t {
     KeepAlive                                = 0,
     Login                                    = 1,
     PlayStatus                               = 2,
@@ -246,7 +247,7 @@ enum class MinecraftPacketIds : int {
     PrimitiveShapes                          = 328,
     ServerboundPackSettingChange             = 329,
     ClientboundDataStore                     = 330,
-    GraphicsParameterOverride                = 331,
+    GraphicsOverrideParameter                = 331,
     ServerboundDataStore                     = 332,
     ClientboundDataDrivenUIShowScreen        = 333,
     ClientboundDataDrivenUICloseAllScreens   = 334,
@@ -263,9 +264,12 @@ enum class MinecraftPacketIds : int {
     ClientboundAttributeLayerSync            = 345,
     ServerStoreInfo                          = 346,
     ServerPresenceInfo                       = 347,
-    EndId                                    = 348,
+    ClientboundUpdateSoundData               = 348,
+    SendPartyDestinationCookie               = 349,
+    PartyDestinationCookieResponse           = 350,
+    EndId                                    = 351,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MinecraftPacketIds, 0, 348);
+SCULK_PROTOCOL_ENUM_RANGE(MinecraftPacketIds, 0, 351)

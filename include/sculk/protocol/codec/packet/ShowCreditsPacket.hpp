@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class ShowCreditsPacket : public IPacket {
 public:
-    enum class CreditsState : std::int32_t {
+    enum class CreditsState : std::uint8_t {
         Start    = 0,
         Finished = 1,
     };
@@ -36,6 +36,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ShowCreditsPacket::CreditsState, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(ShowCreditsPacket::CreditsState, 0, 1)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(ShowCreditsPacket)

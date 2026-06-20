@@ -14,7 +14,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 class DimensionDataPacket : public IPacket {
 public:
     struct DimensionDefinition {
-        enum class GeneratorType : std::int32_t {
+        enum class GeneratorType : std::uint8_t {
             Legacy    = 0,
             Overworld = 1,
             Flat      = 2,
@@ -52,6 +52,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(DimensionDataPacket::DimensionDefinition::GeneratorType, 0, 6);
+SCULK_PROTOCOL_ENUM_RANGE(DimensionDataPacket::DimensionDefinition::GeneratorType, 0, 6)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(DimensionDataPacket)

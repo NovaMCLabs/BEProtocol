@@ -10,10 +10,11 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void MetaData::write(BinaryStream& stream) const {
-    stream.writeArray(mDataItems, [&](const DataItem& item) {
+    stream.writeArray(mDataItems, [](const DataItem& item, BinaryStream& stream) {
         stream.writeEnum(item.mId, &BinaryStream::writeUnsignedVarInt);
-        stream.writeVariantIndex<std::uint32_t>(item.mData, &BinaryStream::writeUnsignedVarInt);
-        std::visit(
+        stream.writeVariant(
+            item.mData,
+            &BinaryStream::writeUnsignedVarInt,
             Overload{
                 [&](uint8_t data) { stream.writeByte(data); },
                 [&](short data) { stream.writeSignedShort(data); },
@@ -24,17 +25,17 @@ void MetaData::write(BinaryStream& stream) const {
                 [&](const BlockPos& data) { data.write(stream); },
                 [&](int64_t data) { stream.writeVarInt64(data); },
                 [&](const Vec3& data) { data.write(stream); },
-            },
-            item.mData
+            }
         );
     });
 }
 
 Result<> MetaData::read(ReadOnlyBinaryStream& stream) {
-    return stream.readArray(mDataItems, [&](DataItem& item) {
+    return stream.readArray(mDataItems, [](DataItem& item, ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readEnum(item.mId, &ReadOnlyBinaryStream::readUnsignedVarInt));
-        _SCULK_READ(stream.readVariantIndex<std::uint32_t>(item.mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
-        return std::visit(
+        return stream.readVariant(
+            item.mData,
+            &ReadOnlyBinaryStream::readUnsignedVarInt,
             Overload{
                 [&](uint8_t& data) { return stream.readByte(data); },
                 [&](short& data) { return stream.readSignedShort(data); },
@@ -45,8 +46,7 @@ Result<> MetaData::read(ReadOnlyBinaryStream& stream) {
                 [&](BlockPos& data) { return data.read(stream); },
                 [&](int64_t& data) { return stream.readVarInt64(data); },
                 [&](Vec3& data) { return data.read(stream); },
-            },
-            item.mData
+            }
         );
     });
 }

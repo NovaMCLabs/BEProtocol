@@ -45,21 +45,13 @@ Result<> SerializedSkin::PersonaPiece::read(ReadOnlyBinaryStream& stream) {
 
 void SerializedSkin::PieceTintColors::write(BinaryStream& stream) const {
     stream.writeString(mPieceType);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mPieceTintColors.size()));
-    for (const std::string& tintColor : mPieceTintColors) {
-        stream.writeString(tintColor);
-    }
+    stream.writeArray(mPieceTintColors, &BinaryStream::writeUnsignedInt, &BinaryStream::writeString);
 }
 
 Result<> SerializedSkin::PieceTintColors::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mPieceType));
-    std::uint32_t tintColorCount{};
-    _SCULK_READ(stream.readUnsignedInt(tintColorCount));
-    mPieceTintColors.resize(tintColorCount);
-    for (std::string& tintColor : mPieceTintColors) {
-        _SCULK_READ(stream.readString(tintColor));
-    }
-    return {};
+    return stream
+        .readArray(mPieceTintColors, &ReadOnlyBinaryStream::readUnsignedInt, &ReadOnlyBinaryStream::readString);
 }
 
 void SerializedSkin::write(BinaryStream& stream) const {
@@ -69,10 +61,7 @@ void SerializedSkin::write(BinaryStream& stream) const {
     stream.writeUnsignedInt(mSkinImageWidth);
     stream.writeUnsignedInt(mSkinImageHeight);
     stream.writeString(mSkinImageBytes);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mAnimations.size()));
-    for (const Animation& animation : mAnimations) {
-        animation.write(stream);
-    }
+    stream.writeArray(mAnimations, &BinaryStream::writeUnsignedInt, &Animation::write);
     stream.writeUnsignedInt(mCapeImageWidth);
     stream.writeUnsignedInt(mCapeImageHeight);
     stream.writeString(mCapeImageBytes);
@@ -83,14 +72,8 @@ void SerializedSkin::write(BinaryStream& stream) const {
     stream.writeString(mFullId);
     stream.writeString(mArmSize);
     stream.writeString(mSkinColor);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mPersonaPieces.size()));
-    for (const PersonaPiece& piece : mPersonaPieces) {
-        piece.write(stream);
-    }
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mPieceTintColors.size()));
-    for (const PieceTintColors& tintColors : mPieceTintColors) {
-        tintColors.write(stream);
-    }
+    stream.writeArray(mPersonaPieces, &BinaryStream::writeUnsignedInt, &PersonaPiece::write);
+    stream.writeArray(mPieceTintColors, &BinaryStream::writeUnsignedInt, &PieceTintColors::write);
     stream.writeBool(mIsPremiumSkin);
     stream.writeBool(mIsPersonaSkin);
     stream.writeBool(mIsPersonaCapeOnClassicSkin);
@@ -105,14 +88,7 @@ Result<> SerializedSkin::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedInt(mSkinImageWidth));
     _SCULK_READ(stream.readUnsignedInt(mSkinImageHeight));
     _SCULK_READ(stream.readString(mSkinImageBytes));
-
-    std::uint32_t animationCount{};
-    _SCULK_READ(stream.readUnsignedInt(animationCount));
-    mAnimations.resize(animationCount);
-    for (Animation& animation : mAnimations) {
-        _SCULK_READ(animation.read(stream));
-    }
-
+    _SCULK_READ(stream.readArray(mAnimations, &ReadOnlyBinaryStream::readUnsignedInt, &Animation::read));
     _SCULK_READ(stream.readUnsignedInt(mCapeImageWidth));
     _SCULK_READ(stream.readUnsignedInt(mCapeImageHeight));
     _SCULK_READ(stream.readString(mCapeImageBytes));
@@ -123,21 +99,8 @@ Result<> SerializedSkin::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mFullId));
     _SCULK_READ(stream.readString(mArmSize));
     _SCULK_READ(stream.readString(mSkinColor));
-
-    std::uint32_t personaPieceCount{};
-    _SCULK_READ(stream.readUnsignedInt(personaPieceCount));
-    mPersonaPieces.resize(personaPieceCount);
-    for (PersonaPiece& piece : mPersonaPieces) {
-        _SCULK_READ(piece.read(stream));
-    }
-
-    std::uint32_t pieceTintColorCount{};
-    _SCULK_READ(stream.readUnsignedInt(pieceTintColorCount));
-    mPieceTintColors.resize(pieceTintColorCount);
-    for (PieceTintColors& tintColors : mPieceTintColors) {
-        _SCULK_READ(tintColors.read(stream));
-    }
-
+    _SCULK_READ(stream.readArray(mPersonaPieces, &ReadOnlyBinaryStream::readUnsignedInt, &PersonaPiece::read));
+    _SCULK_READ(stream.readArray(mPieceTintColors, &ReadOnlyBinaryStream::readUnsignedInt, &PieceTintColors::read));
     _SCULK_READ(stream.readBool(mIsPremiumSkin));
     _SCULK_READ(stream.readBool(mIsPersonaSkin));
     _SCULK_READ(stream.readBool(mIsPersonaCapeOnClassicSkin));

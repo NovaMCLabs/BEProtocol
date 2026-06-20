@@ -82,23 +82,22 @@ void SubChunkPacket::write(BinaryStream& stream) const {
     stream.writeBool(mCacheEnabled);
     stream.writeVarInt(mDimensionType);
     mCenterPos.write(stream);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mSubChunkData.size()));
-    for (const SubChunkPacketData& data : mSubChunkData) {
-        data.write(stream, mCacheEnabled);
-    }
+    stream.writeArray(
+        mSubChunkData,
+        &BinaryStream::writeUnsignedInt,
+        [this](BinaryStream& stream, const SubChunkPacketData& data) { data.write(stream, mCacheEnabled); }
+    );
 }
 
 Result<> SubChunkPacket::read(ReadOnlyBinaryStream& stream) {
-    std::uint32_t count{};
     _SCULK_READ(stream.readBool(mCacheEnabled));
     _SCULK_READ(stream.readVarInt(mDimensionType));
     _SCULK_READ(mCenterPos.read(stream));
-    _SCULK_READ(stream.readUnsignedInt(count));
-    mSubChunkData.resize(count);
-    for (SubChunkPacketData& data : mSubChunkData) {
-        _SCULK_READ(data.read(stream, mCacheEnabled));
-    }
-    return {};
+    return stream.readArray(
+        mSubChunkData,
+        &ReadOnlyBinaryStream::readUnsignedInt,
+        [this](ReadOnlyBinaryStream& stream, SubChunkPacketData& data) { return data.read(stream, mCacheEnabled); }
+    );
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

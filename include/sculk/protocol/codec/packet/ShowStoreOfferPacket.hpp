@@ -37,6 +37,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ShowStoreOfferPacket::Type, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(ShowStoreOfferPacket::Type, 0, 2)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(ShowStoreOfferPacket)

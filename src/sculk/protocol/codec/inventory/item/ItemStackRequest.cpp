@@ -63,10 +63,7 @@ void ItemStackRequestAction::write(BinaryStream& stream) const {
                 stream.writeUnsignedVarInt(data.mRecipeNetworkId);
                 stream.writeByte(data.mNumberOfRequestedCrafts);
                 stream.writeByte(data.mTimesCrafted);
-                stream.writeByte(static_cast<std::uint8_t>(data.mIngredients.size()));
-                for (const RecipeIngredient& ingredient : data.mIngredients) {
-                    ingredient.write(stream);
-                }
+                stream.writeArray(data.mIngredients, &BinaryStream::writeByte, &RecipeIngredient::write);
             },
             [&](const CraftRecipeOptional& data) {
                 stream.writeUnsignedVarInt(data.mRecipeNetId);
@@ -82,10 +79,7 @@ void ItemStackRequestAction::write(BinaryStream& stream) const {
                 stream.writeByte(data.mTimesCrafted);
             },
             [&](const CraftResult& data) {
-                stream.writeUnsignedVarInt(static_cast<std::uint32_t>(data.mCraftResults.size()));
-                for (const NetworkItemInstanceDescriptor& result : data.mCraftResults) {
-                    result.write(stream);
-                }
+                stream.writeArray(data.mCraftResults, &NetworkItemInstanceDescriptor::write);
                 stream.writeByte(data.mTimesCrafted);
             },
             [&](const OnlyType&) {}
@@ -165,12 +159,7 @@ Result<> ItemStackRequestAction::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readUnsignedVarInt(data.mRecipeNetworkId));
         _SCULK_READ(stream.readByte(data.mNumberOfRequestedCrafts));
         _SCULK_READ(stream.readByte(data.mTimesCrafted));
-        std::uint8_t ingredientCount{};
-        _SCULK_READ(stream.readByte(ingredientCount));
-        data.mIngredients.resize(ingredientCount);
-        for (RecipeIngredient& ingredient : data.mIngredients) {
-            _SCULK_READ(ingredient.read(stream));
-        }
+        _SCULK_READ(stream.readArray(data.mIngredients, &ReadOnlyBinaryStream::readByte, &RecipeIngredient::read));
         mVariant = std::move(data);
         return {};
     }
@@ -197,13 +186,8 @@ Result<> ItemStackRequestAction::read(ReadOnlyBinaryStream& stream) {
         return {};
     }
     case Type::CraftResults: {
-        CraftResult   data{};
-        std::uint32_t resultCount{};
-        _SCULK_READ(stream.readUnsignedVarInt(resultCount));
-        data.mCraftResults.resize(resultCount);
-        for (NetworkItemInstanceDescriptor& result : data.mCraftResults) {
-            _SCULK_READ(result.read(stream));
-        }
+        CraftResult data{};
+        _SCULK_READ(stream.readArray(data.mCraftResults, &NetworkItemInstanceDescriptor::read));
         _SCULK_READ(stream.readByte(data.mTimesCrafted));
         mVariant = std::move(data);
         return {};

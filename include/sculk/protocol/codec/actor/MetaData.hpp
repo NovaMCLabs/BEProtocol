@@ -21,7 +21,7 @@ class MetaData {
 public:
     using DataItemVariant = std::variant<uint8_t, short, int, float, std::string, CompoundTag, BlockPos, int64_t, Vec3>;
 
-    enum class DataItemType {
+    enum class DataItemType : std::uint8_t {
         Byte        = 0,
         Short       = 1,
         Int         = 2,
@@ -50,4 +50,4 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MetaData::DataItemType, 0, 9);
+SCULK_PROTOCOL_ENUM_RANGE(MetaData::DataItemType, 0, 9)

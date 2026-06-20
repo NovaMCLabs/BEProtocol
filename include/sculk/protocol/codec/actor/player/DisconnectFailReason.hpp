@@ -8,10 +8,11 @@
 #pragma once
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class DisconnectFailReason : int {
+enum class DisconnectFailReason : std::uint8_t {
     Unknown                                       = 0,
     CantConnectNoInternet                         = 1,
     NoPermissions                                 = 2,
@@ -152,8 +153,10 @@ enum class DisconnectFailReason : int {
     NonceNotFound                                 = 137,
     NonceExpired                                  = 138,
     NonceNotValid                                 = 139,
+    HostDisconnected                              = 140,
+    EditorJoinIntentPolicyFailure                 = 141,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(DisconnectFailReason, 0, 139);
+SCULK_PROTOCOL_ENUM_RANGE(DisconnectFailReason, 0, 141)

@@ -32,6 +32,10 @@ public:
         IdentityType mIdentityType{};
         std::int64_t mActorUniqueId{};
         std::string  mFakePlayerName{};
+
+        void write(BinaryStream& stream, PacketType type) const;
+
+        [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream, PacketType type);
     };
 
 public:
@@ -52,7 +56,7 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SetScorePacket::IdentityType, 0, 3);
-SCULK_PROTOCOL_ENUM_RANGE(SetScorePacket::PacketType, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(SetScorePacket::IdentityType, 0, 3)
+SCULK_PROTOCOL_ENUM_RANGE(SetScorePacket::PacketType, 0, 1)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(SetScorePacket)

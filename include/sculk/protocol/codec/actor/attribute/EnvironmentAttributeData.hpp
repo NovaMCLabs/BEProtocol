@@ -21,6 +21,8 @@ struct EnvironmentAttributeData {
     std::uint32_t                mCurrentTransitionTicks{};
     std::uint32_t                mTotalTransitionTicks{};
     EasingFunction               mEasing{};
+    std::uint32_t                mLocalTransitionTicks{};
+    bool                         mNoiseTransition{};
 
     void write(BinaryStream& stream) const;
 

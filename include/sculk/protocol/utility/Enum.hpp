@@ -13,13 +13,15 @@
     struct magic_enum::customize::enum_range<sculk::protocol::ENUM_CLASS> {                                            \
         static constexpr int min = MIN;                                                                                \
         static constexpr int max = MAX;                                                                                \
-    }
-#define SCULK_PROTOCOL_ENUM_IS_FLAGS(ENUM_CLASS)                                                                       \
+    };
+#define SCULK_PROTOCOL_FLAG_ENUM_RANGE(ENUM_CLASS, MIN, MAX)                                                           \
     template <>                                                                                                        \
     struct magic_enum::customize::enum_range<sculk::protocol::ENUM_CLASS> {                                            \
+        static constexpr int  min      = MIN;                                                                          \
+        static constexpr int  max      = MAX;                                                                          \
         static constexpr bool is_flags = true;                                                                         \
-    }
+    };
 #else
 #define SCULK_PROTOCOL_ENUM_RANGE(ENUM_CLASS, MIN, MAX)
-#define SCULK_PROTOCOL_ENUM_IS_FLAGS(ENUM_CLASS)
+#define SCULK_PROTOCOL_FLAG_ENUM_RANGE(ENUM_CLASS, MIN, MAX)
 #endif

@@ -78,4 +78,4 @@ enum class ActorEvent : std::uint8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ActorEvent, 0, 81);
+SCULK_PROTOCOL_ENUM_RANGE(ActorEvent, 0, 81)

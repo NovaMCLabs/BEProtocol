@@ -52,6 +52,6 @@ operator&(MoveActorAbsolutePacket::Flags lhs, MoveActorAbsolutePacket::Flags rhs
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MoveActorAbsolutePacket::Flags, 1, 8);
+SCULK_PROTOCOL_ENUM_RANGE(MoveActorAbsolutePacket::Flags, 1, 15)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(MoveActorAbsolutePacket)

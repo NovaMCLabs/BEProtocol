@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class BossEventPacket : public IPacket {
 public:
-    enum class EventType : std::uint32_t {
+    enum class EventType : std::uint8_t {
         Add              = 0,
         PlayerAdded      = 1,
         Remove           = 2,
@@ -26,13 +26,12 @@ public:
     };
 
 public:
-    std::int64_t  mTargetActor{};
-    std::int64_t  mPlayer{};
+    std::int64_t  mTargetActorID{};
+    std::int64_t  mPlayerID{};
     EventType     mType{};
     std::string   mName{};
     std::string   mFilteredName{};
     float         mPercentage{};
-    std::uint16_t mDarkenScreen{};
     std::uint32_t mColor{};
     std::uint32_t mOverlay{};
 
@@ -50,6 +49,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(BossEventPacket::EventType, 0, 8);
+SCULK_PROTOCOL_ENUM_RANGE(BossEventPacket::EventType, 0, 8)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(BossEventPacket)

@@ -54,8 +54,8 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(CodeBuilderSourcePacket::Category, 0, 2);
-SCULK_PROTOCOL_ENUM_RANGE(CodeBuilderSourcePacket::CodeStatus, 0, 5);
-SCULK_PROTOCOL_ENUM_RANGE(CodeBuilderSourcePacket::Operation, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(CodeBuilderSourcePacket::Category, 0, 2)
+SCULK_PROTOCOL_ENUM_RANGE(CodeBuilderSourcePacket::CodeStatus, 0, 5)
+SCULK_PROTOCOL_ENUM_RANGE(CodeBuilderSourcePacket::Operation, 0, 3)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(CodeBuilderSourcePacket)

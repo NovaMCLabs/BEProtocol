@@ -7,6 +7,7 @@
 
 #pragma once
 #include "SwapEndian.hpp"
+#include "Traits.hpp"
 #include "sculk/protocol/Version.hpp"
 #include <bitset>
 #include <cstddef>
@@ -18,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -150,20 +152,24 @@ public:
         }
     }
 
-    template <typename T, typename F>
-    constexpr void writeArray(const std::vector<T>& array, F&& func) {
-        writeUnsignedVarInt(static_cast<std::uint32_t>(array.size()));
+    template <typename T, typename P, typename W>
+    constexpr void writeArray(const std::vector<T>& array, P&& prefix, W&& func) {
+        using AT = std::remove_cv_t<std::remove_reference_t<traits::member_func_arg_t<P, 0>>>;
+        std::invoke(std::forward<P>(prefix), *this, static_cast<AT>(array.size()));
         for (const auto& element : array) {
-            if constexpr (std::is_invocable_v<F, BinaryStream&, const T&>) {
-                std::invoke(std::forward<F>(func), *this, element);
-            } else if constexpr (std::is_invocable_v<F, const T&, BinaryStream&>) {
-                std::invoke(std::forward<F>(func), element, *this);
-            } else if constexpr (std::is_invocable_v<F, const T&>) {
-                std::invoke(std::forward<F>(func), element);
+            if constexpr (std::is_invocable_v<W, BinaryStream&, const T&>) {
+                std::invoke(std::forward<W>(func), *this, element);
+            } else if constexpr (std::is_invocable_v<W, const T&, BinaryStream&>) {
+                std::invoke(std::forward<W>(func), element, *this);
             } else {
-                static_assert(false, "invalid write array function");
+                static_assert(traits::always_false_v<T>, "invalid write array function");
             }
         }
+    }
+
+    template <typename T, typename W, typename... Args>
+    constexpr void writeArray(const std::vector<T>& array, W&& func) {
+        writeArray(array, &BinaryStream::writeUnsignedVarInt, std::forward<W>(func));
     }
 
     template <typename T, typename F>
@@ -175,10 +181,8 @@ public:
                 std::invoke(std::forward<F>(func), *this, *opt);
             } else if constexpr (std::is_invocable_v<F, const T&, BinaryStream&>) {
                 std::invoke(std::forward<F>(func), *opt, *this);
-            } else if constexpr (std::is_invocable_v<F, const T&>) {
-                std::invoke(std::forward<F>(func), *opt);
             } else {
-                static_assert(false, "invalid write optional function");
+                static_assert(traits::always_false_v<T>, "invalid write optional function");
             }
         }
     }
@@ -223,13 +227,18 @@ public:
     template <typename T, typename F>
         requires std::is_enum_v<T>
     constexpr void writeEnum(T value, F&& func) {
-        using UT = std::underlying_type_t<T>;
-        std::invoke(std::forward<F>(func), *this, static_cast<UT>(value));
+        using AT = std::remove_cv_t<std::remove_reference_t<traits::member_func_arg_t<F, 0>>>;
+        std::invoke(std::forward<F>(func), *this, static_cast<AT>(value));
     }
 
-    template <typename U, typename T, typename F>
-    constexpr void writeVariantIndex(const T& var, F&& func) {
-        std::invoke(std::forward<F>(func), *this, static_cast<U>(var.index()));
+    template <typename T, typename P, typename V>
+    constexpr void writeVariant(const T& var, P&& prefix, V&& visitor) {
+        using AT = std::remove_cv_t<std::remove_reference_t<traits::member_func_arg_t<P, 0>>>;
+        std::invoke(std::forward<P>(prefix), *this, static_cast<AT>(var.index()));
+        std::visit(
+            [this, &visitor](auto&& arg) { std::invoke(std::forward<V>(visitor), std::forward<decltype(arg)>(arg)); },
+            var
+        );
     }
 };
 

@@ -20,20 +20,12 @@ Result<> Experiments::Experiment::read(ReadOnlyBinaryStream& stream) {
 }
 
 void Experiments::write(BinaryStream& stream) const {
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mExperiments.size()));
-    for (const Experiment& experiment : mExperiments) {
-        experiment.write(stream);
-    }
+    stream.writeArray(mExperiments, &BinaryStream::writeUnsignedInt, &Experiment::write);
     stream.writeBool(mEverToggled);
 }
 
 Result<> Experiments::read(ReadOnlyBinaryStream& stream) {
-    std::uint32_t experimentCount{};
-    _SCULK_READ(stream.readUnsignedInt(experimentCount));
-    mExperiments.resize(experimentCount);
-    for (Experiment& experiment : mExperiments) {
-        _SCULK_READ(experiment.read(stream));
-    }
+    _SCULK_READ(stream.readArray(mExperiments, &ReadOnlyBinaryStream::readUnsignedInt, &Experiment::read));
     return stream.readBool(mEverToggled);
 }
 

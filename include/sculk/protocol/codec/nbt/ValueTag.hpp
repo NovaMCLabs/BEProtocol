@@ -34,7 +34,7 @@ struct ValueTag {
         } else if constexpr (std::is_same_v<T, std::string>) {
             stream.writeString(mValue);
         } else {
-            static_assert(false, "Invalid ValueTag<T> template");
+            static_assert(traits::always_false_v<T>, "Invalid ValueTag<T> template");
         }
     }
 
@@ -56,7 +56,7 @@ struct ValueTag {
         } else if constexpr (std::is_same_v<T, std::string>) {
             return stream.readString(mValue);
         } else {
-            static_assert(false, "Invalid ValueTag<T> template");
+            static_assert(traits::always_false_v<T>, "Invalid ValueTag<T> template");
         }
     };
 };

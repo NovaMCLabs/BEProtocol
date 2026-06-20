@@ -8,10 +8,11 @@
 #pragma once
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class LegacyTelemetryEventType : int {
+enum class LegacyTelemetryEventType : std::uint8_t {
     Achievement                     = 0,
     Interaction                     = 1,
     PortalCreated                   = 2,
@@ -48,4 +49,4 @@ enum class LegacyTelemetryEventType : int {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(LegacyTelemetryEventType, 0, 31);
+SCULK_PROTOCOL_ENUM_RANGE(LegacyTelemetryEventType, 0, 31)

@@ -12,11 +12,12 @@
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include <cstdint>
 #include <optional>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class LocatorBarAction : std::uint32_t {
+enum class LocatorBarAction : std::uint8_t {
     None   = 0,
     Add    = 1,
     Remove = 2,
@@ -41,7 +42,7 @@ struct LocatorBarWaypointHandle {
 };
 
 struct LocatorBarServerWaypointPayload {
-    enum class UpdateFlags : std::uint32_t {
+    enum class UpdateFlags : std::uint8_t {
         Position                = 1u << 0,
         Visibility              = 1u << 1,
         TexturePath             = 1u << 2,
@@ -77,5 +78,5 @@ struct LocatorBarWaypointPayload {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(LocatorBarAction, 0, 3);
-SCULK_PROTOCOL_ENUM_RANGE(LocatorBarServerWaypointPayload::UpdateFlags, 1, 63);
+SCULK_PROTOCOL_ENUM_RANGE(LocatorBarAction, 0, 3)
+SCULK_PROTOCOL_ENUM_RANGE(LocatorBarServerWaypointPayload::UpdateFlags, 1, 63)

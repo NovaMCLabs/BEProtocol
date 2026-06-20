@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class ActorDamageCause : std::int32_t {
+enum class ActorDamageCause : std::uint8_t {
     Override        = 0,
     Contact         = 1,
     EntityAttack    = 2,
@@ -47,9 +47,9 @@ enum class ActorDamageCause : std::int32_t {
     SonicBoom       = 31,
     Campfire        = 32,
     SoulCampfire    = 33,
-    MaceSmash       = 34
+    MaceSmash       = 34,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ActorDamageCause, 0, 34);
+SCULK_PROTOCOL_ENUM_RANGE(ActorDamageCause, 0, 34)

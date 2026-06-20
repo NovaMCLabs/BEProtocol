@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class InventoryTransactionType : std::uint32_t {
+enum class InventoryTransactionType : std::uint8_t {
     NormalTransaction                  = 0,
     InventoryMismatch                  = 1,
     ItemUseInventoryTransaction        = 2,
@@ -22,4 +22,4 @@ enum class InventoryTransactionType : std::uint32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(InventoryTransactionType, 0, 4);
+SCULK_PROTOCOL_ENUM_RANGE(InventoryTransactionType, 0, 4)

@@ -14,7 +14,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class CommandOutputPacket : public IPacket {
 public:
-    enum class Type {
+    enum class Type : std::uint8_t {
         None       = 0,
         LastOutput = 1,
         Silent     = 2,
@@ -49,6 +49,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(CommandOutputPacket::Type, 0, 4);
+SCULK_PROTOCOL_ENUM_RANGE(CommandOutputPacket::Type, 0, 4)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(CommandOutputPacket)

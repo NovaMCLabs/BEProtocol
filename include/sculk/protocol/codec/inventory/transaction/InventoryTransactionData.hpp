@@ -6,18 +6,18 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "InventoryMismatchTransaction.hpp"
-#include "InventoryNormalTransaction.hpp"
+#include "InventoryMismatchData.hpp"
 #include "ItemReleaseInventoryTransaction.hpp"
 #include "ItemUseInventoryTransaction.hpp"
 #include "ItemUseOnActorInventoryTransaction.hpp"
+#include "NormalTransactionData.hpp"
 #include <variant>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-using InventoryTransactionData = std::variant<
-    InventoryNormalTransaction,
-    InventoryMismatchTransaction,
+using InventoryTransactionVariant = std::variant<
+    NormalTransactionData,
+    InventoryMismatchData,
     ItemUseInventoryTransaction,
     ItemUseOnActorInventoryTransaction,
     ItemReleaseInventoryTransaction>;

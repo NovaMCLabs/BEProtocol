@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class InventoryLayout : std::int32_t {
+enum class InventoryLayout : std::uint8_t {
     None           = 0,
     InventoryOnly  = 1,
     Default        = 2,
@@ -21,4 +21,4 @@ enum class InventoryLayout : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(InventoryLayout, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(InventoryLayout, 0, 3)

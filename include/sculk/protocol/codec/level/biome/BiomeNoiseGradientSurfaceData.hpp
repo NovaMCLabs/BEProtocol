@@ -7,7 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/Version.hpp"
-
+#include "sculk/protocol/codec/math/FloatRange.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 #include <vector>
@@ -15,11 +15,22 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct BiomeNoiseGradientSurfaceData {
-    std::vector<std::uint32_t> mNonReplaceableBlocks{};
-    std::vector<std::uint32_t> mGradientBlocks{};
-    std::string                mNoiseSeed{};
-    int                        mFirstOctave{};
-    std::vector<float>         mAmplitudes{};
+    struct SerializedNoiseBlockSpecifier {
+        std::string   mNoise{};
+        float         mThreshold{};
+        FloatRange    mRange{};
+        std::uint32_t mBlock{};
+
+        void write(BinaryStream& stream) const;
+
+        [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+    };
+
+    std::vector<std::uint32_t>                 mNonReplaceableBlocks{};
+    std::vector<SerializedNoiseBlockSpecifier> mGradientBlocks{};
+    std::string                                mNoiseSeed{};
+    int                                        mFirstOctave{};
+    std::vector<float>                         mAmplitudes{};
 
     void write(BinaryStream& stream) const;
 

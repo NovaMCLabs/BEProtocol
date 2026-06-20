@@ -8,16 +8,16 @@
 #pragma once
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
-#include <cstddef>
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class ActorFlags : int {
+enum class ActorFlags : std::uint8_t {
     Onfire                        = 0,
     Sneaking                      = 1,
     Riding                        = 2,
     Sprinting                     = 3,
-    Usingitem                     = 4,
+    UsingItem                     = 4,
     Invisible                     = 5,
     Tempted                       = 6,
     Inlove                        = 7,
@@ -29,7 +29,7 @@ enum class ActorFlags : int {
     Critical                      = 13,
     CanShowName                   = 14,
     AlwaysShowName                = 15,
-    Noai                          = 16,
+    NoAI                          = 16,
     Silent                        = 17,
     Wallclimbing                  = 18,
     Canclimb                      = 19,
@@ -148,4 +148,4 @@ enum class ActorFlags : int {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ActorFlags, 0, 130);
+SCULK_PROTOCOL_ENUM_RANGE(ActorFlags, 0, 130)

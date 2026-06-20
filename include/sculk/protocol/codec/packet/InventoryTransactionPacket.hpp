@@ -7,7 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/codec/inventory/container/LegacySetItemSlot.hpp"
-#include "sculk/protocol/codec/inventory/transaction/InventoryTransactionAction.hpp"
+#include "sculk/protocol/codec/inventory/transaction/InventoryTransaction.hpp"
 #include "sculk/protocol/codec/inventory/transaction/InventoryTransactionData.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 
@@ -15,10 +15,9 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class InventoryTransactionPacket : public IPacket {
 public:
-    std::int32_t                   mLegacyRequestRawId{};
-    std::vector<LegacySetItemSlot> mLegacySetItemSlots{};
-    InventoryTransactionActions    mInventoryTransactionActions{};
-    InventoryTransactionData       mTransactionData{};
+    std::int32_t                                  mLegacyRequestRawId{};
+    std::optional<std::vector<LegacySetItemSlot>> mLegacySetItemSlots{};
+    InventoryTransactionVariant                   mTransaction{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

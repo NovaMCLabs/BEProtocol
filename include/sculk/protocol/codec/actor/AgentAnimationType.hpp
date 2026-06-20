@@ -19,4 +19,4 @@ enum class AgentAnimationType : std::uint8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(AgentAnimationType, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(AgentAnimationType, 0, 1)

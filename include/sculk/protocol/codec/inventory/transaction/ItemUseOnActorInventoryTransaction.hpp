@@ -6,21 +6,24 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "InventoryTransaction.hpp"
 #include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
 #include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
+#include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class ItemUseOnActorInventoryTransaction {
 public:
-    enum class ActionType : std::uint32_t {
+    enum class ActionType : std::uint8_t {
         Interact     = 0,
         Attack       = 1,
         ItemInteract = 2,
     };
 
 public:
+    InventoryTransaction       mTransaction{};
     std::uint64_t              mRuntimeId{};
     ActionType                 mActionType{};
     std::int32_t               mSlot{};
@@ -36,4 +39,4 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ItemUseOnActorInventoryTransaction::ActionType, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(ItemUseOnActorInventoryTransaction::ActionType, 0, 2)

@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/codec/actor/player/UUID.hpp"
+#include "sculk/protocol/codec/level/PresenceConfiguration.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -34,19 +35,10 @@ struct GatheringsConfigurationClientStoreEntryPointInfo {
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
-struct GatheringsConfigurationPresenceInfo {
-    std::string mExperienceName{};
-    std::string mWorldName{};
-
-    void write(BinaryStream& stream) const;
-
-    [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
-};
-
 struct ServerConfigurationJoinInfo {
     std::optional<GatheringsConfigurationJoinInfo>                  mGatheringsConfiguration{};
     std::optional<GatheringsConfigurationClientStoreEntryPointInfo> mStoreEntryPointInfo{};
-    std::optional<GatheringsConfigurationPresenceInfo>              mPresenceInfo{};
+    std::optional<PresenceConfiguration>                            mPresenceInfo{};
 
     void write(BinaryStream& stream) const;
 

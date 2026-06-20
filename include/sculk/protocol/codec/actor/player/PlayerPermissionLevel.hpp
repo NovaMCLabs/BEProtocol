@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class PlayerPermissionLevel : std::int32_t {
+enum class PlayerPermissionLevel : std::uint8_t {
     Visitor  = 0,
     Member   = 1,
     Operator = 2,
@@ -21,4 +21,4 @@ enum class PlayerPermissionLevel : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(PlayerPermissionLevel, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(PlayerPermissionLevel, 0, 3)

@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class AgentActionType : int {
+enum class AgentActionType : std::uint8_t {
     Attack            = 1,
     Collect           = 2,
     Destroy           = 3,
@@ -35,4 +35,4 @@ enum class AgentActionType : int {
 
 }
 
-SCULK_PROTOCOL_ENUM_RANGE(AgentActionType, 1, 18);
+SCULK_PROTOCOL_ENUM_RANGE(AgentActionType, 1, 18)

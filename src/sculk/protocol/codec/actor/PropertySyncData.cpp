@@ -10,23 +10,23 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void PropertySyncData::write(BinaryStream& stream) const {
-    stream.writeArray(mIntEntries, [&](const PropertySyncIntEntry& entry) {
+    stream.writeArray(mIntEntries, [](const PropertySyncIntEntry& entry, BinaryStream& stream) {
         stream.writeUnsignedVarInt(entry.mPropertyIndex);
         stream.writeVarInt(entry.mData);
     });
-    stream.writeArray(mFloatEntries, [&](const PropertySyncFloatEntry& entry) {
+    stream.writeArray(mFloatEntries, [](const PropertySyncFloatEntry& entry, BinaryStream& stream) {
         stream.writeUnsignedVarInt(entry.mPropertyIndex);
         stream.writeFloat(entry.mData);
     });
 }
 
 Result<> PropertySyncData::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readArray(mIntEntries, [&](PropertySyncIntEntry& entry) {
+    _SCULK_READ(stream.readArray(mIntEntries, [](PropertySyncIntEntry& entry, ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readUnsignedVarInt(entry.mPropertyIndex));
         _SCULK_READ(stream.readVarInt(entry.mData));
         return Result<>{};
     }));
-    return stream.readArray(mFloatEntries, [&](PropertySyncFloatEntry& entry) {
+    return stream.readArray(mFloatEntries, [](PropertySyncFloatEntry& entry, ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readUnsignedVarInt(entry.mPropertyIndex));
         return stream.readFloat(entry.mData);
     });

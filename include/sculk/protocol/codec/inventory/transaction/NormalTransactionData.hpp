@@ -6,16 +6,20 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "InventoryTransaction.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-class InventoryMismatchTransaction {
+class NormalTransactionData {
 public:
-    constexpr void write(BinaryStream&) const {}
+    InventoryTransaction mTransaction{};
 
-    [[nodiscard]] constexpr Result<> read(ReadOnlyBinaryStream&) { return {}; }
+public:
+    void write(BinaryStream&) const;
+
+    [[nodiscard]] Result<> read(ReadOnlyBinaryStream&);
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

@@ -65,7 +65,7 @@ Result<> PlayerListPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
     std::uint32_t entryCount{};
     _SCULK_READ(stream.readUnsignedVarInt(entryCount));
-    mPlayerEntryList.resize(entryCount);
+    mPlayerEntryList.resize(static_cast<std::size_t>(entryCount));
     if (mAction == ActionType::Add) {
         for (PlayerListEntry& entry : mPlayerEntryList) {
             _SCULK_READ(entry.read(stream));

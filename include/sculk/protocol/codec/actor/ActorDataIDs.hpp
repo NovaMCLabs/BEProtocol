@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class ActorDataIDs : std::uint32_t {
+enum class ActorDataIDs : std::uint8_t {
     Reserved0                        = 0,
     StructuralIntegrity              = 1,
     Variant                          = 2,
@@ -160,4 +160,4 @@ enum class ActorDataIDs : std::uint32_t {
 }
 
 
-SCULK_PROTOCOL_ENUM_RANGE(ActorDataIDs, 0, 141);
+SCULK_PROTOCOL_ENUM_RANGE(ActorDataIDs, 0, 141)

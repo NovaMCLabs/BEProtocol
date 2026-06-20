@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class MolangVersion : int {
+enum class MolangVersion : std::int8_t {
     Invalid                                = -1,
     BeforeVersioning                       = 0,
     Initial                                = 1,
@@ -35,4 +35,4 @@ enum class MolangVersion : int {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MolangVersion, -1, 14);
+SCULK_PROTOCOL_ENUM_RANGE(MolangVersion, -1, 14)

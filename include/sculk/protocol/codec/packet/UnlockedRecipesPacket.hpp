@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class UnlockedRecipesPacket : public IPacket {
 public:
-    enum class PacketType : std::uint32_t {
+    enum class PacketType : std::uint8_t {
         Empty                    = 0,
         InitiallyUnlockedRecipes = 1,
         NewlyUnlockedRecipes     = 2,
@@ -39,6 +39,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(UnlockedRecipesPacket::PacketType, 0, 4);
+SCULK_PROTOCOL_ENUM_RANGE(UnlockedRecipesPacket::PacketType, 0, 4)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(UnlockedRecipesPacket)

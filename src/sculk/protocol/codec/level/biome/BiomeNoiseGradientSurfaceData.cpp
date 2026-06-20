@@ -9,9 +9,23 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
+void BiomeNoiseGradientSurfaceData::SerializedNoiseBlockSpecifier::write(BinaryStream& stream) const {
+    stream.writeString(mNoise);
+    stream.writeFloat(mThreshold);
+    mRange.write(stream);
+    stream.writeUnsignedInt(mBlock);
+}
+
+Result<> BiomeNoiseGradientSurfaceData::SerializedNoiseBlockSpecifier::read(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readString(mNoise));
+    _SCULK_READ(stream.readFloat(mThreshold));
+    _SCULK_READ(mRange.read(stream));
+    return stream.readUnsignedInt(mBlock);
+}
+
 void BiomeNoiseGradientSurfaceData::write(BinaryStream& stream) const {
     stream.writeArray(mNonReplaceableBlocks, &BinaryStream::writeUnsignedInt);
-    stream.writeArray(mGradientBlocks, &BinaryStream::writeUnsignedInt);
+    stream.writeArray(mGradientBlocks, &SerializedNoiseBlockSpecifier::write);
     stream.writeString(mNoiseSeed);
     stream.writeSignedInt(mFirstOctave);
     stream.writeArray(mAmplitudes, &BinaryStream::writeFloat);
@@ -19,7 +33,7 @@ void BiomeNoiseGradientSurfaceData::write(BinaryStream& stream) const {
 
 Result<> BiomeNoiseGradientSurfaceData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mNonReplaceableBlocks, &ReadOnlyBinaryStream::readUnsignedInt));
-    _SCULK_READ(stream.readArray(mGradientBlocks, &ReadOnlyBinaryStream::readUnsignedInt));
+    _SCULK_READ(stream.readArray(mGradientBlocks, &SerializedNoiseBlockSpecifier::read));
     _SCULK_READ(stream.readString(mNoiseSeed));
     _SCULK_READ(stream.readSignedInt(mFirstOctave));
     return stream.readArray(mAmplitudes, &ReadOnlyBinaryStream::readFloat);

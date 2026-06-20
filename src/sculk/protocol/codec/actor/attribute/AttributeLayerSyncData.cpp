@@ -10,13 +10,15 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 void AttributeLayerSyncData::write(BinaryStream& stream) const {
-    stream.writeVariantIndex<std::uint32_t>(mData, &BinaryStream::writeUnsignedVarInt);
-    std::visit([&](const auto& value) { value.write(stream); }, mData);
+    stream.writeVariant(mData, &BinaryStream::writeUnsignedVarInt, [&stream](const auto& value) {
+        value.write(stream);
+    });
 }
 
 Result<> AttributeLayerSyncData::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    return std::visit([&](auto& value) { return value.read(stream); }, mData);
+    return stream.readVariant(mData, &ReadOnlyBinaryStream::readUnsignedVarInt, [&stream](auto& value) {
+        return value.read(stream);
+    });
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

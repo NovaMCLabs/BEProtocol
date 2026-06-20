@@ -7,15 +7,14 @@
 
 #pragma once
 #include "sculk/protocol/codec/inventory/container/LegacySetItemSlot.hpp"
-#include "sculk/protocol/codec/inventory/transaction/InventoryTransactionAction.hpp"
 #include "sculk/protocol/codec/inventory/transaction/InventoryTransactionData.hpp"
+#include "sculk/protocol/codec/inventory/transaction/ItemUseInventoryTransaction.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct PackedItemUseLegacyInventoryTransaction {
     std::int32_t                   mLegacyRequestRawId{};
     std::vector<LegacySetItemSlot> mLegacySetItemSlots{};
-    InventoryTransactionActions    mTransactionActions{};
     ItemUseInventoryTransaction    mItemUseTransaction{};
 
     void write(BinaryStream& stream) const;

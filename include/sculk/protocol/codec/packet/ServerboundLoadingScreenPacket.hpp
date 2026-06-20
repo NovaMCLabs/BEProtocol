@@ -14,7 +14,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class ServerboundLoadingScreenPacket : public IPacket {
 public:
-    enum class Type : std::int32_t {
+    enum class Type : std::int8_t {
         Unknown            = 0,
         StartLoadingScreen = 1,
         EndLoadingScreen   = 2,
@@ -38,6 +38,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ServerboundLoadingScreenPacket::Type, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(ServerboundLoadingScreenPacket::Type, 0, 2)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(ServerboundLoadingScreenPacket)

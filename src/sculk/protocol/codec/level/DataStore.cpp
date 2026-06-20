@@ -13,14 +13,14 @@ void DataStoreUpdate::write(BinaryStream& stream) const {
     stream.writeString(mName);
     stream.writeString(mProperty);
     stream.writeString(mPath);
-    stream.writeVariantIndex<std::uint32_t>(mData, &BinaryStream::writeUnsignedVarInt);
-    std::visit(
+    stream.writeVariant(
+        mData,
+        &BinaryStream::writeUnsignedVarInt,
         Overload{
             [&](double value) { stream.writeDouble(value); },
             [&](bool value) { stream.writeBool(value); },
             [&](const std::string& value) { stream.writeString(value); },
-        },
-        mData
+        }
     );
     stream.writeUnsignedInt(mPropertyUpdateCount);
     stream.writeUnsignedInt(mPathUpdateCount);
@@ -30,17 +30,15 @@ Result<> DataStoreUpdate::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mName));
     _SCULK_READ(stream.readString(mProperty));
     _SCULK_READ(stream.readString(mPath));
-    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    _SCULK_READ(
-        std::visit(
-            Overload{
-                [&](double& value) { return stream.readDouble(value); },
-                [&](bool& value) { return stream.readBool(value); },
-                [&](std::string& value) { return stream.readString(value); },
-            },
-            mData
-        )
-    );
+    _SCULK_READ(stream.readVariant(
+        mData,
+        &ReadOnlyBinaryStream::readUnsignedVarInt,
+        Overload{
+            [&](double& value) { return stream.readDouble(value); },
+            [&](bool& value) { return stream.readBool(value); },
+            [&](std::string& value) { return stream.readString(value); },
+        }
+    ));
     _SCULK_READ(stream.readUnsignedInt(mPropertyUpdateCount));
     return stream.readUnsignedInt(mPathUpdateCount);
 }
@@ -49,14 +47,14 @@ void DataStoreChange::write(BinaryStream& stream) const {
     stream.writeString(mName);
     stream.writeString(mProperty);
     stream.writeUnsignedInt(mUpdateCount);
-    stream.writeVariantIndex<std::uint32_t>(mData, &BinaryStream::writeUnsignedVarInt);
-    std::visit(
+    stream.writeVariant(
+        mData,
+        &BinaryStream::writeUnsignedVarInt,
         Overload{
             [&](double value) { stream.writeDouble(value); },
             [&](bool value) { stream.writeBool(value); },
             [&](const std::string& value) { stream.writeString(value); },
-        },
-        mData
+        }
     );
 }
 
@@ -64,14 +62,14 @@ Result<> DataStoreChange::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mName));
     _SCULK_READ(stream.readString(mProperty));
     _SCULK_READ(stream.readUnsignedInt(mUpdateCount));
-    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mData, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    return std::visit(
+    return stream.readVariant(
+        mData,
+        &ReadOnlyBinaryStream::readUnsignedVarInt,
         Overload{
             [&](double& value) { return stream.readDouble(value); },
             [&](bool& value) { return stream.readBool(value); },
             [&](std::string& value) { return stream.readString(value); },
-        },
-        mData
+        }
     );
 }
 

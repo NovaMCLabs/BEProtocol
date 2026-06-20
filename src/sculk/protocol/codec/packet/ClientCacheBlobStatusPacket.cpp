@@ -19,30 +19,13 @@ MinecraftPacketIds ClientCacheBlobStatusPacket::getId() const noexcept {
 std::string_view ClientCacheBlobStatusPacket::getName() const noexcept { return "ClientCacheBlobStatusPacket"; }
 
 void ClientCacheBlobStatusPacket::write(BinaryStream& stream) const {
-    stream.writeUnsignedVarInt(static_cast<std::uint32_t>(mMissingIds.size()));
-    stream.writeUnsignedVarInt(static_cast<std::uint32_t>(mFoundIds.size()));
-    for (const auto& id : mMissingIds) {
-        stream.writeUnsignedInt64(id);
-    }
-    for (const auto& id : mFoundIds) {
-        stream.writeUnsignedInt64(id);
-    }
+    stream.writeArray(mMissingIds, &BinaryStream::writeUnsignedInt64);
+    stream.writeArray(mFoundIds, &BinaryStream::writeUnsignedInt64);
 }
 
 Result<> ClientCacheBlobStatusPacket::read(ReadOnlyBinaryStream& stream) {
-    std::uint32_t missingSize{};
-    std::uint32_t foundSize{};
-    _SCULK_READ(stream.readUnsignedVarInt(missingSize));
-    _SCULK_READ(stream.readUnsignedVarInt(foundSize));
-    mMissingIds.resize(missingSize);
-    for (auto& id : mMissingIds) {
-        _SCULK_READ(stream.readUnsignedInt64(id));
-    }
-    mFoundIds.resize(foundSize);
-    for (auto& id : mFoundIds) {
-        _SCULK_READ(stream.readUnsignedInt64(id));
-    }
-    return {};
+    _SCULK_READ(stream.readArray(mMissingIds, &ReadOnlyBinaryStream::readUnsignedInt64));
+    return stream.readArray(mFoundIds, &ReadOnlyBinaryStream::readUnsignedInt64);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

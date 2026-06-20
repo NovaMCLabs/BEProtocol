@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class SetDisplayObjectivePacket : public IPacket {
 public:
-    enum class ObjectiveSortOrder : std::int32_t {
+    enum class ObjectiveSortOrder : std::uint8_t {
         Ascending  = 0,
         Descending = 1,
     };
@@ -39,6 +39,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SetDisplayObjectivePacket::ObjectiveSortOrder, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(SetDisplayObjectivePacket::ObjectiveSortOrder, 0, 1)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(SetDisplayObjectivePacket)

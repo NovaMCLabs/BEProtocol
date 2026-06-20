@@ -13,7 +13,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class ClientboundMapItemDataType : std::uint32_t {
+enum class ClientboundMapItemDataType : std::uint8_t {
     Invalid          = 0,
     TextureUpdate    = 1 << 1,
     DecorationUpdate = 1 << 2,
@@ -33,4 +33,4 @@ operator&(const ClientboundMapItemDataType lhs, const ClientboundMapItemDataType
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ClientboundMapItemDataType, 0, 14);
+SCULK_PROTOCOL_ENUM_RANGE(ClientboundMapItemDataType, 0, 15)

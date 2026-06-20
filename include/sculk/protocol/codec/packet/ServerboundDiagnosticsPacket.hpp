@@ -141,6 +141,18 @@ public:
         [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
     };
 
+    struct ScopeDataSummary {
+        std::string   mLabel{};
+        std::string   mIndentation{};
+        std::uint64_t mTotalHighCostNS{};
+        std::uint64_t mTotalMidCostNS{};
+        std::uint64_t mTotalLowCostNS{};
+
+        void write(BinaryStream& stream) const;
+
+        [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+    };
+
 public:
     float                                   mAvgFps{};
     float                                   mAvgServerSimTickTimeMS{};
@@ -154,6 +166,7 @@ public:
     std::vector<MemoryCategoryCounter>      mMemoryCategoryValues{};
     std::vector<EntityDiagnosticTimingInfo> mEntityDiagnostics{};
     std::vector<SystemDiagnosticTimingInfo> mSystemDiagnostics{};
+    std::vector<ScopeDataSummary>           mScopeDataSummaries{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -169,6 +182,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ServerboundDiagnosticsPacket::MemoryCategory, 0, 91);
+SCULK_PROTOCOL_ENUM_RANGE(ServerboundDiagnosticsPacket::MemoryCategory, 0, 91)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(ServerboundDiagnosticsPacket)

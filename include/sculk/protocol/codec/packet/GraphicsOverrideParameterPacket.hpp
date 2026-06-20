@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-class GraphicsParameterOverridePacket : public IPacket {
+class GraphicsOverrideParameterPacket : public IPacket {
 public:
     enum class Type : std::uint8_t {
         SkyZenithColor          = 0,
@@ -76,11 +76,12 @@ public:
 
 public:
     std::vector<ParameterKeyFrame> mParameterKeyFrameValues{};
+    std::optional<float>           mFloatValue{};
+    std::optional<Vec3>            mVec3Value{};
     std::string                    mBiomeIdentifier{};
+    std::optional<std::string>     mPlayerIdentifier{};
     Type                           mParameterType{};
     bool                           mResetParameter{};
-    float                          mFloatValue{};
-    Vec3                           mVec3Value{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;
@@ -96,6 +97,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(GraphicsParameterOverridePacket::Type, 0, 51);
+SCULK_PROTOCOL_ENUM_RANGE(GraphicsOverrideParameterPacket::Type, 0, 51)
 
-SCULK_PROTOCOL_PACKET_FORMATTER(GraphicsParameterOverridePacket)
+SCULK_PROTOCOL_PACKET_FORMATTER(GraphicsOverrideParameterPacket)

@@ -18,20 +18,20 @@ std::string_view MobArmorEquipmentPacket::getName() const noexcept { return "Mob
 
 void MobArmorEquipmentPacket::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt64(mRuntimeId);
-    mHead.write(stream);
-    mTorso.write(stream);
-    mLegs.write(stream);
-    mFeet.write(stream);
-    mBody.write(stream);
+    mHead.writeCereal(stream);
+    mTorso.writeCereal(stream);
+    mLegs.writeCereal(stream);
+    mFeet.writeCereal(stream);
+    mBody.writeCereal(stream);
 }
 
 Result<> MobArmorEquipmentPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt64(mRuntimeId));
-    _SCULK_READ(mHead.read(stream));
-    _SCULK_READ(mTorso.read(stream));
-    _SCULK_READ(mLegs.read(stream));
-    _SCULK_READ(mFeet.read(stream));
-    return mBody.read(stream);
+    _SCULK_READ(mHead.readCereal(stream));
+    _SCULK_READ(mTorso.readCereal(stream));
+    _SCULK_READ(mLegs.readCereal(stream));
+    _SCULK_READ(mFeet.readCereal(stream));
+    return mBody.readCereal(stream);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

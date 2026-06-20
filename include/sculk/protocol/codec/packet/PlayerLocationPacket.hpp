@@ -14,7 +14,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class PlayerLocationPacket : public IPacket {
 public:
-    enum class Type : std::int32_t {
+    enum class Type : std::int8_t {
         PlayerLocationCoordinates = 0,
         PlayerLocationHide        = 1,
     };
@@ -38,6 +38,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(PlayerLocationPacket::Type, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(PlayerLocationPacket::Type, 0, 1)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(PlayerLocationPacket)

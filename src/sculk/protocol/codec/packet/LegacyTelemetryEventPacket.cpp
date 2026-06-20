@@ -22,8 +22,9 @@ void LegacyTelemetryEventPacket::write(BinaryStream& stream) const {
     stream.writeVarInt64(mActorUniqueId);
     stream.writeEnum(mEventType, &BinaryStream::writeVarInt);
     stream.writeByte(mUsePlayerId);
-    stream.writeVariantIndex<std::uint32_t>(mEventData, &BinaryStream::writeUnsignedVarInt);
-    std::visit(
+    stream.writeVariant(
+        mEventData,
+        &BinaryStream::writeUnsignedVarInt,
         Overload{
             [&](const Achievement& data) { stream.writeVarInt(static_cast<std::int32_t>(data.mAchievementId)); },
             [&](const Interaction& data) {
@@ -106,8 +107,7 @@ void LegacyTelemetryEventPacket::write(BinaryStream& stream) const {
                 stream.writeSignedInt(data.mCount);
             },
             [&](const std::monostate&) {}
-        },
-        mEventData
+        }
     );
 }
 
@@ -115,13 +115,14 @@ Result<> LegacyTelemetryEventPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt64(mActorUniqueId));
     _SCULK_READ(stream.readEnum(mEventType, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readByte(mUsePlayerId));
-    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mEventData, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    return std::visit(
+    return stream.readVariant(
+        mEventData,
+        &ReadOnlyBinaryStream::readUnsignedVarInt,
         Overload{
             [&](Achievement& data) {
                 std::int32_t achievementId{};
                 _SCULK_READ(stream.readVarInt(achievementId));
-                data.mAchievementId = static_cast<AchievementIds>(achievementId);
+                data.mAchievementId = static_cast<AchievementIDs>(achievementId);
                 return Result<>{};
             },
             [&](Interaction& data) {
@@ -227,8 +228,7 @@ Result<> LegacyTelemetryEventPacket::read(ReadOnlyBinaryStream& stream) {
                 return Result<>{};
             },
             [&](std::monostate&) { return Result<>{}; }
-        },
-        mEventData
+        }
     );
 }
 

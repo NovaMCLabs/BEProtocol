@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class NpcDialoguePacket : public IPacket {
 public:
-    enum class ActionType : std::int32_t {
+    enum class ActionType : std::uint8_t {
         Open  = 0,
         Close = 1,
     };
@@ -40,6 +40,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(NpcDialoguePacket::ActionType, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(NpcDialoguePacket::ActionType, 0, 1)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(NpcDialoguePacket)

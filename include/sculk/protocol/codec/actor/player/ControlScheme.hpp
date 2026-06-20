@@ -22,4 +22,4 @@ enum class ControlScheme : std::uint8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ControlScheme, 0, 4);
+SCULK_PROTOCOL_ENUM_RANGE(ControlScheme, 0, 4)

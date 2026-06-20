@@ -13,14 +13,14 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct BiomeCoordinateData {
-    enum class RandomDistributionType : std::int32_t {
+    enum class RandomDistributionType : std::uint8_t {
         SingleValued    = 0,
         Uniform         = 1,
         Gaussian        = 2,
         InverseGaussian = 3,
         FixedGrid       = 4,
         JitteredGrid    = 5,
-        Triangle        = 6
+        Triangle        = 6,
     };
 
     std::int32_t           mMinValueType{};
@@ -38,4 +38,4 @@ struct BiomeCoordinateData {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(BiomeCoordinateData::RandomDistributionType, 0, 6);
+SCULK_PROTOCOL_ENUM_RANGE(BiomeCoordinateData::RandomDistributionType, 0, 6)

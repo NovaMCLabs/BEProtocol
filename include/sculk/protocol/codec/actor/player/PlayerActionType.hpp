@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class PlayerActionType : std::int32_t {
+enum class PlayerActionType : std::int8_t {
     Unknown               = -1,
     StartDestroyBlock     = 0,
     AbortDestroyBlock     = 1,
@@ -57,4 +57,4 @@ enum class PlayerActionType : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(PlayerActionType, -1, 38);
+SCULK_PROTOCOL_ENUM_RANGE(PlayerActionType, -1, 38)

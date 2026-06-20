@@ -14,8 +14,7 @@ void PackedItemUseLegacyInventoryTransaction::write(BinaryStream& stream) const 
     if (mLegacyRequestRawId < -1 && (mLegacyRequestRawId & 1) == 0) {
         stream.writeArray(mLegacySetItemSlots, &LegacySetItemSlot::write);
     }
-    mTransactionActions.write(stream);
-    mItemUseTransaction.write(stream);
+    mItemUseTransaction.writeLegacy(stream);
 }
 
 Result<> PackedItemUseLegacyInventoryTransaction::read(ReadOnlyBinaryStream& stream) {
@@ -23,8 +22,7 @@ Result<> PackedItemUseLegacyInventoryTransaction::read(ReadOnlyBinaryStream& str
     if (mLegacyRequestRawId < -1 && (mLegacyRequestRawId & 1) == 0) {
         _SCULK_READ(stream.readArray(mLegacySetItemSlots, &LegacySetItemSlot::read));
     }
-    _SCULK_READ(mTransactionActions.read(stream));
-    return mItemUseTransaction.read(stream);
+    return mItemUseTransaction.readLegacy(stream);
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

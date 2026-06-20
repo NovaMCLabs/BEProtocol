@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class PlayStatus : std::int32_t {
+enum class PlayStatus : std::uint8_t {
     LoginSuccess                             = 0,
     LoginFailedClientOld                     = 1,
     LoginFailedServerOld                     = 2,
@@ -27,4 +27,4 @@ enum class PlayStatus : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(PlayStatus, 0, 9);
+SCULK_PROTOCOL_ENUM_RANGE(PlayStatus, 0, 9)

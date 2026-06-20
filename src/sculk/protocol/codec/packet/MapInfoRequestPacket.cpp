@@ -28,22 +28,13 @@ std::string_view MapInfoRequestPacket::getName() const noexcept { return "MapInf
 
 void MapInfoRequestPacket::write(BinaryStream& stream) const {
     stream.writeVarInt64(mMapUniqueId);
-    stream.writeUnsignedInt(static_cast<std::uint32_t>(mClientPixels.size()));
-    for (const auto& pixel : mClientPixels) {
-        pixel.write(stream);
-    }
+    stream.writeArray(mClientPixels, &BinaryStream::writeUnsignedInt, &MapInfoRequestPacket::ClientPixel::write);
 }
 
 Result<> MapInfoRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt64(mMapUniqueId));
-    std::uint32_t pixelCount{};
-    _SCULK_READ(stream.readUnsignedInt(pixelCount));
-    mClientPixels.clear();
-    mClientPixels.resize(pixelCount);
-    for (auto& pixel : mClientPixels) {
-        _SCULK_READ(pixel.read(stream));
-    }
-    return {};
+    return stream
+        .readArray(mClientPixels, &ReadOnlyBinaryStream::readUnsignedInt, &MapInfoRequestPacket::ClientPixel::read);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

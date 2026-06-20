@@ -22,21 +22,12 @@ std::string_view ResourcePackClientResponsePacket::getName() const noexcept {
 
 void ResourcePackClientResponsePacket::write(BinaryStream& stream) const {
     stream.writeByte(mResponse);
-    stream.writeUnsignedShort(static_cast<std::uint16_t>(mPackIds.size()));
-    for (const auto& packId : mPackIds) {
-        stream.writeString(packId);
-    }
+    stream.writeArray(mPackIds, &BinaryStream::writeUnsignedShort, &BinaryStream::writeString);
 }
 
 Result<> ResourcePackClientResponsePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readByte(mResponse));
-    std::uint16_t size{};
-    _SCULK_READ(stream.readUnsignedShort(size));
-    mPackIds.resize(size);
-    for (std::uint16_t i = 0; i < size; ++i) {
-        _SCULK_READ(stream.readString(mPackIds[i]));
-    }
-    return {};
+    return stream.readArray(mPackIds, &ReadOnlyBinaryStream::readUnsignedShort, &ReadOnlyBinaryStream::readString);
 }
 
 #ifdef SCULK_PROTOCOL_ENABLE_FORMATTING

@@ -9,7 +9,7 @@
 #include "sculk/protocol/codec/actor/ActorType.hpp"
 #include "sculk/protocol/codec/actor/InteractionType.hpp"
 #include "sculk/protocol/codec/actor/POIBlockInteractionType.hpp"
-#include "sculk/protocol/codec/actor/player/AchievementIds.hpp"
+#include "sculk/protocol/codec/level/AchievementIDs.hpp"
 #include "sculk/protocol/codec/level/LegacyTelemetryEventType.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include <variant>
@@ -19,7 +19,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 class LegacyTelemetryEventPacket : public IPacket {
 public:
     struct Achievement {
-        AchievementIds mAchievementId{};
+        AchievementIDs mAchievementId{};
     };
 
     struct Interaction {

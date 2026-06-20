@@ -45,6 +45,7 @@ public:
     bool                                       mClientGen{};
     bool                                       mEnableHashId{};
     bool                                       mServerAuthSound{};
+    bool                                       mIsLoggingChat{};
     std::optional<ServerConfigurationJoinInfo> mServerConfigurationJoinInfo{};
     ServerTelemetryData                        mServerTelemetryData{};
 

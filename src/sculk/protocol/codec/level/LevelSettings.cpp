@@ -59,6 +59,8 @@ void LevelSettings::write(BinaryStream& stream) const {
     stream.writeBool(mForceExperimentalGameplay);
     stream.writeByte(mChatRestrictionLevel);
     stream.writeBool(mDisablePlayerInteractions);
+    stream.writeVarInt(mServerEditorConnectionPolicy);
+    stream.writeBool(mAllowAnonymousBlockDropsInEditorWorlds);
 }
 
 Result<> LevelSettings::read(ReadOnlyBinaryStream& stream) {
@@ -110,7 +112,9 @@ Result<> LevelSettings::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mEduResourceUri));
     _SCULK_READ(stream.readBool(mForceExperimentalGameplay));
     _SCULK_READ(stream.readByte(mChatRestrictionLevel));
-    return stream.readBool(mDisablePlayerInteractions);
+    _SCULK_READ(stream.readBool(mDisablePlayerInteractions));
+    _SCULK_READ(stream.readVarInt(mServerEditorConnectionPolicy));
+    return stream.readBool(mAllowAnonymousBlockDropsInEditorWorlds);
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

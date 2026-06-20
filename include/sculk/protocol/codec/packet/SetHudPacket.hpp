@@ -14,7 +14,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class SetHudPacket : public IPacket {
 public:
-    enum class HudElement : std::int32_t {
+    enum class HudElement : std::int8_t {
         PaperDoll     = 0,
         Armor         = 1,
         ToolTips      = 2,
@@ -31,7 +31,7 @@ public:
         Count         = 13,
     };
 
-    enum class HudVisibility : std::int32_t {
+    enum class HudVisibility : std::int8_t {
         Hide  = 0,
         Reset = 1,
         Count = 2,
@@ -55,7 +55,7 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(SetHudPacket::HudElement, 0, 13);
-SCULK_PROTOCOL_ENUM_RANGE(SetHudPacket::HudVisibility, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(SetHudPacket::HudElement, 0, 13)
+SCULK_PROTOCOL_ENUM_RANGE(SetHudPacket::HudVisibility, 0, 2)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(SetHudPacket)

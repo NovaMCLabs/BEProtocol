@@ -41,26 +41,16 @@ Result<> GatheringsConfigurationClientStoreEntryPointInfo::read(ReadOnlyBinarySt
     return stream.readString(mStoreName);
 }
 
-void GatheringsConfigurationPresenceInfo::write(BinaryStream& stream) const {
-    stream.writeString(mExperienceName);
-    stream.writeString(mWorldName);
-}
-
-Result<> GatheringsConfigurationPresenceInfo::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readString(mExperienceName));
-    return stream.readString(mWorldName);
-}
-
 void ServerConfigurationJoinInfo::write(BinaryStream& stream) const {
     stream.writeOptional(mGatheringsConfiguration, &GatheringsConfigurationJoinInfo::write);
     stream.writeOptional(mStoreEntryPointInfo, &GatheringsConfigurationClientStoreEntryPointInfo::write);
-    stream.writeOptional(mPresenceInfo, &GatheringsConfigurationPresenceInfo::write);
+    stream.writeOptional(mPresenceInfo, &PresenceConfiguration::write);
 }
 
 Result<> ServerConfigurationJoinInfo::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mGatheringsConfiguration, &GatheringsConfigurationJoinInfo::read));
     _SCULK_READ(stream.readOptional(mStoreEntryPointInfo, &GatheringsConfigurationClientStoreEntryPointInfo::read));
-    return stream.readOptional(mPresenceInfo, &GatheringsConfigurationPresenceInfo::read);
+    return stream.readOptional(mPresenceInfo, &PresenceConfiguration::read);
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

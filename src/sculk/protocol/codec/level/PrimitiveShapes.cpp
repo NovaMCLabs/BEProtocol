@@ -22,13 +22,14 @@ void PrimitiveShapes::write(BinaryStream& stream) const {
     stream.writeOptional(mColor, &BinaryStream::writeSignedInt);
     stream.writeOptional(mDimensionId, &BinaryStream::writeVarInt);
     stream.writeOptional(mAttachedToEntityId, &BinaryStream::writeVarInt64);
-    stream.writeVariantIndex<std::uint32_t>(mShape, &BinaryStream::writeUnsignedVarInt);
-    std::visit(
+    stream.writeVariant(
+        mShape,
+        &BinaryStream::writeUnsignedVarInt,
         Overload{
-            [&](const PrimitiveLine& line) { line.mLineEndLocation.write(stream); },
-            [&](const PrimitiveBox& box) { box.mBoxBound.write(stream); },
-            [&](const PrimitiveSegments& segments) { stream.writeByte(segments.mSegments); },
-            [&](const PrimitiveText& text) {
+            [&](const LineDataPayload& line) { line.mLineEndLocation.write(stream); },
+            [&](const BoxDataPayload& box) { box.mBoxBound.write(stream); },
+            [&](const SphereDataPayload& sphere) { stream.writeByte(sphere.mSegments); },
+            [&](const TextDataPayload& text) {
                 stream.writeString(text.mText);
                 stream.writeBool(text.mUseRotation);
                 stream.writeOptional(text.mBackgroundColor, &BinaryStream::writeSignedInt);
@@ -36,15 +37,34 @@ void PrimitiveShapes::write(BinaryStream& stream) const {
                 stream.writeBool(text.mShowBackface);
                 stream.writeBool(text.mShowTextBackface);
             },
-            [&](const PrimitiveArrow& arrow) {
+            [&](const ArrowDataPayload& arrow) {
                 stream.writeOptional(arrow.mArrowEndLocation, &Vec3::write);
                 stream.writeOptional(arrow.mArrowHeadLength, &BinaryStream::writeFloat);
                 stream.writeOptional(arrow.mArrowHeadRadius, &BinaryStream::writeFloat);
                 stream.writeOptional(arrow.mArrowSegments, &BinaryStream::writeByte);
             },
+            [&](const CylinderDataPayload& cylinder) {
+                cylinder.mRadiusX.write(stream);
+                cylinder.mRadiusZ.write(stream);
+                stream.writeFloat(cylinder.mHeight);
+                stream.writeByte(cylinder.mNumSegments);
+            },
+            [&](const PyramidDataPayload& pyramid) {
+                stream.writeFloat(pyramid.mWidth);
+                stream.writeOptional(pyramid.mDepth, &BinaryStream::writeFloat);
+                stream.writeFloat(pyramid.mHeight);
+            },
+            [&](const EllipsoidDataPayload& ellipsoid) {
+                ellipsoid.mRadii.write(stream);
+                stream.writeByte(ellipsoid.mSegmentsPerAxis);
+            },
+            [&](const ConeDataPayload& cone) {
+                cone.mRadii.write(stream);
+                stream.writeFloat(cone.mHeight);
+                stream.writeByte(cone.mNumSegments);
+            },
             [&](const auto&) {}
-        },
-        mShape
+        }
     );
 }
 
@@ -61,13 +81,14 @@ Result<> PrimitiveShapes::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mColor, &ReadOnlyBinaryStream::readSignedInt));
     _SCULK_READ(stream.readOptional(mDimensionId, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readOptional(mAttachedToEntityId, &ReadOnlyBinaryStream::readVarInt64));
-    _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mShape, &ReadOnlyBinaryStream::readUnsignedVarInt));
-    return std::visit(
+    return stream.readVariant(
+        mShape,
+        &ReadOnlyBinaryStream::readUnsignedVarInt,
         Overload{
-            [&](PrimitiveLine& line) { return line.mLineEndLocation.read(stream); },
-            [&](PrimitiveBox& box) { return box.mBoxBound.read(stream); },
-            [&](PrimitiveSegments& segments) { return stream.readByte(segments.mSegments); },
-            [&](PrimitiveText& text) {
+            [&](LineDataPayload& line) { return line.mLineEndLocation.read(stream); },
+            [&](BoxDataPayload& box) { return box.mBoxBound.read(stream); },
+            [&](SphereDataPayload& sphere) { return stream.readByte(sphere.mSegments); },
+            [&](TextDataPayload& text) {
                 _SCULK_READ(stream.readString(text.mText));
                 _SCULK_READ(stream.readBool(text.mUseRotation));
                 _SCULK_READ(stream.readOptional(text.mBackgroundColor, &ReadOnlyBinaryStream::readSignedInt));
@@ -75,15 +96,34 @@ Result<> PrimitiveShapes::read(ReadOnlyBinaryStream& stream) {
                 _SCULK_READ(stream.readBool(text.mShowBackface));
                 return stream.readBool(text.mShowTextBackface);
             },
-            [&](PrimitiveArrow& arrow) {
+            [&](ArrowDataPayload& arrow) {
                 _SCULK_READ(stream.readOptional(arrow.mArrowEndLocation, &Vec3::read));
                 _SCULK_READ(stream.readOptional(arrow.mArrowHeadLength, &ReadOnlyBinaryStream::readFloat));
                 _SCULK_READ(stream.readOptional(arrow.mArrowHeadRadius, &ReadOnlyBinaryStream::readFloat));
                 return stream.readOptional(arrow.mArrowSegments, &ReadOnlyBinaryStream::readByte);
             },
+            [&](CylinderDataPayload& cylinder) {
+                _SCULK_READ(cylinder.mRadiusX.read(stream));
+                _SCULK_READ(cylinder.mRadiusZ.read(stream));
+                _SCULK_READ(stream.readFloat(cylinder.mHeight));
+                return stream.readByte(cylinder.mNumSegments);
+            },
+            [&](PyramidDataPayload& pyramid) {
+                _SCULK_READ(stream.readFloat(pyramid.mWidth));
+                _SCULK_READ(stream.readOptional(pyramid.mDepth, &ReadOnlyBinaryStream::readFloat));
+                return stream.readFloat(pyramid.mHeight);
+            },
+            [&](EllipsoidDataPayload& ellipsoid) {
+                _SCULK_READ(ellipsoid.mRadii.read(stream));
+                return stream.readByte(ellipsoid.mSegmentsPerAxis);
+            },
+            [&](ConeDataPayload& cone) {
+                _SCULK_READ(cone.mRadii.read(stream));
+                _SCULK_READ(stream.readFloat(cone.mHeight));
+                return stream.readByte(cone.mNumSegments);
+            },
             [&](auto&) { return Result<>{}; }
-        },
-        mShape
+        }
     );
 }
 

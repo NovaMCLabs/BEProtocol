@@ -22,20 +22,11 @@ Result<> PlayerBlockActionData::read(ReadOnlyBinaryStream& stream) {
 }
 
 void PlayerBlockActions::write(BinaryStream& stream) const {
-    stream.writeVarInt(static_cast<int>(mActions.size()));
-    for (const auto& action : mActions) {
-        action.write(stream);
-    }
+    stream.writeArray(mActions, &BinaryStream::writeVarInt, &PlayerBlockActionData::write);
 }
 
 Result<> PlayerBlockActions::read(ReadOnlyBinaryStream& stream) {
-    int actionCount{};
-    _SCULK_READ(stream.readVarInt(actionCount));
-    mActions.resize(static_cast<std::size_t>(actionCount));
-    for (auto& action : mActions) {
-        _SCULK_READ(action.read(stream));
-    }
-    return {};
+    return stream.readArray(mActions, &ReadOnlyBinaryStream::readVarInt, &PlayerBlockActionData::read);
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

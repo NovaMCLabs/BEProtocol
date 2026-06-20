@@ -56,4 +56,4 @@ enum class ContainerType : std::uint8_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(ContainerType, 0, 255);
+SCULK_PROTOCOL_ENUM_RANGE(ContainerType, 0, 255)

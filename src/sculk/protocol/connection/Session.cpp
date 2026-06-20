@@ -53,7 +53,7 @@ Session::~Session() { disconnect(); }
 
 bool Session::isCompressed() const noexcept { return mCompressionType.has_value(); }
 
-void Session::setCompressed(CompressionType type, std::int32_t threshold) noexcept {
+void Session::setCompressed(CompressionAlgorithm type, std::int32_t threshold) noexcept {
     (void)flushUnlocked();
     std::scoped_lock lock{mMutex};
     mCompressionType      = type;
@@ -171,15 +171,15 @@ bool Session::sendBatchedBufferImmediately(Buffer&& packetsBuffer) noexcept {
     BinaryStream compressedStream{finalBuffer};
 
     if (mCompressionType.has_value()) {
-        auto headerType = CompressionType::None;
+        auto headerType = CompressionAlgorithm::None;
         if (packetsBuffer.size() >= static_cast<std::size_t>(mCompressionThreshold)) {
             headerType = *mCompressionType;
             switch (headerType) {
-            case CompressionType::Zlib: {
+            case CompressionAlgorithm::Zlib: {
                 packetsBuffer = compression::zlib::compress(packetsBuffer);
                 break;
             }
-            case CompressionType::Snappy: {
+            case CompressionAlgorithm::Snappy: {
                 packetsBuffer = compression::snappy::compress(packetsBuffer);
                 break;
             }
@@ -346,15 +346,15 @@ Result<Session::Buffer> Session::serializeBatchedPackets(const BatchedBuffer& pa
     BinaryStream    compressedStream{finalBuffer};
 
     if (mCompressionType.has_value()) {
-        auto headerType = Session::CompressionType::None;
+        auto headerType = CompressionAlgorithm::None;
         if (packetsBuffer.size() >= static_cast<std::size_t>(mCompressionThreshold)) {
             headerType = *mCompressionType;
             switch (headerType) {
-            case Session::CompressionType::Zlib: {
+            case CompressionAlgorithm::Zlib: {
                 packetsBuffer = compression::zlib::compress(packetsBuffer);
                 break;
             }
-            case Session::CompressionType::Snappy: {
+            case CompressionAlgorithm::Snappy: {
                 packetsBuffer = compression::snappy::compress(packetsBuffer);
                 break;
             }
@@ -396,14 +396,14 @@ Result<Session::BatchedBuffer> Session::deserializeBatchPackets(std::span<const 
     Buffer               decompressedBuffer{};
 
     if (mCompressionType.has_value()) {
-        CompressionType type{};
+        CompressionAlgorithm type{};
         if (!compressedStream.readEnum(type, &ReadOnlyBinaryStream::readSignedChar)) {
             return error_utils::makeError("failed to read compression type from batch packet");
         }
 
         const auto compressedPayload = compressedStream.getLeftBufferView();
         switch (type) {
-        case CompressionType::Zlib: {
+        case CompressionAlgorithm::Zlib: {
             auto res = compression::zlib::decompress(compressedPayload);
             if (!res) {
                 return error_utils::makeError("zlib decompression failed");
@@ -411,7 +411,7 @@ Result<Session::BatchedBuffer> Session::deserializeBatchPackets(std::span<const 
             decompressedBuffer = std::move(*res);
             break;
         }
-        case CompressionType::Snappy: {
+        case CompressionAlgorithm::Snappy: {
             auto res = compression::snappy::decompress(compressedPayload);
             if (!res) {
                 return error_utils::makeError("snappy decompression failed");
@@ -419,7 +419,7 @@ Result<Session::BatchedBuffer> Session::deserializeBatchPackets(std::span<const 
             decompressedBuffer = std::move(*res);
             break;
         }
-        case CompressionType::None: {
+        case CompressionAlgorithm::None: {
             decompressedBuffer.assign(compressedPayload.begin(), compressedPayload.end());
             break;
         }

@@ -12,7 +12,7 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class Difficulty : std::int32_t {
+enum class Difficulty : std::uint8_t {
     Peaceful = 0,
     Easy     = 1,
     Normal   = 2,
@@ -23,4 +23,4 @@ enum class Difficulty : std::int32_t {
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(Difficulty, 0, 5);
+SCULK_PROTOCOL_ENUM_RANGE(Difficulty, 0, 5)

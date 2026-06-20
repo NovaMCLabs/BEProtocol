@@ -13,7 +13,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 class MultiplayerSettingsPacket : public IPacket {
 public:
-    enum class Type : std::int32_t {
+    enum class Type : std::uint8_t {
         EnableMultiplayer  = 0,
         DisableMultiplayer = 1,
         RefreshJoincode    = 2,
@@ -36,6 +36,6 @@ public:
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(MultiplayerSettingsPacket::Type, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(MultiplayerSettingsPacket::Type, 0, 2)
 
 SCULK_PROTOCOL_PACKET_FORMATTER(MultiplayerSettingsPacket)

@@ -20,7 +20,7 @@ std::string_view SetScoreboardIdentityPacket::getName() const noexcept { return 
 
 void SetScoreboardIdentityPacket::write(BinaryStream& stream) const {
     stream.writeEnum(mType, &BinaryStream::writeByte);
-    stream.writeArray(mSetScoreboardIdentities, [&](const ScoreboardIdentity& data) {
+    stream.writeArray(mSetScoreboardIdentities, [this](const ScoreboardIdentity& data, BinaryStream& stream) {
         stream.writeVarInt64(data.mScoreboardId);
         if (mType == Type::Update) {
             stream.writeVarInt64(data.mPlayerUniqueId);
@@ -30,7 +30,7 @@ void SetScoreboardIdentityPacket::write(BinaryStream& stream) const {
 
 Result<> SetScoreboardIdentityPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
-    return stream.readArray(mSetScoreboardIdentities, [&](ScoreboardIdentity& data) {
+    return stream.readArray(mSetScoreboardIdentities, [this](ScoreboardIdentity& data, ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readVarInt64(data.mScoreboardId));
         if (mType == Type::Update) {
             _SCULK_READ(stream.readVarInt64(data.mPlayerUniqueId));

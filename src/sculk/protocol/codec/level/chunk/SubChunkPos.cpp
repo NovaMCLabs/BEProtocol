@@ -21,4 +21,16 @@ Result<> SubChunkPos::read(ReadOnlyBinaryStream& stream) {
     return stream.readVarInt(mZ);
 }
 
+void SubChunkPos::writeCereal(BinaryStream& stream) const {
+    stream.writeSignedInt(mX);
+    stream.writeSignedInt(mY);
+    stream.writeSignedInt(mZ);
+}
+
+Result<> SubChunkPos::readCereal(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readSignedInt(mX));
+    _SCULK_READ(stream.readSignedInt(mY));
+    return stream.readSignedInt(mZ);
+}
+
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
