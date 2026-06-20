@@ -30,15 +30,13 @@ std::string_view SubChunkRequestPacket::getName() const noexcept { return "SubCh
 
 void SubChunkRequestPacket::write(BinaryStream& stream) const {
     stream.writeVarInt(mDimensionType);
-    stream.writeArray(mSubChunkPosOffsetList, &BinaryStream::writeUnsignedInt, &SubChunkPosOffset::write);
+    stream.writeArray(mSubChunkPosOffsetList, &SubChunkPosOffset::write);
     mCenterPos.writeCereal(stream);
 }
 
 Result<> SubChunkRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt(mDimensionType));
-    _SCULK_READ(
-        stream.readArray(mSubChunkPosOffsetList, &ReadOnlyBinaryStream::readUnsignedInt, &SubChunkPosOffset::read)
-    );
+    _SCULK_READ(stream.readArray(mSubChunkPosOffsetList, &SubChunkPosOffset::read));
     return mCenterPos.readCereal(stream);
 }
 

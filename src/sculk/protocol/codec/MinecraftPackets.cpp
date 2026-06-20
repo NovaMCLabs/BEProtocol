@@ -301,7 +301,18 @@ Result<std::unique_ptr<IPacket>> MinecraftPackets::readAndCreatePacketFromStream
         return MAKE_ERROR("Failed to create packet", packet);
     }
     if (auto status = (*packet)->read(stream); !status) {
-        return MAKE_ERROR("Failed to read packet from stream", status);
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
+        return error_utils::makeError(
+            std::format(
+                "Failed to read {}({}) from stream: {}",
+                (*packet)->getName(),
+                std::to_underlying((*packet)->getId()),
+                status.error().mMessage
+            )
+        );
+#else
+        return error_utils::makeError("Failed to read packet from stream");
+#endif
     }
     return packet;
 }

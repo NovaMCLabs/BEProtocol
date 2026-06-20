@@ -344,7 +344,7 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
                                                address = packet->systemAddress,
                                                packet  = std::move(payload),
                                                errorMessage =
-                                                   std::string(packetExpected.error().message())]() mutable noexcept {
+                                                   std::string(packetExpected.error().mMessage)]() mutable noexcept {
                         mOnPacketParseFailed(guid, address, std::move(packet), errorMessage);
                     });
                 }

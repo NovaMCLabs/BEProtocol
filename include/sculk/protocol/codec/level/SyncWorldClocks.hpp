@@ -15,10 +15,10 @@
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct TimeMarkerData {
-    std::uint64_t mId{};
-    std::string   mName{};
-    std::int32_t  mTime{};
-    std::int32_t  mPeriod{};
+    std::uint64_t               mId{};
+    std::string                 mName{};
+    std::int32_t                mTime{};
+    std::optional<std::int32_t> mPeriod{};
 
     void write(BinaryStream& stream) const;
 

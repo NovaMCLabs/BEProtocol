@@ -13,14 +13,14 @@ void TimeMarkerData::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt64(mId);
     stream.writeString(mName);
     stream.writeVarInt(mTime);
-    stream.writeSignedInt(mPeriod);
+    stream.writeOptional(mPeriod, &BinaryStream::writeSignedInt);
 }
 
 Result<> TimeMarkerData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt64(mId));
     _SCULK_READ(stream.readString(mName));
     _SCULK_READ(stream.readVarInt(mTime));
-    return stream.readSignedInt(mPeriod);
+    return stream.readOptional(mPeriod, &ReadOnlyBinaryStream::readSignedInt);
 }
 
 void SyncWorldClockStateData::write(BinaryStream& stream) const {

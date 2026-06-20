@@ -302,7 +302,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
                     (void)mThreadPool->submit([this,
                                                buffer = std::move(payload),
                                                errorMessage =
-                                                   std::string(packetExpected.error().message())]() mutable noexcept {
+                                                   std::string(packetExpected.error().mMessage)]() mutable noexcept {
                         if (mOnPacketParseFailed) {
                             mOnPacketParseFailed(std::move(buffer), errorMessage);
                         }
