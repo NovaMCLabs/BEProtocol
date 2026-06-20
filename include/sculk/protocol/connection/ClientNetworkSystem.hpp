@@ -30,8 +30,9 @@ class ClientNetworkSystem final {
     friend class io::ClientIoRuntime;
 
 public:
-    using ConnectionEventCallback = std::function<void()>;
-    using PacketReceiveCallback   = std::function<void(std::unique_ptr<IPacket>&& packet)>;
+    using ConnectionEventCallback   = std::function<void()>;
+    using PacketReceiveCallback     = std::function<void(std::unique_ptr<IPacket>&& packet)>;
+    using PacketParseFailedCallback = std::function<void(Session::Buffer&& buffer, std::string errorMessage)>;
 
 public:
     explicit ClientNetworkSystem(std::size_t workerThreadCount = 0);
@@ -56,13 +57,15 @@ public:
 
     [[nodiscard]] bool getServerNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
-    bool setOnConnected(ConnectionEventCallback&& callback) noexcept;
+    Result<> setOnConnected(ConnectionEventCallback&& callback) noexcept;
 
-    bool setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
+    Result<> setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
 
-    bool setOnConnectionFailed(ConnectionEventCallback&& callback) noexcept;
+    Result<> setOnConnectionFailed(ConnectionEventCallback&& callback) noexcept;
 
-    bool setOnPacketReceive(PacketReceiveCallback&& callback);
+    Result<> setOnPacketReceive(PacketReceiveCallback&& callback) noexcept;
+
+    Result<> setOnPacketParseFailed(PacketParseFailedCallback&& callback) noexcept;
 
     [[nodiscard]] Session& getSession() const noexcept;
 
@@ -94,6 +97,7 @@ private:
     ConnectionEventCallback                                   mOnDisconnected{};
     ConnectionEventCallback                                   mOnConnectionFailed{};
     PacketReceiveCallback                                     mOnPacketReceive{};
+    PacketParseFailedCallback                                 mOnPacketParseFailed{};
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

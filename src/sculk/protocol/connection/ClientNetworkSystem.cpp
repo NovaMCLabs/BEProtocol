@@ -109,36 +109,49 @@ bool ClientNetworkSystem::getServerNetworkStatus(NetworkStatus& outStatus) const
     return true;
 }
 
-bool ClientNetworkSystem::setOnConnected(ConnectionEventCallback&& callback) noexcept {
+Result<> ClientNetworkSystem::setOnConnected(ConnectionEventCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on connected callback while running");
     }
     mOnConnected = std::move(callback);
-    return true;
+    return {};
 }
 
-bool ClientNetworkSystem::setOnDisconnected(ConnectionEventCallback&& callback) noexcept {
+Result<> ClientNetworkSystem::setOnDisconnected(ConnectionEventCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on disconnected callback while running");
     }
     mOnDisconnected = std::move(callback);
-    return true;
+    return {};
 }
 
-bool ClientNetworkSystem::setOnConnectionFailed(ConnectionEventCallback&& callback) noexcept {
+Result<> ClientNetworkSystem::setOnConnectionFailed(ConnectionEventCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on connection failed callback while running");
     }
     mOnConnectionFailed = std::move(callback);
-    return true;
+    return {};
 }
 
-bool ClientNetworkSystem::setOnPacketReceive(PacketReceiveCallback&& callback) {
+Result<> ClientNetworkSystem::setOnPacketReceive(PacketReceiveCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on packet receive callback while running");
     }
     mOnPacketReceive = std::move(callback);
-    return true;
+    return {};
+}
+
+Result<> ClientNetworkSystem::setOnPacketParseFailed(PacketParseFailedCallback&& callback) noexcept {
+    if (mRunning.load(std::memory_order_acquire)) {
+        return error_utils::makeError("Cannot set on packet parse failed callback while running");
+    }
+    if (!mOnPacketReceive) {
+        return error_utils::makeError(
+            "Cannot set on packet parse failed callback without setting on packet receive callback"
+        );
+    }
+    mOnPacketParseFailed = std::move(callback);
+    return {};
 }
 
 Session& ClientNetworkSystem::getSession() const noexcept { return *mSession.load(std::memory_order_acquire); }
@@ -210,10 +223,9 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         auto session = std::make_shared<Session>(mPeer.get(), remote);
         mSession.store(session, std::memory_order_release);
         if (mOnConnected) {
-            auto onConnected = mOnConnected;
-            (void)mThreadPool->submit([onConnected = std::move(onConnected)]() mutable noexcept {
-                if (onConnected) {
-                    onConnected();
+            (void)mThreadPool->submit([this]() mutable noexcept {
+                if (mOnConnected) {
+                    mOnConnected();
                 }
             });
         }
@@ -229,10 +241,9 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         }
 
         if (mOnDisconnected) {
-            auto onDisconnected = mOnDisconnected;
-            (void)mThreadPool->submit([onDisconnected = std::move(onDisconnected)]() mutable noexcept {
-                if (onDisconnected) {
-                    onDisconnected();
+            (void)mThreadPool->submit([this]() mutable noexcept {
+                if (mOnDisconnected) {
+                    mOnDisconnected();
                 }
             });
         }
@@ -249,10 +260,9 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         }
 
         if (mOnConnectionFailed) {
-            auto onConnectionFailed = mOnConnectionFailed;
-            (void)mThreadPool->submit([onConnectionFailed = std::move(onConnectionFailed)]() mutable noexcept {
-                if (onConnectionFailed) {
-                    onConnectionFailed();
+            (void)mThreadPool->submit([this]() mutable noexcept {
+                if (mOnConnectionFailed) {
+                    mOnConnectionFailed();
                 }
             });
         }
@@ -280,12 +290,25 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
     auto onPacketReceive = mOnPacketReceive;
     for (auto& payload : *packets) {
         if (onPacketReceive) {
-            auto packetObj = MinecraftPackets::readAndCreatePacketFromBuffer(payload);
-            (void)mThreadPool->submit([onPacketReceive, packet = std::move(packetObj)]() mutable noexcept {
-                if (onPacketReceive) {
-                    onPacketReceive(std::move(packet));
+            auto packetExpected = MinecraftPackets::readAndCreatePacketFromBuffer(payload);
+            if (packetExpected) {
+                (void)mThreadPool->submit([this, packet = std::move(*packetExpected)]() mutable noexcept {
+                    if (mOnPacketReceive) {
+                        mOnPacketReceive(std::move(packet));
+                    }
+                });
+            } else {
+                if (mOnPacketParseFailed) {
+                    (void)mThreadPool->submit([this,
+                                               buffer = std::move(payload),
+                                               errorMessage =
+                                                   std::string(packetExpected.error().message())]() mutable noexcept {
+                        if (mOnPacketParseFailed) {
+                            mOnPacketParseFailed(std::move(buffer), errorMessage);
+                        }
+                    });
                 }
-            });
+            }
         } else {
             (void)session->enqueueInboundPacket(std::move(payload));
         }

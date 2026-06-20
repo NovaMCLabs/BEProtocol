@@ -10,6 +10,7 @@
 #include "packet/IPacket.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/utility/Result.hpp"
 #include <memory>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -23,13 +24,14 @@ public:
     };
 
 public:
-    [[nodiscard]] static std::unique_ptr<IPacket> createPacket(MinecraftPacketIds packetId);
+    [[nodiscard]] static Result<std::unique_ptr<IPacket>> createPacket(MinecraftPacketIds packetId);
 
-    [[nodiscard]] static std::unique_ptr<IPacket> createPacket(const PacketHeader& header);
+    [[nodiscard]] static Result<std::unique_ptr<IPacket>> createPacket(const PacketHeader& header);
 
-    [[nodiscard]] static std::unique_ptr<IPacket> readAndCreatePacketFromStream(ReadOnlyBinaryStream& stream);
+    [[nodiscard]] static Result<std::unique_ptr<IPacket>> readAndCreatePacketFromStream(ReadOnlyBinaryStream& stream);
 
-    [[nodiscard]] static std::unique_ptr<IPacket> readAndCreatePacketFromBuffer(std::span<const std::byte> buffer);
+    [[nodiscard]] static Result<std::unique_ptr<IPacket>>
+    readAndCreatePacketFromBuffer(std::span<const std::byte> buffer);
 
     [[nodiscard]] static Result<PacketHeader> readPacketHeader(ReadOnlyBinaryStream& stream);
 

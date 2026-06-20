@@ -42,6 +42,12 @@ public:
         std::function<void(const RakNet::RakNetGUID& guid, const RakNet::SystemAddress& address)>;
     using PacketReceiveCallback = std::function<
         void(const RakNet::RakNetGUID& guid, const RakNet::SystemAddress& address, std::unique_ptr<IPacket>&& packet)>;
+    using PacketParseFailedCallback = std::function<void(
+        const RakNet::RakNetGUID&    guid,
+        const RakNet::SystemAddress& address,
+        Session::Buffer&&            packet,
+        std::string                  errorMessage
+    )>;
 
 public:
     explicit ServerNetworkSystem(std::size_t workerThreadCount = 0);
@@ -71,11 +77,13 @@ public:
 
     [[nodiscard]] std::size_t getSessionsCount() const;
 
-    bool setOnConnected(ConnectionEventCallback&& callback) noexcept;
+    Result<> setOnConnected(ConnectionEventCallback&& callback) noexcept;
 
-    bool setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
+    Result<> setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
 
-    bool setOnPacketReceive(PacketReceiveCallback&& callback);
+    Result<> setOnPacketReceive(PacketReceiveCallback&& callback) noexcept;
+
+    Result<> setOnPacketParseFailed(PacketParseFailedCallback&& callback) noexcept;
 
     [[nodiscard]] std::weak_ptr<Session> getSession(const RakNet::RakNetGUID& guid) const noexcept;
 
@@ -116,6 +124,7 @@ private:
     ConnectionEventCallback                                   mOnConnected{};
     ConnectionEventCallback                                   mOnDisconnected{};
     PacketReceiveCallback                                     mOnPacketReceive{};
+    PacketParseFailedCallback                                 mOnPacketParseFailed{};
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

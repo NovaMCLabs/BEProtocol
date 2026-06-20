@@ -163,28 +163,41 @@ std::shared_ptr<Session> ServerNetworkSystem::getSessionShared(const RakNet::Rak
     return session;
 }
 
-bool ServerNetworkSystem::setOnConnected(ConnectionEventCallback&& callback) noexcept {
+Result<> ServerNetworkSystem::setOnConnected(ConnectionEventCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on connected callback while running");
     }
     mOnConnected = std::move(callback);
-    return true;
+    return {};
 }
 
-bool ServerNetworkSystem::setOnDisconnected(ConnectionEventCallback&& callback) noexcept {
+Result<> ServerNetworkSystem::setOnDisconnected(ConnectionEventCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on disconnected callback while running");
     }
     mOnDisconnected = std::move(callback);
-    return true;
+    return {};
 }
 
-bool ServerNetworkSystem::setOnPacketReceive(PacketReceiveCallback&& callback) {
+Result<> ServerNetworkSystem::setOnPacketReceive(PacketReceiveCallback&& callback) noexcept {
     if (mRunning.load(std::memory_order_acquire)) {
-        return false;
+        return error_utils::makeError("Cannot set on packet receive callback while running");
     }
     mOnPacketReceive = std::move(callback);
-    return true;
+    return {};
+}
+
+Result<> ServerNetworkSystem::setOnPacketParseFailed(PacketParseFailedCallback&& callback) noexcept {
+    if (mRunning.load(std::memory_order_acquire)) {
+        return error_utils::makeError("Cannot set on packet parse failed callback while running");
+    }
+    if (!mOnPacketReceive) {
+        return error_utils::makeError(
+            "Cannot set on packet parse failed callback without setting on packet receive callback"
+        );
+    }
+    mOnPacketParseFailed = std::move(callback);
+    return {};
 }
 
 std::weak_ptr<Session> ServerNetworkSystem::getSession(const RakNet::RakNetGUID& guid) const noexcept {
@@ -316,13 +329,26 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
 
     for (auto& payload : *packets) {
         if (mOnPacketReceive) {
-            auto packetObj = MinecraftPackets::readAndCreatePacketFromBuffer(payload);
-            (void)mThreadPool->submit([this,
-                                       guid    = packet->guid,
-                                       address = packet->systemAddress,
-                                       packet  = std::move(packetObj)]() mutable noexcept {
-                mOnPacketReceive(guid, address, std::move(packet));
-            });
+            auto packetExpected = MinecraftPackets::readAndCreatePacketFromBuffer(payload);
+            if (packetExpected) {
+                (void)mThreadPool->submit([this,
+                                           guid    = packet->guid,
+                                           address = packet->systemAddress,
+                                           packet  = std::move(*packetExpected)]() mutable noexcept {
+                    mOnPacketReceive(guid, address, std::move(packet));
+                });
+            } else {
+                if (mOnPacketParseFailed) {
+                    (void)mThreadPool->submit([this,
+                                               guid    = packet->guid,
+                                               address = packet->systemAddress,
+                                               packet  = std::move(payload),
+                                               errorMessage =
+                                                   std::string(packetExpected.error().message())]() mutable noexcept {
+                        mOnPacketParseFailed(guid, address, std::move(packet), errorMessage);
+                    });
+                }
+            }
         } else {
             (void)session->enqueueInboundPacket(std::move(payload));
         }

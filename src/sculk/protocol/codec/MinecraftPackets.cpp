@@ -245,22 +245,28 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
     case MinecraftPacketIds::PACKET_ID: {                                                                              \
         return std::make_unique<PACKET_ID##Packet>();                                                                  \
     }
+#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
 #define CREATE_PACKET_DEFAULT(PACKET_ID)                                                                               \
     default: {                                                                                                         \
-        return nullptr;                                                                                                \
+        return error_utils::makeError(std::format("Invalid packet ID: {}", std::to_underlying(PACKET_ID)));            \
     }                                                                                                                  \
     }
+#define MAKE_ERROR(MESSAGE, RET) error_utils::makeError(std::format(MESSAGE ": {}", RET.error().mMessage))
+#else
+#define CREATE_PACKET_DEFAULT(PACKET_ID)                                                                               \
+    default: {                                                                                                         \
+        return error_utils::makeError("Invalid packet ID");                                                            \
+    }                                                                                                                  \
+    }
+#define MAKE_ERROR(MESSAGE, RET) error_utils::makeError(MESSAGE)
+#endif
 #define DEPRECATED_PACKET(PACKET_ID)
 // clang-format on
 
 Result<MinecraftPackets::PacketHeader> MinecraftPackets::readPacketHeader(ReadOnlyBinaryStream& stream) {
     std::uint32_t header{};
     if (auto status = stream.readUnsignedVarInt(header); !status) {
-#ifdef SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS
-        return error_utils::makeError(std::format("Failed to read packet header: {}", status.error().mMessage));
-#else
-        return error_utils::makeError("Failed to read packet header");
-#endif
+        return MAKE_ERROR("Failed to read packet header", status);
     }
     return PacketHeader{
         .mPacketId          = static_cast<MinecraftPacketIds>(header & 0x3FF),
@@ -276,40 +282,43 @@ void MinecraftPackets::writePacketHeader(BinaryStream& stream, const PacketHeade
     );
 }
 
-std::unique_ptr<IPacket> MinecraftPackets::createPacket(const PacketHeader& header) {
+Result<std::unique_ptr<IPacket>> MinecraftPackets::createPacket(const PacketHeader& header) {
     auto packet = createPacket(header.mPacketId);
     if (packet) {
-        packet->mSenderSubClientId = header.mSenderSubClientId;
-        packet->mTargetSubClientId = header.mTargetSubClientId;
+        (*packet)->mSenderSubClientId = header.mSenderSubClientId;
+        (*packet)->mTargetSubClientId = header.mTargetSubClientId;
     }
     return packet;
 }
 
-std::unique_ptr<IPacket> MinecraftPackets::readAndCreatePacketFromStream(ReadOnlyBinaryStream& stream) {
+Result<std::unique_ptr<IPacket>> MinecraftPackets::readAndCreatePacketFromStream(ReadOnlyBinaryStream& stream) {
     auto header = readPacketHeader(stream);
     if (!header) {
-        return nullptr;
+        return MAKE_ERROR("Failed to read packet header", header);
     }
     auto packet = createPacket(*header);
-    if (!packet || !packet->read(stream)) {
-        return nullptr;
+    if (!packet) {
+        return MAKE_ERROR("Failed to create packet", packet);
+    }
+    if (auto status = (*packet)->read(stream); !status) {
+        return MAKE_ERROR("Failed to read packet from stream", status);
     }
     return packet;
 }
 
-std::unique_ptr<IPacket> MinecraftPackets::readAndCreatePacketFromBuffer(std::span<const std::byte> buffer) {
+Result<std::unique_ptr<IPacket>> MinecraftPackets::readAndCreatePacketFromBuffer(std::span<const std::byte> buffer) {
     auto stream = ReadOnlyBinaryStream{buffer};
     auto packet = readAndCreatePacketFromStream(stream);
     if (!packet) {
-        return nullptr;
+        return MAKE_ERROR("Failed to create packet from buffer", packet);
     }
     if (stream.hasDataLeft()) {
-        return nullptr;
+        return error_utils::makeError("Extra data left in buffer after reading packet");
     }
     return packet;
 }
 
-std::unique_ptr<IPacket> MinecraftPackets::createPacket(MinecraftPacketIds packetId) {
+Result<std::unique_ptr<IPacket>> MinecraftPackets::createPacket(MinecraftPacketIds packetId) {
     CREATE_PACKET_SWITCH(packetId)
     CREATE_PACKET(Login)                                  // 1
     CREATE_PACKET(PlayStatus)                             // 2
