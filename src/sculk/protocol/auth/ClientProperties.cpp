@@ -7,6 +7,7 @@
 
 #include "sculk/protocol/auth/ClientProperties.hpp"
 #include "../ssl/ES384.hpp"
+#include <format>
 #include <sculk/reflection/jsonc/reflection.hpp>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -184,6 +185,8 @@ Result<> ClientProperties::sign(const PemKeyPair& clientKeyPair) {
     }
     return {};
 }
+
+std::string ClientProperties::toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
 
 Result<ClientProperties> ClientProperties::fromString(std::string_view rawClientProperties) {
     SCULK_CLIENT_PROPERTIES_SERIALIZE_OPTION_INIT();

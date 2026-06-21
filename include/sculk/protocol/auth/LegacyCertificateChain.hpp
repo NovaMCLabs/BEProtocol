@@ -10,7 +10,6 @@
 #include "PemKeyPair.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <chrono>
-#include <format>
 #include <optional>
 #include <string>
 
@@ -55,7 +54,7 @@ public:
 
     [[nodiscard]] bool checkIssuer(std::string_view expectedIssuer) const;
 
-    [[nodiscard]] std::string toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
+    [[nodiscard]] std::string toString() const;
 
     [[nodiscard]] bool verify(std::string_view publicKeyPem) const;
 

@@ -8,6 +8,7 @@
 #include "sculk/protocol/auth/LoginToken.hpp"
 #include "../ssl/ES384.hpp"
 #include "../ssl/RS256.hpp"
+#include <format>
 #include <sculk/reflection/jsonc/reflection.hpp>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -230,6 +231,10 @@ Result<> LoginToken::selfSign(const PemKeyPair& clientKeyPair) {
         return error_utils::makeError("Failed to sign login token with ES384");
     }
     return {};
+}
+
+std::string LoginToken::toString() const {
+    return isEmpty() ? "" : std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature);
 }
 
 Result<LoginToken> LoginToken::fromString(std::string_view rawLoginToken) {

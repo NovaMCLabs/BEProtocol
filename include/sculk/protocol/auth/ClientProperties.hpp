@@ -9,7 +9,6 @@
 #include "AuthenticationKeyManager.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <array>
-#include <format>
 #include <string>
 #include <vector>
 
@@ -203,7 +202,7 @@ public:
 
     [[nodiscard]] Result<> sign(const PemKeyPair& clientKeyPair);
 
-    [[nodiscard]] std::string toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
+    [[nodiscard]] std::string toString() const;
 
 public:
     [[nodiscard]] static Result<ClientProperties> fromString(std::string_view rawClientProperties);

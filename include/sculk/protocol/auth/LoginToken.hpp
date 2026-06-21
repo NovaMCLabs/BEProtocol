@@ -9,7 +9,6 @@
 #include "AuthenticationKeyManager.hpp"
 #include "PemKeyPair.hpp"
 #include "sculk/protocol/utility/Result.hpp"
-#include <format>
 #include <optional>
 #include <string>
 
@@ -65,9 +64,7 @@ public:
 
     [[nodiscard]] Result<> selfSign(const PemKeyPair& clientKeyPair);
 
-    [[nodiscard]] std::string toString() const {
-        return isEmpty() ? "" : std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature);
-    }
+    [[nodiscard]] std::string toString() const;
 
 public:
     [[nodiscard]] static Result<LoginToken> fromString(std::string_view rawLoginToken);

@@ -16,7 +16,7 @@ option(PROTOCOL_ENABLE_DETAIL_ERRORS "Enable detailed error information" OFF)
 option(PROTOCOL_ENABLE_CODEC "Enable codec features" ON)
 option(PROTOCOL_ENABLE_AUTHENTICATION "Enable authentication features" ON)
 option(PROTOCOL_ENABLE_CONNECTION "Enable connection features" ON)
-option(PROTOCOL_ENABLE_EXCEPTIONS "Enable C++ exceptions for Protocol target" OFF)
+option(PROTOCOL_ENABLE_EXCEPTIONS "Enable C++ exceptions for Protocol target" ON)
 option(PROTOCOL_ENABLE_FORMATTING "Enable string formatting support for Protocol target" OFF)
 
 if(PROTOCOL_ENABLE_CONNECTION AND(NOT PROTOCOL_ENABLE_CODEC OR NOT PROTOCOL_ENABLE_AUTHENTICATION))
@@ -231,6 +231,7 @@ target_include_directories(Protocol PUBLIC
 
 if(PROTOCOL_ENABLE_DETAIL_ERRORS)
     target_compile_definitions(Protocol PUBLIC SCULK_PROTOCOL_ENABLE_DETAIL_ERRORS)
+    set(PROTOCOL_ENABLE_EXCEPTIONS ON CACHE BOOL "Enable C++ exceptions for Protocol target" FORCE)
 endif()
 
 if(PROTOCOL_ENABLE_CODEC AND PROTOCOL_ENABLE_FORMATTING)

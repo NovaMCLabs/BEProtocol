@@ -8,7 +8,6 @@
 #pragma once
 #include "sculk/protocol/auth/PemKeyPair.hpp"
 #include "sculk/protocol/utility/Result.hpp"
-#include <format>
 #include <optional>
 #include <span>
 #include <string>
@@ -43,7 +42,7 @@ public:
 
     [[nodiscard]] Result<> sign(const PemKeyPair& localKeyPair);
 
-    [[nodiscard]] std::string toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
+    [[nodiscard]] std::string toString() const;
 
     void setSaltBytes(std::span<const std::byte> salt);
 

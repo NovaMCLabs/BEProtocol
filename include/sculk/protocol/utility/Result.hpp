@@ -103,13 +103,12 @@ makeError(std::string_view error, std::source_location location = std::source_lo
     }
 #define _SCULK_CHECK_MAX(VALUE, MAX)                                                                                   \
     if (VALUE > static_cast<std::remove_cv_t<std::remove_reference_t<decltype(VALUE)>>>(MAX)) {                        \
-        return error_utils::makeError(#VALUE " out of bounds: too large");
-}
+        return error_utils::makeError(#VALUE " out of bounds: too large");                                             \
+    }
 #endif
 
 #define _SCULK_CHECK_BOUNDS(VALUE, MIN, MAX)                                                                           \
     _SCULK_CHECK_MIN(VALUE, MIN)                                                                                       \
     else _SCULK_CHECK_MAX(VALUE, MAX)
-
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

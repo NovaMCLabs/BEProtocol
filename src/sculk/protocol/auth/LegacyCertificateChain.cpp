@@ -8,6 +8,7 @@
 #include "sculk/protocol/auth/LegacyCertificateChain.hpp"
 #include "../ssl/ES384.hpp"
 #include "sculk/reflection/jsonc/reflection.hpp"
+#include <format>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -96,6 +97,8 @@ bool Certificate::checkTimeValidity(std::chrono::seconds leeway, std::chrono::sy
 bool Certificate::checkIssuer(std::string_view expectedIssuer) const {
     return mPayload.iss && *mPayload.iss == expectedIssuer;
 }
+
+std::string Certificate::toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
 
 bool Certificate::verify(std::string_view publicKeyPem) const {
     std::string signingInput = std::format("{}.{}", mRawHeader, mRawPayload);

@@ -9,6 +9,7 @@
 #include "../ssl/ES384.hpp"
 #include "../ssl/RS256.hpp"
 #include <cctype>
+#include <format>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <sculk/reflection/jsonc/reflection.hpp>
@@ -194,6 +195,8 @@ std::vector<std::byte> base64Decode(std::string_view data) {
 }
 
 } // namespace
+
+std::string HandShakeToken::toString() const { return std::format("{}.{}.{}", mRawHeader, mRawPayload, mSignature); }
 
 void HandShakeToken::setSaltBytes(std::span<const std::byte> salt) { mPayload.salt = base64Encode(salt); }
 
