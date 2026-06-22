@@ -52,20 +52,7 @@ namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
         "AQAB"                                                                                                         \
     )
 
-AuthenticationKeyManager::AuthenticationKeyManager(bool useCachedMojangKeys, std::chrono::seconds leeway)
-: mLeeway(leeway) {
-    if (useCachedMojangKeys) {
-        // Cached keys
-        mPublicKeysPemByKeyId = {
-            {"C1D78C9429FE3EC5D72000398E256C302D8A7833", SCULK_CACHED_MOJANG_PUBLIC_KEY_1},
-            {"37959048C139ECD3712923EE3A05B6C3D8DAC402", SCULK_CACHED_MOJANG_PUBLIC_KEY_2},
-            {"E9544A8594022198E82407994498E38E84A888FD", SCULK_CACHED_MOJANG_PUBLIC_KEY_3},
-            {"6CD621632CEE45A16374B30445B1FB9B77EC7BF7", SCULK_CACHED_MOJANG_PUBLIC_KEY_4},
-        };
-        mExpectedIssuer       = "https://authorization.franchise.minecraft-services.net/";
-        mExpectedPlayFabTitle = "20CA2";
-    }
-}
+AuthenticationKeyManager::AuthenticationKeyManager(std::chrono::seconds leeway) : mLeeway(leeway) {}
 
 std::optional<std::string_view> AuthenticationKeyManager::getPublicKeyPemByKeyId(const std::string& keyId) const {
     auto it = mPublicKeysPemByKeyId.find(keyId);
@@ -115,7 +102,7 @@ AuthenticationKeyManager& AuthenticationKeyManager::setLeeway(std::chrono::secon
     return *this;
 }
 
-Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeoutSeconds) {
+Result<> AuthenticationKeyManager::initMojangPublicKeyFromNetwork(std::size_t timeoutSeconds) {
     // https://client.discovery.minecraft-services.net/api/v1.0/discovery/MinecraftPE/builds/1.0.0.0
     httplib::Client serviceClient("https://client.discovery.minecraft-services.net");
     serviceClient.set_connection_timeout(timeoutSeconds);
@@ -202,10 +189,15 @@ Result<> AuthenticationKeyManager::initMojangPublicKeyBlocking(std::size_t timeo
     return {};
 }
 
-std::future<Result<>> AuthenticationKeyManager::initMojangPublicKeyAsync(std::size_t timeoutSeconds) {
-    return std::async(std::launch::async, [this, timeoutSeconds]() {
-        return initMojangPublicKeyBlocking(timeoutSeconds);
-    });
+void AuthenticationKeyManager::initMojangPublicKeyFromCachedKeys() {
+    mPublicKeysPemByKeyId = {
+        {"C1D78C9429FE3EC5D72000398E256C302D8A7833", SCULK_CACHED_MOJANG_PUBLIC_KEY_1},
+        {"37959048C139ECD3712923EE3A05B6C3D8DAC402", SCULK_CACHED_MOJANG_PUBLIC_KEY_2},
+        {"E9544A8594022198E82407994498E38E84A888FD", SCULK_CACHED_MOJANG_PUBLIC_KEY_3},
+        {"6CD621632CEE45A16374B30445B1FB9B77EC7BF7", SCULK_CACHED_MOJANG_PUBLIC_KEY_4},
+    };
+    mExpectedIssuer       = "https://authorization.franchise.minecraft-services.net/";
+    mExpectedPlayFabTitle = "20CA2";
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

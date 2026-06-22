@@ -21,7 +21,7 @@ class AuthenticationKeyManager {
     std::chrono::seconds                         mLeeway{};
 
 public:
-    AuthenticationKeyManager(bool useCachedMojangKeys = false, std::chrono::seconds leeway = std::chrono::seconds(60));
+    AuthenticationKeyManager(std::chrono::seconds leeway = std::chrono::seconds(60));
 
     [[nodiscard]] std::optional<std::string_view> getPublicKeyPemByKeyId(const std::string& keyId) const;
 
@@ -34,9 +34,9 @@ public:
 public:
     AuthenticationKeyManager& setLeeway(std::chrono::seconds leeway);
 
-    Result<> initMojangPublicKeyBlocking(std::size_t timeoutSeconds = 5);
+    Result<> initMojangPublicKeyFromNetwork(std::size_t timeoutSeconds = 5);
 
-    std::future<Result<>> initMojangPublicKeyAsync(std::size_t timeoutSeconds = 5);
+    void initMojangPublicKeyFromCachedKeys();
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
