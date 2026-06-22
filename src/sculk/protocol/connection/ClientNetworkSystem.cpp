@@ -36,11 +36,11 @@ ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool)
 ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool, io::ClientIoRuntime&)
 : ClientNetworkSystem(threadPool) {}
 
-ClientNetworkSystem::~ClientNetworkSystem() { disconnect(); }
+ClientNetworkSystem::~ClientNetworkSystem() { stop(); }
 
-bool ClientNetworkSystem::connect(std::string_view host, std::uint16_t port) {
+NetworkStartResult ClientNetworkSystem::start() {
     if (mRunning.exchange(true, std::memory_order_acq_rel)) {
-        return false;
+        return NetworkStartResult::AlreadyStarted;
     }
 
     std::array<RakNet::SocketDescriptor, 2> descriptor{};
@@ -50,22 +50,13 @@ bool ClientNetworkSystem::connect(std::string_view host, std::uint16_t port) {
     const auto startupResult = mPeer->Startup(1, descriptor.data(), 2);
     if (startupResult != RakNet::RAKNET_STARTED) {
         mRunning.store(false, std::memory_order_release);
-        return false;
+        return static_cast<NetworkStartResult>(startupResult);
     }
 
-    const auto connectResult = mPeer->Connect(host.data(), port, nullptr, 0);
-    if (connectResult != RakNet::CONNECTION_ATTEMPT_STARTED) {
-        mPeer->Shutdown(0);
-        mRunning.store(false, std::memory_order_release);
-        return false;
-    }
-
-    mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
-    mFlushThread   = std::jthread([this](std::stop_token token) { flushLoop(token); });
-    return true;
+    return NetworkStartResult::Success;
 }
 
-void ClientNetworkSystem::disconnect() {
+void ClientNetworkSystem::stop() {
     if (!mRunning.exchange(false, std::memory_order_acq_rel)) {
         return;
     }
@@ -85,10 +76,56 @@ void ClientNetworkSystem::disconnect() {
     auto session = mSession.load(std::memory_order_acquire);
     if (session) {
         session->disconnect();
+        mSession.store(nullptr, std::memory_order_release);
     }
 
     if (mPeer) {
         mPeer->Shutdown(20);
+    }
+}
+
+ClientNetworkSystem::ConnectionResult ClientNetworkSystem::connect(std::string_view host, std::uint16_t port) {
+    if (!mRunning.load(std::memory_order_acquire)) {
+        return ConnectionResult::NetworkNotStarted;
+    }
+
+    if (mSession.load(std::memory_order_acquire)) {
+        return ConnectionResult::AlreadyConnectedToEndpoint;
+    }
+
+    const auto connectResult = mPeer->Connect(host.data(), port, nullptr, 0);
+    if (connectResult != RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED) {
+        return static_cast<ConnectionResult>(connectResult);
+    }
+
+    if (!mReceiveThread.joinable()) {
+        mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
+    }
+
+    if (!mFlushThread.joinable()) {
+        mFlushThread = std::jthread([this](std::stop_token token) { flushLoop(token); });
+    }
+
+    return ConnectionResult::ConnectionAttemptStarted;
+}
+
+void ClientNetworkSystem::disconnect() {
+    if (mReceiveThread.joinable()) {
+        mReceiveThread.request_stop();
+        mReceiveThread.join();
+    }
+
+    if (mFlushThread.joinable()) {
+        mFlushThread.request_stop();
+        mFlushThread.join();
+    }
+
+    // Keep the session object alive so delayed callbacks that call getSession()
+    // do not dereference a null pointer after disconnect.
+    auto session = mSession.load(std::memory_order_acquire);
+    if (session) {
+        session->disconnect();
+        mSession.store(nullptr, std::memory_order_release);
     }
 }
 
@@ -238,6 +275,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         auto session = mSession.load(std::memory_order_acquire);
         if (session) {
             session->disconnect();
+            mSession.store(nullptr, std::memory_order_release);
         }
 
         if (mOnDisconnected) {
@@ -247,7 +285,6 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
                 }
             });
         }
-        mRunning.store(false, std::memory_order_release);
         return;
     }
 
@@ -257,6 +294,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         auto session = mSession.load(std::memory_order_acquire);
         if (session) {
             session->disconnect();
+            mSession.store(nullptr, std::memory_order_release);
         }
 
         if (mOnConnectionFailed) {
@@ -266,7 +304,6 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
                 }
             });
         }
-        mRunning.store(false, std::memory_order_release);
         return;
     }
 

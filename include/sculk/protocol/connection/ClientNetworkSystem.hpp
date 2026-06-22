@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "NetworkStartResult.hpp"
 #include "Session.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
@@ -47,7 +48,23 @@ public:
     ~ClientNetworkSystem();
 
 public:
-    [[nodiscard]] bool connect(std::string_view host, std::uint16_t port);
+    enum class ConnectionResult : std::uint8_t {
+        ConnectionAttemptStarted           = 0,
+        InvalidParameter                   = 1,
+        CannotResolveDomainName            = 2,
+        AlreadyConnectedToEndpoint         = 3,
+        ConnectionAttemptAlreadyInProgress = 4,
+        SecurityInitializationFailed       = 5,
+        NetworkNotStarted                  = 6,
+        UnknownError                       = 7,
+    };
+
+public:
+    [[nodiscard]] NetworkStartResult start();
+
+    void stop();
+
+    [[nodiscard]] ConnectionResult connect(std::string_view host, std::uint16_t port);
 
     void disconnect();
 

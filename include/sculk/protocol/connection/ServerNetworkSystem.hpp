@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "NetworkStartResult.hpp"
 #include "Session.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
@@ -61,7 +62,21 @@ public:
     ~ServerNetworkSystem();
 
 public:
-    [[nodiscard]] bool start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, std::uint32_t maxConnections);
+    [[nodiscard]] NetworkStartResult
+    start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, std::uint32_t maxConnections);
+
+    [[nodiscard]] NetworkStartResult start(
+        const std::string& ipv4Host,
+        std::uint16_t      ipv4Port,
+        const std::string& ipv6Host,
+        std::uint16_t      ipv6Port,
+        std::uint32_t      maxConnections
+    );
+
+    [[nodiscard]] NetworkStartResult start(std::uint16_t ipv4Port, std::uint32_t maxConnections);
+
+    [[nodiscard]] NetworkStartResult
+    start(const std::string& ipv4Host, std::uint16_t ipv4Port, std::uint32_t maxConnections);
 
     void setMotd(std::string_view motd);
 
@@ -73,7 +88,7 @@ public:
 
     [[nodiscard]] bool isRunning() const noexcept;
 
-    [[nodiscard]] bool getClientNetworkStatus(const RakNet::RakNetGUID& guid, NetworkStatus& outStatus) const noexcept;
+    [[nodiscard]] Result<NetworkStatus> getClientNetworkStatus(const RakNet::RakNetGUID& guid) const noexcept;
 
     [[nodiscard]] std::size_t getSessionsCount() const;
 
@@ -112,7 +127,7 @@ private:
 private:
     std::uint32_t                                             mMaxConnections{};
     std::uint16_t                                             mIpv4Port{};
-    std::uint16_t                                             mIpv6Port{};
+    std::optional<std::uint16_t>                              mIpv6Port{};
     std::string                                               mMotd{};
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
     std::unique_ptr<thread::ThreadPool>                       mOwnedThreadPool{};

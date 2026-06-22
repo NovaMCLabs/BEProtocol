@@ -49,9 +49,10 @@ ServerNetworkSystem::ServerNetworkSystem(thread::ThreadPool& threadPool)
 
 ServerNetworkSystem::~ServerNetworkSystem() { stop(); }
 
-bool ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, std::uint32_t maxConnections) {
+NetworkStartResult
+ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, std::uint32_t maxConnections) {
     if (mRunning.exchange(true, std::memory_order_acq_rel)) {
-        return false;
+        return NetworkStartResult::AlreadyStarted;
     }
 
     mIpv4Port       = ipv4Port;
@@ -59,16 +60,16 @@ bool ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, 
     mMaxConnections = maxConnections;
 
     std::array<RakNet::SocketDescriptor, 2> descriptors{
-        RakNet::SocketDescriptor{mIpv4Port, nullptr},
-        RakNet::SocketDescriptor{mIpv6Port, nullptr}
+        RakNet::SocketDescriptor{mIpv4Port,  nullptr},
+        RakNet::SocketDescriptor{*mIpv6Port, nullptr}
     };
     descriptors[0].socketFamily = AF_INET;
     descriptors[1].socketFamily = AF_INET6;
 
     auto status = mPeer->Startup(mMaxConnections, descriptors.data(), 2);
-    if (status != RakNet::RAKNET_STARTED) {
+    if (status != RakNet::StartupResult::RAKNET_STARTED) {
         mRunning.store(false, std::memory_order_release);
-        return false;
+        return static_cast<NetworkStartResult>(status);
     }
 
     mPeer->SetMaximumIncomingConnections(mMaxConnections);
@@ -76,7 +77,96 @@ bool ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, 
 
     mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
     mFlushThread   = std::jthread([this](std::stop_token token) { flushLoop(token); });
-    return true;
+    return NetworkStartResult::Success;
+}
+
+NetworkStartResult ServerNetworkSystem::start(
+    const std::string& ipv4Host,
+    std::uint16_t      ipv4Port,
+    const std::string& ipv6Host,
+    std::uint16_t      ipv6Port,
+    std::uint32_t      maxConnections
+) {
+    if (mRunning.exchange(true, std::memory_order_acq_rel)) {
+        return NetworkStartResult::AlreadyStarted;
+    }
+
+    mIpv4Port       = ipv4Port;
+    mIpv6Port       = ipv6Port;
+    mMaxConnections = maxConnections;
+
+    std::array<RakNet::SocketDescriptor, 2> descriptors{
+        RakNet::SocketDescriptor{mIpv4Port,  ipv4Host.c_str()},
+        RakNet::SocketDescriptor{*mIpv6Port, ipv6Host.c_str()}
+    };
+    descriptors[0].socketFamily = AF_INET;
+    descriptors[1].socketFamily = AF_INET6;
+
+    auto status = mPeer->Startup(mMaxConnections, descriptors.data(), 2);
+    if (status != RakNet::StartupResult::RAKNET_STARTED) {
+        mRunning.store(false, std::memory_order_release);
+        return static_cast<NetworkStartResult>(status);
+    }
+
+    mPeer->SetMaximumIncomingConnections(mMaxConnections);
+    updateAnnouncement();
+
+    mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
+    mFlushThread   = std::jthread([this](std::stop_token token) { flushLoop(token); });
+    return NetworkStartResult::Success;
+}
+
+NetworkStartResult ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint32_t maxConnections) {
+    if (mRunning.exchange(true, std::memory_order_acq_rel)) {
+        return NetworkStartResult::AlreadyStarted;
+    }
+
+    mIpv4Port       = ipv4Port;
+    mIpv6Port       = std::nullopt;
+    mMaxConnections = maxConnections;
+
+    RakNet::SocketDescriptor descriptor{mIpv4Port, nullptr};
+    descriptor.socketFamily = AF_INET;
+
+    auto status = mPeer->Startup(mMaxConnections, &descriptor, 1);
+    if (status != RakNet::StartupResult::RAKNET_STARTED) {
+        mRunning.store(false, std::memory_order_release);
+        return static_cast<NetworkStartResult>(status);
+    }
+
+    mPeer->SetMaximumIncomingConnections(mMaxConnections);
+    updateAnnouncement();
+
+    mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
+    mFlushThread   = std::jthread([this](std::stop_token token) { flushLoop(token); });
+    return NetworkStartResult::Success;
+}
+
+NetworkStartResult
+ServerNetworkSystem::start(const std::string& ipv4Host, std::uint16_t ipv4Port, std::uint32_t maxConnections) {
+    if (mRunning.exchange(true, std::memory_order_acq_rel)) {
+        return NetworkStartResult::AlreadyStarted;
+    }
+
+    mIpv4Port       = ipv4Port;
+    mIpv6Port       = std::nullopt;
+    mMaxConnections = maxConnections;
+
+    RakNet::SocketDescriptor descriptor{mIpv4Port, ipv4Host.c_str()};
+    descriptor.socketFamily = AF_INET;
+
+    auto status = mPeer->Startup(mMaxConnections, &descriptor, 1);
+    if (status != RakNet::StartupResult::RAKNET_STARTED) {
+        mRunning.store(false, std::memory_order_release);
+        return static_cast<NetworkStartResult>(status);
+    }
+
+    mPeer->SetMaximumIncomingConnections(mMaxConnections);
+    updateAnnouncement();
+
+    mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
+    mFlushThread   = std::jthread([this](std::stop_token token) { flushLoop(token); });
+    return NetworkStartResult::Success;
 }
 
 void ServerNetworkSystem::setMotd(std::string_view motd) {
@@ -94,7 +184,7 @@ void ServerNetworkSystem::updateAnnouncement() noexcept {
         mMaxConnections,
         mPeer->GetMyGUID().ToString(),
         mIpv4Port,
-        mIpv6Port
+        mIpv6Port.value_or(0)
     );
     std::uint16_t length = static_cast<std::uint16_t>(message.size());
     message.insert(0, 2, '\0');
@@ -142,17 +232,13 @@ void ServerNetworkSystem::stop() {
 
 bool ServerNetworkSystem::isRunning() const noexcept { return mRunning.load(std::memory_order_acquire); }
 
-bool ServerNetworkSystem::getClientNetworkStatus(
-    const RakNet::RakNetGUID& guid,
-    NetworkStatus&            outStatus
-) const noexcept {
+Result<NetworkStatus> ServerNetworkSystem::getClientNetworkStatus(const RakNet::RakNetGUID& guid) const noexcept {
     auto session = getSessionShared(guid);
     if (!session) {
-        return false;
+        return error_utils::makeError("Session not found");
     }
 
-    outStatus = session->getNetworkStatus();
-    return true;
+    return session->getNetworkStatus();
 }
 
 std::size_t ServerNetworkSystem::getSessionsCount() const { return mSessions.size(); }
