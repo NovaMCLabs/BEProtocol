@@ -9,6 +9,7 @@
 #include "NetworkStartResult.hpp"
 #include "Session.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include "sculk/protocol/connection/thread/TaskStrand.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
 #include "thread/AtomicSharedPtr.hpp"
 #include <RakPeerInterface.h>
@@ -88,6 +89,8 @@ public:
 
     [[nodiscard]] bool getNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
+    [[nodiscard]] std::uint64_t droppedEventCallbackCount() const noexcept;
+
 private:
     struct RakPeerDeleter {
         void operator()(RakNet::RakPeerInterface* peer) const noexcept;
@@ -106,6 +109,9 @@ private:
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
     std::unique_ptr<thread::ThreadPool>                       mOwnedThreadPool{};
     thread::ThreadPool*                                       mThreadPool{};
+    thread::TaskStrand                                        mCallbackStrand{};
+    io::ClientIoRuntime*                                      mIoRuntime{};
+    bool                                                      mIoRegistered{false};
     std::atomic_bool                                          mRunning{false};
     std::jthread                                              mReceiveThread{};
     std::jthread                                              mFlushThread{};

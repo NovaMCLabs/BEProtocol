@@ -41,6 +41,57 @@ constexpr auto FLUSH_INTERVAL = std::chrono::milliseconds(20);
     }
 }
 
+[[nodiscard]] bool tryIncrementBounded(std::atomic_uint32_t& counter, std::uint32_t maxValue) noexcept {
+    auto current = counter.load(std::memory_order_acquire);
+    while (current < maxValue) {
+        if (counter.compare_exchange_weak(current, current + 1, std::memory_order_acq_rel, std::memory_order_acquire)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+[[nodiscard]] bool tryAddBounded(std::atomic_uint64_t& counter, std::uint64_t add, std::uint64_t maxValue) noexcept {
+    auto current = counter.load(std::memory_order_acquire);
+    while (current <= (maxValue - add)) {
+        if (counter
+                .compare_exchange_weak(current, current + add, std::memory_order_acq_rel, std::memory_order_acquire)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void releaseQueueBudget(
+    std::atomic_uint32_t& packets,
+    std::atomic_uint64_t& bytes,
+    std::uint64_t         releasedBytes
+) noexcept {
+    (void)packets.fetch_sub(1, std::memory_order_acq_rel);
+    (void)bytes.fetch_sub(releasedBytes, std::memory_order_acq_rel);
+}
+
+[[nodiscard]] bool tryAcquireQueueBudget(
+    std::atomic_uint32_t& packets,
+    std::atomic_uint64_t& bytes,
+    std::uint64_t         packetBytes,
+    std::uint32_t         maxPackets,
+    std::uint64_t         maxBytes
+) noexcept {
+    if (!tryIncrementBounded(packets, maxPackets)) {
+        return false;
+    }
+
+    if (!tryAddBounded(bytes, packetBytes, maxBytes)) {
+        (void)packets.fetch_sub(1, std::memory_order_acq_rel);
+        return false;
+    }
+
+    return true;
+}
+
 } // namespace
 
 Session::Session(RakNet::RakPeerInterface* peer, const RakNet::AddressOrGUID& remote) noexcept
@@ -68,9 +119,57 @@ void Session::setEncrypted(std::vector<std::byte>&& key) noexcept {
     mEncryption.emplace(std::move(key));
 }
 
-bool Session::sendPacket(BufferView buffer) { return mOutboundPackets.enqueue(Buffer{buffer.begin(), buffer.end()}); }
+bool Session::sendPacket(BufferView buffer) {
+    if (!mConnected.load(std::memory_order_relaxed)) {
+        return false;
+    }
 
-bool Session::sendPacket(Buffer&& buffer) { return mOutboundPackets.enqueue(std::move(buffer)); }
+    Buffer copied{buffer.begin(), buffer.end()};
+    if (!tryAcquireQueueBudget(
+            mOutboundQueuedPackets,
+            mOutboundQueuedBytes,
+            static_cast<std::uint64_t>(copied.size()),
+            MAX_OUTBOUND_QUEUED_PACKETS,
+            MAX_OUTBOUND_QUEUED_BYTES
+        )) {
+        mDroppedOutboundPackets.fetch_add(1, std::memory_order_relaxed);
+        return false;
+    }
+
+    if (!mOutboundPackets.enqueue(std::move(copied))) {
+        releaseQueueBudget(mOutboundQueuedPackets, mOutboundQueuedBytes, static_cast<std::uint64_t>(buffer.size()));
+        mDroppedOutboundPackets.fetch_add(1, std::memory_order_relaxed);
+        return false;
+    }
+
+    return true;
+}
+
+bool Session::sendPacket(Buffer&& buffer) {
+    if (!mConnected.load(std::memory_order_relaxed)) {
+        return false;
+    }
+
+    const auto packetBytes = static_cast<std::uint64_t>(buffer.size());
+    if (!tryAcquireQueueBudget(
+            mOutboundQueuedPackets,
+            mOutboundQueuedBytes,
+            packetBytes,
+            MAX_OUTBOUND_QUEUED_PACKETS,
+            MAX_OUTBOUND_QUEUED_BYTES
+        )) {
+        mDroppedOutboundPackets.fetch_add(1, std::memory_order_relaxed);
+        return false;
+    }
+
+    if (!mOutboundPackets.enqueue(std::move(buffer))) {
+        releaseQueueBudget(mOutboundQueuedPackets, mOutboundQueuedBytes, packetBytes);
+        mDroppedOutboundPackets.fetch_add(1, std::memory_order_relaxed);
+        return false;
+    }
+
+    return true;
+}
 
 bool Session::sendPacketImmediately(Buffer&& buffer) {
     Buffer packetsBuffer{};
@@ -122,6 +221,8 @@ bool Session::flushUnlocked() {
 
     Buffer packet{};
     while (mOutboundPackets.try_dequeue(packet)) {
+        const auto packetBytes = static_cast<std::uint64_t>(packet.size());
+        releaseQueueBudget(mOutboundQueuedPackets, mOutboundQueuedBytes, packetBytes);
         outPackets.push_back(std::move(packet));
     }
 
@@ -145,6 +246,9 @@ bool Session::receivePacket(Buffer& outBuffer) noexcept {
     if (!mInboundPackets.try_dequeue(packet)) {
         return false;
     }
+
+    const auto packetBytes = static_cast<std::uint64_t>(packet.size());
+    releaseQueueBudget(mInboundQueuedPackets, mInboundQueuedBytes, packetBytes);
 
     outBuffer = std::move(packet);
     return true;
@@ -222,9 +326,13 @@ bool Session::sendBatchedBufferImmediately(Buffer&& packetsBuffer) noexcept {
     );
 }
 
-bool Session::hasPendingInboundPackets() const noexcept { return mInboundPackets.size_approx() > 0; }
+bool Session::hasPendingInboundPackets() const noexcept {
+    return mInboundQueuedPackets.load(std::memory_order_acquire) > 0;
+}
 
-bool Session::hasPendingOutboundPackets() const noexcept { return mOutboundPackets.size_approx() > 0; }
+bool Session::hasPendingOutboundPackets() const noexcept {
+    return mOutboundQueuedPackets.load(std::memory_order_acquire) > 0;
+}
 
 bool Session::isConnected() const noexcept { return mConnected.load(std::memory_order_relaxed); }
 
@@ -244,8 +352,8 @@ NetworkStatus Session::getNetworkStatus() const noexcept {
             .count()
     );
     status.mConnected           = mConnected.load(std::memory_order_relaxed);
-    status.mInboundQueueApprox  = static_cast<std::size_t>(mInboundPackets.size_approx());
-    status.mOutboundQueueApprox = static_cast<std::size_t>(mOutboundPackets.size_approx());
+    status.mInboundQueueApprox  = static_cast<std::size_t>(mInboundQueuedPackets.load(std::memory_order_acquire));
+    status.mOutboundQueueApprox = static_cast<std::size_t>(mOutboundQueuedPackets.load(std::memory_order_acquire));
 
     if (!mPeer || mRemote.IsUndefined()) {
         status.mConnectionState =
@@ -317,6 +425,20 @@ void Session::disconnect() noexcept {
         mEncryption.reset();
     }
 
+    // Drain pending queues on disconnect to promptly release retained buffers.
+    Buffer drained{};
+    while (mInboundPackets.try_dequeue(drained)) {
+        const auto packetBytes = static_cast<std::uint64_t>(drained.size());
+        releaseQueueBudget(mInboundQueuedPackets, mInboundQueuedBytes, packetBytes);
+        drained.clear();
+    }
+
+    while (mOutboundPackets.try_dequeue(drained)) {
+        const auto packetBytes = static_cast<std::uint64_t>(drained.size());
+        releaseQueueBudget(mOutboundQueuedPackets, mOutboundQueuedBytes, packetBytes);
+        drained.clear();
+    }
+
     if (!wasConnected) {
         return;
     }
@@ -331,7 +453,33 @@ bool Session::enqueueInboundPacket(Buffer&& buffer) noexcept {
         return false;
     }
 
-    return mInboundPackets.enqueue(std::move(buffer));
+    const auto packetBytes = static_cast<std::uint64_t>(buffer.size());
+    if (!tryAcquireQueueBudget(
+            mInboundQueuedPackets,
+            mInboundQueuedBytes,
+            packetBytes,
+            MAX_INBOUND_QUEUED_PACKETS,
+            MAX_INBOUND_QUEUED_BYTES
+        )) {
+        mDroppedInboundPackets.fetch_add(1, std::memory_order_relaxed);
+        return false;
+    }
+
+    if (!mInboundPackets.enqueue(std::move(buffer))) {
+        releaseQueueBudget(mInboundQueuedPackets, mInboundQueuedBytes, packetBytes);
+        mDroppedInboundPackets.fetch_add(1, std::memory_order_relaxed);
+        return false;
+    }
+
+    return true;
+}
+
+std::uint64_t Session::droppedInboundPackets() const noexcept {
+    return mDroppedInboundPackets.load(std::memory_order_relaxed);
+}
+
+std::uint64_t Session::droppedOutboundPackets() const noexcept {
+    return mDroppedOutboundPackets.load(std::memory_order_relaxed);
 }
 
 Result<Session::Buffer> Session::serializeBatchedPackets(const BatchedBuffer& packets) {

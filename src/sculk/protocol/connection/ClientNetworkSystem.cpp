@@ -7,6 +7,8 @@
 
 #include "sculk/protocol/connection/ClientNetworkSystem.hpp"
 #include "sculk/protocol/codec/MinecraftPackets.hpp"
+#include "sculk/protocol/connection/detail/RakPacketOwner.hpp"
+#include "sculk/protocol/connection/io/ClientIoRuntime.hpp"
 #include <MessageIdentifiers.h>
 #include <chrono>
 #include <thread>
@@ -25,16 +27,28 @@ ClientNetworkSystem::ClientNetworkSystem(std::size_t workerThreadCount)
 : mPeer(RakNet::RakPeerInterface::GetInstance()),
   mOwnedThreadPool(std::make_unique<thread::ThreadPool>(workerThreadCount)),
   mThreadPool(mOwnedThreadPool.get()),
+  mCallbackStrand(mThreadPool),
+  mIoRuntime(nullptr),
+  mIoRegistered(false),
   mSession(std::shared_ptr<Session>{}) {}
 
 ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool)
 : mPeer(RakNet::RakPeerInterface::GetInstance()),
   mOwnedThreadPool(nullptr),
   mThreadPool(&threadPool),
+  mCallbackStrand(mThreadPool),
+  mIoRuntime(nullptr),
+  mIoRegistered(false),
   mSession(std::shared_ptr<Session>{}) {}
 
-ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool, io::ClientIoRuntime&)
-: ClientNetworkSystem(threadPool) {}
+ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool, io::ClientIoRuntime& ioRuntime)
+: mPeer(RakNet::RakPeerInterface::GetInstance()),
+  mOwnedThreadPool(nullptr),
+  mThreadPool(&threadPool),
+  mCallbackStrand(mThreadPool),
+  mIoRuntime(&ioRuntime),
+  mIoRegistered(false),
+  mSession(std::shared_ptr<Session>{}) {}
 
 ClientNetworkSystem::~ClientNetworkSystem() { stop(); }
 
@@ -53,6 +67,11 @@ NetworkStartResult ClientNetworkSystem::start() {
         return static_cast<NetworkStartResult>(startupResult);
     }
 
+    if (mIoRuntime && !mIoRegistered) {
+        mIoRuntime->registerClient(*this);
+        mIoRegistered = true;
+    }
+
     return NetworkStartResult::Success;
 }
 
@@ -69,6 +88,11 @@ void ClientNetworkSystem::stop() {
     if (mFlushThread.joinable()) {
         mFlushThread.request_stop();
         mFlushThread.join();
+    }
+
+    if (mIoRuntime && mIoRegistered) {
+        mIoRuntime->unregisterClient(*this);
+        mIoRegistered = false;
     }
 
     // Keep the session object alive so delayed callbacks that call getSession()
@@ -98,12 +122,16 @@ ClientNetworkSystem::ConnectionResult ClientNetworkSystem::connect(std::string_v
         return static_cast<ConnectionResult>(connectResult);
     }
 
-    if (!mReceiveThread.joinable()) {
-        mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
-    }
+    if (!mIoRuntime) {
+        if (!mReceiveThread.joinable()) {
+            mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
+        }
 
-    if (!mFlushThread.joinable()) {
-        mFlushThread = std::jthread([this](std::stop_token token) { flushLoop(token); });
+        if (!mFlushThread.joinable()) {
+            mFlushThread = std::jthread([this](std::stop_token token) { flushLoop(token); });
+        }
+    } else if (mIoRegistered) {
+        mIoRuntime->notifyWork();
     }
 
     return ConnectionResult::ConnectionAttemptStarted;
@@ -197,12 +225,13 @@ bool ClientNetworkSystem::getNetworkStatus(NetworkStatus& outStatus) const noexc
     return getServerNetworkStatus(outStatus);
 }
 
+std::uint64_t ClientNetworkSystem::droppedEventCallbackCount() const noexcept { return mCallbackStrand.droppedCount(); }
+
 bool ClientNetworkSystem::ioTickOnce() noexcept {
     bool progressed = false;
 
-    while (RakNet::Packet* packet = mPeer->Receive()) {
-        processIncomingPacket(packet);
-        mPeer->DeallocatePacket(packet);
+    while (detail::RakPacketOwner packet{mPeer.get(), mPeer->Receive()}) {
+        processIncomingPacket(packet.get());
         progressed = true;
     }
 
@@ -218,9 +247,8 @@ void ClientNetworkSystem::receiveLoop(std::stop_token stopToken) {
     while (!stopToken.stop_requested() && mRunning.load(std::memory_order_acquire)) {
         const auto tickBegin = std::chrono::steady_clock::now();
 
-        while (RakNet::Packet* packet = mPeer->Receive()) {
-            processIncomingPacket(packet);
-            mPeer->DeallocatePacket(packet);
+        while (detail::RakPacketOwner packet{mPeer.get(), mPeer->Receive()}) {
+            processIncomingPacket(packet.get());
         }
 
         const auto nextTick = tickBegin + RECEIVE_TICK_INTERVAL;
@@ -260,11 +288,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         auto session = std::make_shared<Session>(mPeer.get(), remote);
         mSession.store(session, std::memory_order_release);
         if (mOnConnected) {
-            (void)mThreadPool->submit([this]() mutable noexcept {
-                if (mOnConnected) {
-                    mOnConnected();
-                }
-            });
+            (void)mCallbackStrand.enqueue([this]() { mOnConnected(); });
         }
         return;
     }
@@ -279,11 +303,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         }
 
         if (mOnDisconnected) {
-            (void)mThreadPool->submit([this]() mutable noexcept {
-                if (mOnDisconnected) {
-                    mOnDisconnected();
-                }
-            });
+            (void)mCallbackStrand.enqueue([this]() { mOnDisconnected(); });
         }
         return;
     }
@@ -298,11 +318,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         }
 
         if (mOnConnectionFailed) {
-            (void)mThreadPool->submit([this]() mutable noexcept {
-                if (mOnConnectionFailed) {
-                    mOnConnectionFailed();
-                }
-            });
+            (void)mCallbackStrand.enqueue([this]() { mOnConnectionFailed(); });
         }
         return;
     }
@@ -324,25 +340,20 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         return;
     }
 
-    auto onPacketReceive = mOnPacketReceive;
     for (auto& payload : *packets) {
-        if (onPacketReceive) {
+        if (mOnPacketReceive) {
             auto packetExpected = MinecraftPackets::readAndCreatePacketFromBuffer(payload);
             if (packetExpected) {
-                (void)mThreadPool->submit([this, packet = std::move(*packetExpected)]() mutable noexcept {
-                    if (mOnPacketReceive) {
-                        mOnPacketReceive(std::move(packet));
-                    }
+                (void)mCallbackStrand.enqueue([this, packet = std::move(*packetExpected)]() mutable {
+                    mOnPacketReceive(std::move(packet));
                 });
             } else {
                 if (mOnPacketParseFailed) {
-                    (void)mThreadPool->submit([this,
-                                               buffer = std::move(payload),
-                                               errorMessage =
-                                                   std::string(packetExpected.error().mMessage)]() mutable noexcept {
-                        if (mOnPacketParseFailed) {
-                            mOnPacketParseFailed(std::move(buffer), errorMessage);
-                        }
+                    (void)mCallbackStrand.enqueue([this,
+                                                   buffer = std::move(payload),
+                                                   errorMessage =
+                                                       std::string(packetExpected.error().mMessage)]() mutable {
+                        mOnPacketParseFailed(std::move(buffer), errorMessage);
                     });
                 }
             }

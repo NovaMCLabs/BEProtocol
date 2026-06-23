@@ -9,6 +9,7 @@
 #include "NetworkStartResult.hpp"
 #include "Session.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include "sculk/protocol/connection/thread/TaskStrand.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
 #include <RakPeerInterface.h>
 #include <atomic>
@@ -92,6 +93,8 @@ public:
 
     [[nodiscard]] std::size_t getSessionsCount() const;
 
+    [[nodiscard]] std::uint64_t droppedEventCallbackCount() const noexcept;
+
     Result<> setOnConnected(ConnectionEventCallback&& callback) noexcept;
 
     Result<> setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
@@ -109,7 +112,12 @@ private:
         void operator()(RakNet::RakPeerInterface* peer) const noexcept;
     };
 
-    using SessionsMap = detail::ThreadSafeParallelFlatHashMap<RakNet::RakNetGUID, std::shared_ptr<Session>>;
+    struct SessionContext final {
+        std::shared_ptr<Session>            mSession{};
+        std::shared_ptr<thread::TaskStrand> mStrand{};
+    };
+
+    using SessionContextsMap = detail::ThreadSafeParallelFlatHashMap<RakNet::RakNetGUID, std::shared_ptr<SessionContext>>;
 
 private:
     void receiveLoop(std::stop_token stopToken);
@@ -118,11 +126,13 @@ private:
 
     void processIncomingPacket(RakNet::Packet* packet);
 
+    [[nodiscard]] std::shared_ptr<SessionContext> getSessionContext(const RakNet::RakNetGUID& guid) const noexcept;
+
     [[nodiscard]] std::shared_ptr<Session> getSessionShared(const RakNet::RakNetGUID& guid) const noexcept;
 
-    void upsertSession(const RakNet::RakNetGUID& key, std::shared_ptr<Session> session);
+    void upsertSessionContext(const RakNet::RakNetGUID& key, std::shared_ptr<SessionContext> context);
 
-    std::shared_ptr<Session> removeSession(const RakNet::RakNetGUID& key);
+    std::shared_ptr<SessionContext> removeSessionContext(const RakNet::RakNetGUID& key);
 
 private:
     std::uint32_t                                             mMaxConnections{};
@@ -135,7 +145,7 @@ private:
     std::atomic_bool                                          mRunning{false};
     std::jthread                                              mReceiveThread{};
     std::jthread                                              mFlushThread{};
-    SessionsMap                                               mSessions{};
+    SessionContextsMap                                        mSessionContexts{};
     ConnectionEventCallback                                   mOnConnected{};
     ConnectionEventCallback                                   mOnDisconnected{};
     PacketReceiveCallback                                     mOnPacketReceive{};
