@@ -6,8 +6,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+
 #include "sculk/protocol/Version.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
+
 #include <atomic>
 #include <concepts>
 #include <concurrentqueue.h>
@@ -36,7 +38,7 @@ public:
             F mFunction;
 
             explicit Model(F&& function) noexcept(std::is_nothrow_move_constructible_v<F>)
-            : mFunction(std::move(function)) {}
+            : mFunction(std::forward<F>(function)) {}
 
             void call() noexcept override { std::invoke(mFunction); }
         };
@@ -46,7 +48,7 @@ public:
 
         template <typename F>
             requires std::invocable<F&>
-        explicit Task(F&& function) : mFunction(std::make_unique<Model<std::decay_t<F>>>(std::forward<F>(function))) {}
+        Task(F&& function) : mModel(std::make_unique<Model<std::decay_t<F>>>(std::forward<F>(function))) {}
 
         Task(const Task&)            = delete;
         Task& operator=(const Task&) = delete;
@@ -54,118 +56,125 @@ public:
         Task(Task&&) noexcept            = default;
         Task& operator=(Task&&) noexcept = default;
 
-        explicit operator bool() const noexcept { return static_cast<bool>(mFunction); }
+        explicit operator bool() const noexcept { return static_cast<bool>(mModel); }
 
-        void operator()() noexcept { mFunction->call(); }
+        void operator()() noexcept { mModel->call(); }
 
     private:
-        std::unique_ptr<Concept> mFunction{};
+        std::unique_ptr<Concept> mModel{};
     };
 #endif
 
     static constexpr std::uint32_t DEFAULT_MAX_PENDING_TASKS = 2048;
 
-public:
     explicit TaskStrand(
         ThreadPool*   threadPool      = nullptr,
         std::uint32_t maxPendingTasks = DEFAULT_MAX_PENDING_TASKS
     ) noexcept
-    : mThreadPool(threadPool),
-      mMaxPendingTasks(maxPendingTasks) {}
+    : mState(std::make_shared<State>(threadPool, maxPendingTasks)) {}
 
-    void setThreadPool(ThreadPool* threadPool) noexcept { mThreadPool = threadPool; }
+    void setThreadPool(ThreadPool* threadPool) noexcept { mState->mThreadPool = threadPool; }
 
     void setMaxPendingTasks(std::uint32_t maxPendingTasks) noexcept {
-        mMaxPendingTasks.store(maxPendingTasks, std::memory_order_release);
+        mState->mMaxPendingTasks.store(maxPendingTasks, std::memory_order_release);
     }
 
     [[nodiscard]] std::uint32_t maxPendingTasks() const noexcept {
-        return mMaxPendingTasks.load(std::memory_order_acquire);
+        return mState->mMaxPendingTasks.load(std::memory_order_acquire);
     }
 
     template <typename F>
         requires std::invocable<F&>
     [[nodiscard]] bool enqueue(F&& task) noexcept {
+        auto state = mState;
         Task wrapped{std::forward<F>(task)};
         if (!wrapped) {
             return false;
         }
 
-        auto pending = mPendingTasks.fetch_add(1, std::memory_order_acq_rel) + 1;
-        if (pending > mMaxPendingTasks.load(std::memory_order_acquire)) {
-            mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
-            mDroppedCount.fetch_add(1, std::memory_order_relaxed);
+        const auto pending = state->mPendingTasks.fetch_add(1, std::memory_order_acq_rel) + 1;
+        if (pending > state->mMaxPendingTasks.load(std::memory_order_acquire)) {
+            state->mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
+            state->mDroppedCount.fetch_add(1, std::memory_order_relaxed);
             return false;
         }
 
-        auto* pool = mThreadPool;
+        auto* pool = state->mThreadPool;
         if (!pool) {
-            mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
-            mDroppedCount.fetch_add(1, std::memory_order_relaxed);
+            state->mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
+            state->mDroppedCount.fetch_add(1, std::memory_order_relaxed);
             return false;
         }
 
-        if (!mTasks.enqueue(std::move(wrapped))) {
-            mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
-            mDroppedCount.fetch_add(1, std::memory_order_relaxed);
+        if (!state->mTasks.enqueue(std::move(wrapped))) {
+            state->mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
+            state->mDroppedCount.fetch_add(1, std::memory_order_relaxed);
             return false;
         }
 
-        scheduleDrain(*pool);
+        scheduleDrain(std::move(state), *pool);
         return true;
     }
 
-    [[nodiscard]] std::uint64_t droppedCount() const noexcept { return mDroppedCount.load(std::memory_order_relaxed); }
+    [[nodiscard]] std::uint64_t droppedCount() const noexcept {
+        return mState->mDroppedCount.load(std::memory_order_relaxed);
+    }
 
-    [[nodiscard]] std::uint32_t pendingTasks() const noexcept { return mPendingTasks.load(std::memory_order_acquire); }
+    [[nodiscard]] std::uint32_t pendingTasks() const noexcept {
+        return mState->mPendingTasks.load(std::memory_order_acquire);
+    }
 
 private:
-    void scheduleDrain(ThreadPool& pool) noexcept {
-        if (mDrainScheduled.exchange(true, std::memory_order_acq_rel)) {
+    struct State final {
+        explicit State(ThreadPool* threadPool, std::uint32_t maxPendingTasks) noexcept
+        : mThreadPool(threadPool),
+          mMaxPendingTasks(maxPendingTasks) {}
+
+        ThreadPool*                       mThreadPool{nullptr};
+        moodycamel::ConcurrentQueue<Task> mTasks{};
+        std::atomic_uint32_t              mMaxPendingTasks{DEFAULT_MAX_PENDING_TASKS};
+        std::atomic_uint32_t              mPendingTasks{0};
+        std::atomic_bool                  mDrainScheduled{false};
+        std::atomic<std::uint64_t>        mDroppedCount{0};
+    };
+
+    void scheduleDrain(std::shared_ptr<State> state, ThreadPool& pool) noexcept {
+        if (state->mDrainScheduled.exchange(true, std::memory_order_acq_rel)) {
             return;
         }
 
-        const bool submitted = pool.submit([this]() noexcept { drain(); });
+        const bool submitted = pool.submit([state]() noexcept { drain(std::move(state)); });
         if (!submitted) {
-            mDrainScheduled.store(false, std::memory_order_release);
-            mDroppedCount.fetch_add(1, std::memory_order_relaxed);
+            state->mDrainScheduled.store(false, std::memory_order_release);
+            state->mDroppedCount.fetch_add(1, std::memory_order_relaxed);
+            drain(std::move(state));
         }
     }
 
-    void drain() noexcept {
+    static void drain(std::shared_ptr<State> state) noexcept {
         Task task;
 
         for (;;) {
-            while (mTasks.try_dequeue(task)) {
+            while (state->mTasks.try_dequeue(task)) {
                 task();
                 task = Task{};
-                mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
+                state->mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
             }
 
-            mDrainScheduled.store(false, std::memory_order_release);
+            state->mDrainScheduled.store(false, std::memory_order_release);
 
-            if (!mTasks.try_dequeue(task)) {
+            if (state->mTasks.size_approx() == 0) {
                 break;
             }
 
-            if (mDrainScheduled.exchange(true, std::memory_order_acq_rel)) {
-                (void)mTasks.enqueue(std::move(task));
+            if (state->mDrainScheduled.exchange(true, std::memory_order_acq_rel)) {
                 break;
             }
-
-            task();
-            task = Task{};
-            mPendingTasks.fetch_sub(1, std::memory_order_acq_rel);
         }
     }
 
 private:
-    ThreadPool*                       mThreadPool{nullptr};
-    moodycamel::ConcurrentQueue<Task> mTasks{};
-    std::atomic_uint32_t              mMaxPendingTasks{DEFAULT_MAX_PENDING_TASKS};
-    std::atomic_uint32_t              mPendingTasks{0};
-    std::atomic_bool                  mDrainScheduled{false};
-    std::atomic<std::uint64_t>        mDroppedCount{0};
+    std::shared_ptr<State> mState{};
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE::thread
