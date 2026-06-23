@@ -218,9 +218,9 @@ void ServerNetworkSystem::stop() {
 
     std::vector<std::shared_ptr<SessionContext>> contexts;
     contexts.reserve(mSessionContexts.size());
-    mSessionContexts.for_each(
-        [&contexts](const SessionContextsMap::value_type& entry) { contexts.push_back(entry.second); }
-    );
+    mSessionContexts.for_each([&contexts](const SessionContextsMap::value_type& entry) {
+        contexts.push_back(entry.second);
+    });
 
     for (const auto& context : contexts) {
         if (context && context->mSession) {
@@ -256,7 +256,7 @@ Result<NetworkStatus> ServerNetworkSystem::getClientNetworkStatus(const RakNet::
 
 std::size_t ServerNetworkSystem::getSessionsCount() const { return mSessionContexts.size(); }
 
-std::uint64_t ServerNetworkSystem::droppedEventCallbackCount() const noexcept {
+std::uint64_t ServerNetworkSystem::getDroppedEventCallbackCount() const noexcept {
     std::uint64_t dropped = 0;
     mSessionContexts.for_each([&dropped](const SessionContextsMap::value_type& entry) {
         if (entry.second && entry.second->mStrand) {
@@ -269,10 +269,9 @@ std::uint64_t ServerNetworkSystem::droppedEventCallbackCount() const noexcept {
 std::shared_ptr<ServerNetworkSystem::SessionContext>
 ServerNetworkSystem::getSessionContext(const RakNet::RakNetGUID& guid) const noexcept {
     std::shared_ptr<SessionContext> context{};
-    (void)mSessionContexts.if_contains(
-        guid,
-        [&context](const SessionContextsMap::value_type& entry) { context = entry.second; }
-    );
+    (void)mSessionContexts.if_contains(guid, [&context](const SessionContextsMap::value_type& entry) {
+        context = entry.second;
+    });
     return context;
 }
 
@@ -338,8 +337,9 @@ void ServerNetworkSystem::disconnectClient(const RakNet::RakNetGUID& guid) noexc
 
     if (mOnDisconnected) {
         if (context->mStrand) {
-            (void)context->mStrand
-                ->enqueue([this, guid]() { mOnDisconnected(guid, RakNet::UNASSIGNED_SYSTEM_ADDRESS); });
+            (void)context->mStrand->enqueue([this, guid]() {
+                mOnDisconnected(guid, RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+            });
         }
     }
 }
@@ -417,8 +417,8 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
     }
 
     if (messageId == DefaultMessageIDTypes::ID_NEW_INCOMING_CONNECTION) {
-        auto remote  = RakNet::AddressOrGUID{packet};
-        auto context = std::make_shared<SessionContext>();
+        auto remote       = RakNet::AddressOrGUID{packet};
+        auto context      = std::make_shared<SessionContext>();
         context->mSession = std::make_shared<Session>(mPeer.get(), remote);
         context->mStrand  = std::make_shared<thread::TaskStrand>(mThreadPool);
         upsertSessionContext(key, context);
@@ -494,10 +494,7 @@ void ServerNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
     }
 }
 
-void ServerNetworkSystem::upsertSessionContext(
-    const RakNet::RakNetGUID&      key,
-    std::shared_ptr<SessionContext> context
-) {
+void ServerNetworkSystem::upsertSessionContext(const RakNet::RakNetGUID& key, std::shared_ptr<SessionContext> context) {
     mSessionContexts.lazy_emplace_l(
         key,
         [&context](SessionContextsMap::value_type& existing) { existing.second = context; },
@@ -508,7 +505,7 @@ void ServerNetworkSystem::upsertSessionContext(
 std::shared_ptr<ServerNetworkSystem::SessionContext>
 ServerNetworkSystem::removeSessionContext(const RakNet::RakNetGUID& key) {
     std::shared_ptr<SessionContext> removed;
-    const bool found =
+    const bool                      found =
         mSessionContexts.modify_if(key, [&removed](SessionContextsMap::value_type& entry) { removed = entry.second; });
     if (!found) {
         return nullptr;

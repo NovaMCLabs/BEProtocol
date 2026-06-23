@@ -89,7 +89,7 @@ public:
 
     [[nodiscard]] bool getNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
-    [[nodiscard]] std::uint64_t droppedEventCallbackCount() const noexcept;
+    [[nodiscard]] std::uint64_t getDroppedEventCallbackCount() const noexcept;
 
 private:
     struct RakPeerDeleter {

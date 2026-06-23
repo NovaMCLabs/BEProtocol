@@ -225,7 +225,9 @@ bool ClientNetworkSystem::getNetworkStatus(NetworkStatus& outStatus) const noexc
     return getServerNetworkStatus(outStatus);
 }
 
-std::uint64_t ClientNetworkSystem::droppedEventCallbackCount() const noexcept { return mCallbackStrand.droppedCount(); }
+std::uint64_t ClientNetworkSystem::getDroppedEventCallbackCount() const noexcept {
+    return mCallbackStrand.droppedCount();
+}
 
 bool ClientNetworkSystem::ioTickOnce() noexcept {
     bool progressed = false;

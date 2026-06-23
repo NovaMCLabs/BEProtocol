@@ -93,7 +93,7 @@ public:
 
     [[nodiscard]] std::size_t getSessionsCount() const;
 
-    [[nodiscard]] std::uint64_t droppedEventCallbackCount() const noexcept;
+    [[nodiscard]] std::uint64_t getDroppedEventCallbackCount() const noexcept;
 
     Result<> setOnConnected(ConnectionEventCallback&& callback) noexcept;
 
@@ -117,7 +117,8 @@ private:
         std::shared_ptr<thread::TaskStrand> mStrand{};
     };
 
-    using SessionContextsMap = detail::ThreadSafeParallelFlatHashMap<RakNet::RakNetGUID, std::shared_ptr<SessionContext>>;
+    using SessionContextsMap =
+        detail::ThreadSafeParallelFlatHashMap<RakNet::RakNetGUID, std::shared_ptr<SessionContext>>;
 
 private:
     void receiveLoop(std::stop_token stopToken);
