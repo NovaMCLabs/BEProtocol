@@ -14,32 +14,31 @@
 #include "thread/AtomicSharedPtr.hpp"
 #include <RakPeerInterface.h>
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
-#include <thread>
+#include <type_traits>
+#include <utility>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-namespace io {
-class ClientIoRuntime;
-}
-
 class ClientNetworkSystem final {
-    friend class io::ClientIoRuntime;
-
 public:
-    using ConnectionEventCallback   = std::function<void()>;
-    using PacketReceiveCallback     = std::function<void(std::unique_ptr<IPacket>&& packet)>;
-    using PacketParseFailedCallback = std::function<void(Session::Buffer&& buffer, std::string errorMessage)>;
+    using ConnectionEventCallback         = std::function<void()>;
+    using RawPacketReceiveCallback        = std::function<bool(Session::Buffer& payload)>;
+    using PacketReceiveCallback           = std::function<void(std::unique_ptr<IPacket>&& packet)>;
+    using PacketParseFailedCallback       = std::function<void(MinecraftPacketIds id, std::string_view message)>;
+    using TaskStrandBackpressurePolicy    = thread::TaskStrand::BackpressurePolicy;
+    using RawIngressLimitExceededCallback = std::function<bool(std::size_t packetBytes, std::size_t packetsInWindow)>;
 
 public:
     explicit ClientNetworkSystem(std::size_t workerThreadCount = 0);
     explicit ClientNetworkSystem(thread::ThreadPool& threadPool);
-    ClientNetworkSystem(thread::ThreadPool& threadPool, io::ClientIoRuntime& ioRuntime);
 
     ClientNetworkSystem(const ClientNetworkSystem&)            = delete;
     ClientNetworkSystem& operator=(const ClientNetworkSystem&) = delete;
@@ -61,66 +60,136 @@ public:
     };
 
 public:
+    // Starts the client network system and initializes the RakNet peer.
     [[nodiscard]] NetworkStartResult start();
 
+    // Stops the client network system and releases all pending work.
     void stop();
 
+    // Initiates a connection attempt to the specified host and port.
     [[nodiscard]] ConnectionResult connect(std::string_view host, std::uint16_t port);
 
+    // Disconnects the current session if one is active.
     void disconnect();
 
+    // Returns whether the client network system is currently running.
     [[nodiscard]] bool isRunning() const noexcept;
 
+    // Returns whether the client currently has an active session.
     [[nodiscard]] bool isConnected() const noexcept;
 
+    // Copies the current server network status into the output parameter.
     [[nodiscard]] bool getServerNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
+    // Sets the callback invoked when the connection is established.
     Result<> setOnConnected(ConnectionEventCallback&& callback) noexcept;
 
+    // Sets the callback invoked when the connection is closed.
     Result<> setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
 
+    // Sets the callback invoked when a connection attempt fails.
     Result<> setOnConnectionFailed(ConnectionEventCallback&& callback) noexcept;
 
+    // Sets the callback invoked when a packet is received.
     Result<> setOnPacketReceive(PacketReceiveCallback&& callback) noexcept;
 
+    // Sets the callback invoked when packet parsing fails.
     Result<> setOnPacketParseFailed(PacketParseFailedCallback&& callback) noexcept;
 
-    [[nodiscard]] Session& getSession() const noexcept;
+    // Sets the callback invoked when a raw packet is received. If this callback returns false, the packet will not be
+    // processed further.
+    Result<> setOnRawPacketReceive(RawPacketReceiveCallback&& callback) noexcept;
 
+    // Sets the callback invoked when raw ingress limits are exceeded.
+    // The callback return value decides whether the connection is disconnected.
+    Result<> setOnRawIngressLimitExceeded(RawIngressLimitExceededCallback&& callback) noexcept;
+
+    // Sets the raw ingress limits used before packet parsing.
+    // This option can only be configured before start().
+    Result<> setRawIngressLimits(std::size_t maxPacketBytes, std::size_t maxPacketsPerSecond) noexcept;
+
+    // Returns the maximum raw packet size accepted before parsing.
+    [[nodiscard]] std::size_t getRawIngressMaxPacketBytes() const noexcept;
+
+    // Returns the maximum number of raw packets accepted per second.
+    [[nodiscard]] std::size_t getRawIngressMaxPacketsPerSecond() const noexcept;
+
+    // Sets the backpressure policy used by the callback strand.
+    Result<> setOnTaskPressure(TaskStrandBackpressurePolicy&& callback) noexcept;
+
+    // Returns a weak reference to the current session, if any.
+    [[nodiscard]] std::weak_ptr<Session> getSession() const noexcept;
+
+    // Copies the current network status into the output parameter.
     [[nodiscard]] bool getNetworkStatus(NetworkStatus& outStatus) const noexcept;
-
-    [[nodiscard]] std::uint64_t getDroppedEventCallbackCount() const noexcept;
 
 private:
     struct RakPeerDeleter {
         void operator()(RakNet::RakPeerInterface* peer) const noexcept;
     };
 
+    struct CallbackSet final {
+        ConnectionEventCallback         mOnConnected{};
+        ConnectionEventCallback         mOnDisconnected{};
+        ConnectionEventCallback         mOnConnectionFailed{};
+        PacketReceiveCallback           mOnPacketReceive{};
+        PacketParseFailedCallback       mOnPacketParseFailed{};
+        RawPacketReceiveCallback        mOnRawPacketReceive{};
+        RawIngressLimitExceededCallback mOnRawIngressLimitExceeded{};
+    };
+
 private:
     [[nodiscard]] bool ioTickOnce() noexcept;
 
-    void receiveLoop(std::stop_token stopToken);
+    void scheduleIoPump() noexcept;
 
-    void flushLoop(std::stop_token stopToken);
+    void ioPumpTask() noexcept;
 
-    void processIncomingPacket(RakNet::Packet* packet);
+    void scheduleIoPumpAfter(std::chrono::milliseconds delay) noexcept;
+
+    void waitForPendingIoJobs() noexcept;
+
+    void waitForPendingDelayedWakeups() noexcept;
+
+    template <typename F>
+        requires std::invocable<F&> && std::is_nothrow_invocable_v<F&>
+    bool submitIoJob(F&& job) noexcept {
+        mPendingIoJobs.fetch_add(1, std::memory_order_acq_rel);
+
+        const bool submitted = mThreadPool->submit([this, job = std::forward<F>(job)]() mutable noexcept {
+            job();
+            if (mPendingIoJobs.fetch_sub(1, std::memory_order_acq_rel) == 1) {
+                mPendingIoJobs.notify_all();
+            }
+        });
+
+        if (!submitted) {
+            if (mPendingIoJobs.fetch_sub(1, std::memory_order_acq_rel) == 1) {
+                mPendingIoJobs.notify_all();
+            }
+        }
+
+        return submitted;
+    }
+
+    void processIncomingPacket(RakNet::Packet& packet);
 
 private:
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
     std::unique_ptr<thread::ThreadPool>                       mOwnedThreadPool{};
     thread::ThreadPool*                                       mThreadPool{};
-    thread::TaskStrand                                        mCallbackStrand{};
-    io::ClientIoRuntime*                                      mIoRuntime{};
-    bool                                                      mIoRegistered{false};
-    std::atomic_bool                                          mRunning{false};
-    std::jthread                                              mReceiveThread{};
-    std::jthread                                              mFlushThread{};
+    thread::TaskStrand                                        mCallbackStrand;
+    std::atomic_bool                                          mRunning{};
+    std::atomic_bool                                          mIoPumpActive{};
+    std::atomic_bool                                          mIoPumpScheduled{};
+    std::atomic_uint32_t                                      mPendingIoJobs{};
+    std::atomic_uint32_t                                      mPendingDelayedWakeups{};
+    std::size_t                                               mRawIngressMaxPacketBytes{};
+    std::size_t                                               mRawIngressMaxPacketsPerSecond{};
+    std::chrono::steady_clock::time_point                     mRawIngressWindowStart{};
+    std::size_t                                               mRawIngressWindowPackets{};
     AtomicSharedPtr<Session>                                  mSession{};
-    ConnectionEventCallback                                   mOnConnected{};
-    ConnectionEventCallback                                   mOnDisconnected{};
-    ConnectionEventCallback                                   mOnConnectionFailed{};
-    PacketReceiveCallback                                     mOnPacketReceive{};
-    PacketParseFailedCallback                                 mOnPacketParseFailed{};
+    AtomicSharedPtr<CallbackSet>                              mCallbacks{};
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

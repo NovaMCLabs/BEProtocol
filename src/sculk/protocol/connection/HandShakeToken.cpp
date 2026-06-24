@@ -206,7 +206,7 @@ std::vector<std::byte> HandShakeToken::randomSalt() {
     constexpr std::size_t  saltSize = 8;
     std::vector<std::byte> salt(saltSize);
 
-    auto* output = reinterpret_cast<std::uint8_t*>(salt.data());
+    auto* output = reinterpret_cast<unsigned char*>(salt.data());
     if (RAND_bytes(output, static_cast<int>(salt.size())) != 1) {
         return {};
     }

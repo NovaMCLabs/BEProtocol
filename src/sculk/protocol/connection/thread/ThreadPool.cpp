@@ -55,19 +55,74 @@ void ThreadPool::workerLoop(std::stop_token stopToken, std::size_t workerIndex) 
     auto& state = *mWorkerStates[workerIndex];
 
     for (;;) {
-        state.mSignal.acquire();
-
-        if (mStopping.load(std::memory_order_acquire) || stopToken.stop_requested()) {
-            Task task;
-            while (state.mTasks.try_dequeue(task)) {
-                task();
-            }
-            return;
-        }
-
         Task task;
         while (state.mTasks.try_dequeue(task)) {
             task();
+        }
+
+        for (;;) {
+            Task delayedTask{};
+            bool hasDelayedTask = false;
+            {
+                std::lock_guard lock{state.mDelayedMutex};
+                if (!state.mDelayedTasks.empty()
+                    && state.mDelayedTasks.front().mDue <= std::chrono::steady_clock::now()) {
+                    std::pop_heap(state.mDelayedTasks.begin(), state.mDelayedTasks.end(), DelayedEntryCompare{});
+                    delayedTask = std::move(state.mDelayedTasks.back().mTask);
+                    state.mDelayedTasks.pop_back();
+                    hasDelayedTask = true;
+                }
+            }
+
+            if (!hasDelayedTask) {
+                break;
+            }
+
+            delayedTask();
+        }
+
+        if (mStopping.load(std::memory_order_acquire) || stopToken.stop_requested()) {
+            while (state.mTasks.try_dequeue(task)) {
+                task();
+            }
+
+            for (;;) {
+                Task delayedTask{};
+                bool hasDelayedTask = false;
+                {
+                    std::lock_guard lock{state.mDelayedMutex};
+                    if (!state.mDelayedTasks.empty()) {
+                        std::pop_heap(state.mDelayedTasks.begin(), state.mDelayedTasks.end(), DelayedEntryCompare{});
+                        delayedTask = std::move(state.mDelayedTasks.back().mTask);
+                        state.mDelayedTasks.pop_back();
+                        hasDelayedTask = true;
+                    }
+                }
+
+                if (!hasDelayedTask) {
+                    break;
+                }
+
+                delayedTask();
+            }
+
+            return;
+        }
+
+        auto waitFor = std::chrono::steady_clock::duration::max();
+        {
+            std::lock_guard lock{state.mDelayedMutex};
+            if (!state.mDelayedTasks.empty()) {
+                const auto now = std::chrono::steady_clock::now();
+                const auto due = state.mDelayedTasks.front().mDue;
+                waitFor        = due <= now ? std::chrono::steady_clock::duration::zero() : (due - now);
+            }
+        }
+
+        if (waitFor == std::chrono::steady_clock::duration::max()) {
+            state.mSignal.acquire();
+        } else if (waitFor > std::chrono::steady_clock::duration::zero()) {
+            (void)state.mSignal.try_acquire_for(waitFor);
         }
     }
 }

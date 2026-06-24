@@ -8,7 +8,6 @@
 #pragma once
 #include "sculk/protocol/codec/level/CompressionAlgorithm.hpp"
 #include "sculk/protocol/connection/NetworkStatus.hpp"
-#include "sculk/protocol/connection/coro/Task.hpp"
 #include "sculk/protocol/connection/encryption/CryptoManager.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/Result.hpp"
@@ -34,17 +33,15 @@ public:
     using BatchedBuffer   = std::vector<Buffer>;
     using OutboundBuffers = std::vector<Buffer>;
 
+    explicit Session(RakNet::RakPeerInterface* peer, const RakNet::AddressOrGUID& remote) noexcept;
+
+    ~Session();
+
 protected:
     RakNet::RakPeerInterface*             mPeer{};
     RakNet::AddressOrGUID                 mRemote{};
     moodycamel::ConcurrentQueue<Buffer>   mInboundPackets{};
     std::deque<Buffer>                    mOutboundPackets{};
-    std::atomic_uint32_t                  mInboundQueuedPackets{0};
-    std::atomic_uint32_t                  mOutboundQueuedPackets{0};
-    std::atomic_uint64_t                  mInboundQueuedBytes{0};
-    std::atomic_uint64_t                  mOutboundQueuedBytes{0};
-    std::atomic_uint64_t                  mDroppedInboundPackets{0};
-    std::atomic_uint64_t                  mDroppedOutboundPackets{0};
     std::atomic_bool                      mConnected{};
     std::optional<CompressionAlgorithm>   mCompressionType{};
     std::int32_t                          mCompressionThreshold{};
@@ -52,29 +49,20 @@ protected:
     std::chrono::steady_clock::time_point mNextFlushAt{};
     mutable std::mutex                    mMutex{};
 
-public:
-    static constexpr std::uint32_t MAX_INBOUND_QUEUED_PACKETS  = 4096;
-    static constexpr std::uint32_t MAX_OUTBOUND_QUEUED_PACKETS = 4096;
-    static constexpr std::uint64_t MAX_INBOUND_QUEUED_BYTES    = 8ULL * 1024ULL * 1024ULL;
-    static constexpr std::uint64_t MAX_OUTBOUND_QUEUED_BYTES   = 8ULL * 1024ULL * 1024ULL;
-
-public:
-    explicit Session(RakNet::RakPeerInterface* peer, const RakNet::AddressOrGUID& remote) noexcept;
-
     Session(const Session&)            = delete;
     Session& operator=(const Session&) = delete;
     Session(Session&&)                 = delete;
     Session& operator=(Session&&)      = delete;
 
-    ~Session();
-
 public:
     [[nodiscard]] bool isCompressed() const noexcept;
 
+    // NOT THREAD SAFE
     void setCompressed(CompressionAlgorithm type, std::int32_t threshold) noexcept;
 
     [[nodiscard]] bool isEncrypted() const noexcept;
 
+    // NOT THREAD SAFE
     void setEncrypted(std::vector<std::byte>&& key) noexcept;
 
     bool sendPacket(Buffer&& buffer);
@@ -91,8 +79,6 @@ public:
 
     [[nodiscard]] bool receivePacket(Buffer& outBuffer) noexcept;
 
-    [[nodiscard]] coro::Task<Result<Buffer>> receivePacketAsync();
-
     void disconnect() noexcept;
 
     [[nodiscard]] bool isConnected() const noexcept;
@@ -108,14 +94,6 @@ public:
 public:
     [[nodiscard]] bool sendBatchedBufferImmediately(Buffer&& packetsBuffer) noexcept;
 
-    [[nodiscard]] bool hasPendingInboundPackets() const noexcept;
-
-    [[nodiscard]] bool hasPendingOutboundPackets() const noexcept;
-
-    [[nodiscard]] std::uint64_t droppedInboundPackets() const noexcept;
-
-    [[nodiscard]] std::uint64_t droppedOutboundPackets() const noexcept;
-
     [[nodiscard]] bool enqueueInboundPacket(Buffer&& buffer) noexcept;
 
     [[nodiscard]] Result<Buffer> serializeBatchedPackets(const BatchedBuffer& packets);
@@ -123,7 +101,9 @@ public:
     [[nodiscard]] Result<BatchedBuffer> deserializeBatchPackets(std::span<const std::byte> batchedBuffer);
 
 private:
-    [[nodiscard]] bool flushUnlocked();
+    [[nodiscard]] bool flushPendingBeforeStateChangeUnlocked() noexcept;
+
+    [[nodiscard]] bool dequeueOutboundUnlocked(OutboundBuffers& outPackets) noexcept;
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
