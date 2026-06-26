@@ -149,7 +149,7 @@ jobs:
               run: cmake --build build --config Release --parallel
 
     build-on-macos-arm64:
-        name: Build on macOS 26 ARM64 (Apple Clang)
+        name: Build on MacOS ARM64 (Apple Clang)
         runs-on: macos-26
         steps:
             - name: Checkout
@@ -168,7 +168,7 @@ jobs:
               run: cmake --build build --config Release --parallel
 
     build-on-macos-intel:
-        name: Build on macOS 26 X86_64 (Apple Clang)
+        name: Build on MacOS X86_64 (Apple Clang)
         runs-on: macos-26-intel
         steps:
             - name: Checkout

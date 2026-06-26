@@ -198,7 +198,7 @@ if(PROTOCOL_ENABLE_CONNECTION)
     FetchContent_Declare(
         RakNet
         GIT_REPOSITORY https://github.com/SculkCatalystMC/RakNet
-        GIT_TAG main
+        GIT_TAG v1.0.0
     )
     FetchContent_MakeAvailable(RakNet)
 
