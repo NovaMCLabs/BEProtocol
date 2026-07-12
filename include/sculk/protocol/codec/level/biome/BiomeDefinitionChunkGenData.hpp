@@ -40,7 +40,7 @@ struct BiomeDefinitionChunkGenData {
     std::optional<BiomeOverworldGenRulesData>         mOverworldGenRules{};
     std::optional<BiomeMultinoiseGenRulesData>        mMultinoiseGenRules{};
     std::optional<BiomeLegacyWorldGenRulesData>       mLegacyWorldGenRules{};
-    std::optional<BiomeReplacementData>               mBiomeReplacementData{};
+    std::optional<std::vector<BiomeReplacementData>>  mBiomeReplacementData{};
     std::optional<VillageType>                        mVillageType{};
     std::optional<BiomeSurfaceBuilderData>            mSurfaceBuilderData{};
     std::optional<BiomeSurfaceBuilderData>            mSubSurfaceBuilderData{};

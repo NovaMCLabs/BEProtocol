@@ -17,7 +17,12 @@ void BiomeDefinitionChunkGenData::write(BinaryStream& stream) const {
     stream.writeOptional(mOverworldGenRules, &BiomeOverworldGenRulesData::write);
     stream.writeOptional(mMultinoiseGenRules, &BiomeMultinoiseGenRulesData::write);
     stream.writeOptional(mLegacyWorldGenRules, &BiomeLegacyWorldGenRulesData::write);
-    stream.writeOptional(mBiomeReplacementData, &BiomeReplacementData::write);
+    stream.writeOptional(
+        mBiomeReplacementData,
+        [](BinaryStream& stream, const std::vector<BiomeReplacementData>& value) {
+            stream.writeArray(value, &BiomeReplacementData::write);
+        }
+    );
     stream.writeOptional(mVillageType, [](BinaryStream& stream, const VillageType& value) {
         stream.writeEnum(value, &BinaryStream::writeByte);
     });
@@ -33,7 +38,12 @@ Result<> BiomeDefinitionChunkGenData::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mOverworldGenRules, &BiomeOverworldGenRulesData::read));
     _SCULK_READ(stream.readOptional(mMultinoiseGenRules, &BiomeMultinoiseGenRulesData::read));
     _SCULK_READ(stream.readOptional(mLegacyWorldGenRules, &BiomeLegacyWorldGenRulesData::read));
-    _SCULK_READ(stream.readOptional(mBiomeReplacementData, &BiomeReplacementData::read));
+    _SCULK_READ(stream.readOptional(
+        mBiomeReplacementData,
+        [](ReadOnlyBinaryStream& stream, std::vector<BiomeReplacementData>& value) {
+            return stream.readArray(value, &BiomeReplacementData::read);
+        }
+    ));
     _SCULK_READ(stream.readOptional(mVillageType, [](ReadOnlyBinaryStream& stream, VillageType& value) {
         return stream.readEnum(value, &ReadOnlyBinaryStream::readByte);
     }));
