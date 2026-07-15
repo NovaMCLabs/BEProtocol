@@ -85,8 +85,18 @@ enum class AchievementIds : std::uint8_t {
     StayHydrated                    = 114,
     MobKabob                        = 115,
     AdventuringTime                 = 116,
+    UhOh                            = 117,
+    GettingWood                     = 118,
+    BenchMaking                     = 119,
+    TimeToMine                      = 120,
+    HotTopic                        = 121,
+    AcquireHardware                 = 122,
+    GettingAnUpgrade                = 123,
+    MonsterHunter                   = 124,
+    Diamonds                        = 125,
+    PlethoraOfCats                  = 126,
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
 
-SCULK_PROTOCOL_ENUM_RANGE(AchievementIds, 7, 116)
+SCULK_PROTOCOL_ENUM_RANGE(AchievementIds, 7, 126)
